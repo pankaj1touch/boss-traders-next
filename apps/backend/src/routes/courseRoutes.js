@@ -1,0 +1,20 @@
+const express = require('express');
+const router = express.Router();
+const courseController = require('../controllers/courseController');
+const { authenticate, authorize, optionalAuth } = require('../middleware/auth');
+const { validate } = require('../middleware/validate');
+const {
+  createCourseSchema,
+  updateCourseSchema,
+  enrollCourseSchema,
+} = require('../validators/courseValidators');
+
+router.get('/', optionalAuth, courseController.getAllCourses);
+router.get('/:slug', optionalAuth, courseController.getCourseBySlug);
+router.post('/:id/enroll', authenticate, validate(enrollCourseSchema), courseController.enrollInCourse);
+router.post('/', authenticate, authorize('instructor', 'admin'), validate(createCourseSchema), courseController.createCourse);
+router.patch('/:id', authenticate, authorize('instructor', 'admin'), validate(updateCourseSchema), courseController.updateCourse);
+router.delete('/:id', authenticate, authorize('admin'), courseController.deleteCourse);
+
+module.exports = router;
+
