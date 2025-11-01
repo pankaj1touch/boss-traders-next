@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { PasswordInput } from '@/components/ui/PasswordInput';
@@ -42,7 +42,16 @@ export default function LoginPage() {
       const result = await login(data).unwrap();
       dispatch(setCredentials(result));
       dispatch(addToast({ type: 'success', message: 'Login successful!' }));
-      router.push('/');
+      
+      // Role-based redirect
+      const userRoles = result.user?.roles || [];
+      if (userRoles.includes('admin')) {
+        router.push('/admin');
+      } else if (userRoles.includes('student')) {
+        router.push('/student');
+      } else {
+        router.push('/');
+      }
     } catch (error: any) {
       dispatch(addToast({ type: 'error', message: error.data?.message || 'Login failed' }));
     }
@@ -59,7 +68,14 @@ export default function LoginPage() {
       >
         <div className="mb-8 text-center">
           <Link href="/" className="inline-flex items-center gap-2">
-            <BookOpen className="h-10 w-10 text-primary-600" />
+            <Image
+              src="/logo.jpeg"
+              alt="Boss Traders Investor Class"
+              width={40}
+              height={40}
+              className="rounded-lg"
+              priority
+            />
             <span className="text-2xl font-bold">Boss Traders investor class</span>
           </Link>
           <h1 className="mt-6 text-3xl font-bold">Welcome Back</h1>

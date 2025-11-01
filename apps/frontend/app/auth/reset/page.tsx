@@ -55,7 +55,7 @@ export default function ResetPasswordPage() {
 
   const validateToken = async () => {
     try {
-      const response = await fetch(`http://localhost:4000/api/auth/validate-reset-token?token=${token}`, {
+      const response = await fetch(`https://api.bosstradersinvestorclass.com/api/auth/validate-reset-token?token=${token}`, {
         method: 'GET',
       });
 
@@ -77,7 +77,7 @@ export default function ResetPasswordPage() {
     try {
       setIsLoading(true);
       
-      const response = await fetch('http://localhost:4000/api/auth/reset-password', {
+      const response = await fetch('https://api.bosstradersinvestorclass.com/api/auth/reset-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -3,8 +3,7 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CreditCard, CheckCircle, QrCode, Upload, Copy, Check } from 'lucide-react';
-import Image from 'next/image';
+import { CreditCard, CheckCircle, Phone, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
@@ -27,7 +26,7 @@ export default function CheckoutPage() {
   const [processPayment, { isLoading: isProcessing }] = useProcessPaymentMutation();
   const [verifyPayment, { isLoading: isVerifying }] = useVerifyPaymentMutation();
 
-  const [paymentMethod, setPaymentMethod] = useState('qr');
+  const [paymentMethod, setPaymentMethod] = useState('call');
   const [transactionId, setTransactionId] = useState('');
   const [copied, setCopied] = useState(false);
 
@@ -43,7 +42,7 @@ export default function CheckoutPage() {
     }
   };
 
-  const handleQRPayment = async () => {
+  const handleCallPayment = async () => {
     if (!transactionId.trim()) {
       dispatch(addToast({ type: 'error', message: 'Please enter transaction ID' }));
       return;
@@ -68,13 +67,12 @@ export default function CheckoutPage() {
     }
   };
 
-  const handleCopyUPI = () => {
-    if (order?.upiId) {
-      navigator.clipboard.writeText(order.upiId);
-      setCopied(true);
-      dispatch(addToast({ type: 'success', message: 'UPI ID copied!' }));
-      setTimeout(() => setCopied(false), 2000);
-    }
+  const handleCopyPhone = () => {
+    const phoneNumber = '+91 1234567890'; // Replace with actual phone number from config/order
+    navigator.clipboard.writeText(phoneNumber);
+    setCopied(true);
+    dispatch(addToast({ type: 'success', message: 'Phone number copied!' }));
+    setTimeout(() => setCopied(false), 2000);
   };
 
   if (isLoading) {
@@ -118,22 +116,22 @@ export default function CheckoutPage() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-4">
-                    {/* QR Code Payment Option */}
+                    {/* Call Payment Option */}
                     <label className={`flex items-center gap-3 rounded-xl border-2 p-4 cursor-pointer transition-colors ${
-                      paymentMethod === 'qr' ? 'border-primary-500 bg-primary-50 dark:bg-primary-950' : 'border-gray-200 hover:border-primary-500'
+                      paymentMethod === 'call' ? 'border-primary-500 bg-primary-50 dark:bg-primary-950' : 'border-gray-200 hover:border-primary-500'
                     }`}>
                       <input
                         type="radio"
                         name="payment"
-                        value="qr"
-                        checked={paymentMethod === 'qr'}
+                        value="call"
+                        checked={paymentMethod === 'call'}
                         onChange={(e) => setPaymentMethod(e.target.value)}
                         className="accent-primary-500"
                       />
-                      <QrCode className="h-6 w-6 text-primary-600" />
+                      <Phone className="h-6 w-6 text-primary-600" />
                       <div>
-                        <span className="font-medium">UPI / QR Code Payment</span>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Pay via PhonePe, Google Pay, Paytm</p>
+                        <span className="font-medium">Call to Pay</span>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Call us to complete your payment</p>
                       </div>
                     </label>
 
@@ -154,61 +152,69 @@ export default function CheckoutPage() {
                     </label>
                   </div>
 
-                  {/* QR Code Display */}
-                  {paymentMethod === 'qr' && order.qrCodeImageUrl && (
+                  {/* Call Payment Display */}
+                  {paymentMethod === 'call' && (
                     <div className="space-y-4 rounded-xl bg-gradient-to-br from-primary-50 to-blue-50 p-6 dark:from-primary-950 dark:to-blue-950">
                       <div className="text-center">
                         <h3 className="mb-2 text-xl font-semibold text-primary-900 dark:text-primary-100">
-                          Scan QR Code to Pay
+                          Call Us to Complete Payment
                         </h3>
                         <p className="mb-4 text-2xl font-bold text-primary-600 dark:text-primary-400">
                           ₹{order.total.toFixed(2)}
                         </p>
                         
-                        {/* QR Code Image */}
-                        <div className="mx-auto mb-4 w-fit rounded-2xl bg-white p-4 shadow-lg">
-                          <Image
-                            src={order.qrCodeImageUrl}
-                            alt="Payment QR Code"
-                            width={280}
-                            height={280}
-                            className="rounded-xl"
-                            priority
-                          />
-                        </div>
-
-                        {/* UPI ID Display */}
-                        <div className="mb-2 flex items-center justify-center gap-2">
-                          <p className="text-sm text-gray-700 dark:text-gray-300">
-                            UPI ID: <span className="font-mono font-semibold">{order.upiId}</span>
-                          </p>
-                          <button
-                            onClick={handleCopyUPI}
-                            className="rounded-lg p-1 hover:bg-white/50 dark:hover:bg-black/20"
-                            aria-label="Copy UPI ID"
-                          >
-                            {copied ? (
-                              <Check className="h-4 w-4 text-green-600" />
-                            ) : (
-                              <Copy className="h-4 w-4 text-gray-600" />
-                            )}
-                          </button>
+                        {/* Phone Number Display */}
+                        <div className="mx-auto mb-4 w-fit rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-900">
+                          <div className="flex flex-col items-center gap-4">
+                            <Phone className="h-12 w-12 text-primary-600" />
+                            <div className="flex flex-col items-center gap-2">
+                              <p className="text-sm text-gray-600 dark:text-gray-400">Call us at</p>
+                              <div className="flex items-center gap-2">
+                                <a
+                                  href="tel:+911234567890"
+                                  className="text-2xl font-bold text-primary-600 hover:text-primary-700 dark:text-primary-400"
+                                  aria-label="Call phone number"
+                                >
+                                  +91 1234567890
+                                </a>
+                                <button
+                                  onClick={handleCopyPhone}
+                                  className="rounded-lg p-1 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                  aria-label="Copy phone number"
+                                >
+                                  {copied ? (
+                                    <Check className="h-5 w-5 text-green-600" />
+                                  ) : (
+                                    <Copy className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+                            <a
+                              href="tel:+911234567890"
+                              className="mt-2 inline-flex items-center gap-2 rounded-xl bg-primary-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                              aria-label="Call now"
+                            >
+                              <Phone className="h-5 w-5" />
+                              Call Now
+                            </a>
+                          </div>
                         </div>
                         
                         <p className="text-xs text-gray-600 dark:text-gray-400">
-                          📱 Scan with PhonePe, Google Pay, Paytm, or any UPI app
+                          📞 Our team will assist you with payment and course activation
                         </p>
                       </div>
 
                       {/* Payment Confirmation Form */}
                       <div className="mt-6 space-y-4 rounded-xl border-t-2 border-primary-200 bg-white pt-4 dark:border-primary-800 dark:bg-gray-900">
                         <p className="font-semibold text-gray-900 dark:text-gray-100">
-                          ✅ After payment, submit details:
+                          ✅ After payment via call, submit details:
                         </p>
                         
                         <Input
-                          label="Transaction ID / UTR Number"
-                          placeholder="Enter 12-digit transaction ID"
+                          label="Transaction ID / Reference Number"
+                          placeholder="Enter transaction ID provided by our team"
                           value={transactionId}
                           onChange={(e) => setTransactionId(e.target.value)}
                           required
@@ -216,13 +222,13 @@ export default function CheckoutPage() {
 
                         <div className="rounded-lg bg-amber-50 p-3 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-200">
                           <p className="font-medium">📌 Important:</p>
-                          <p className="text-xs">Enter the transaction ID from your payment app after completing the payment. We will verify and activate your course within 24 hours.</p>
+                          <p className="text-xs">After completing payment over the call, enter the transaction ID provided by our team. We will verify and activate your course within 24 hours.</p>
                         </div>
 
                         <Button
                           className="w-full"
                           size="lg"
-                          onClick={handleQRPayment}
+                          onClick={handleCallPayment}
                           disabled={!transactionId.trim()}
                           isLoading={isVerifying}
                         >

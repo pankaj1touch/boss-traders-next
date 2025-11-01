@@ -40,7 +40,7 @@ export default function ForgotPasswordPage() {
       setIsLoading(true);
       
       // Call forgot password API
-      const response = await fetch('http://localhost:4000/api/auth/forgot-password', {
+      const response = await fetch('https://api.bosstradersinvestorclass.com/api/auth/forgot-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

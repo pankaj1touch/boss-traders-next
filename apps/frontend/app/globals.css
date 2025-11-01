@@ -52,3 +52,60 @@
   @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
 }
 
+/* Rich Text Editor Styles */
+.ql-editor {
+  min-height: 300px;
+}
+
+.ql-toolbar {
+  border-top: 1px solid #e5e7eb;
+  border-left: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+  @apply bg-white dark:bg-gray-800;
+}
+
+.ql-container {
+  border-bottom: 1px solid #e5e7eb;
+  border-left: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
+  border-bottom-left-radius: 0.75rem;
+  border-bottom-right-radius: 0.75rem;
+  @apply bg-white dark:bg-gray-800;
+}
+
+.dark .ql-toolbar {
+  border-color: #374151;
+}
+
+.dark .ql-container {
+  border-color: #374151;
+}
+
+.ql-editor {
+  @apply text-gray-900 dark:text-gray-100;
+}
+
+.ql-toolbar .ql-stroke {
+  stroke: currentColor;
+}
+
+.ql-toolbar .ql-fill {
+  fill: currentColor;
+}
+
+.dark .ql-toolbar {
+  color: #d1d5db;
+}
+
+.dark .ql-toolbar .ql-picker-label {
+  color: #d1d5db;
+}
+
+.dark .ql-toolbar .ql-picker-options {
+  background-color: #1f2937;
+  border-color: #374151;
+  color: #d1d5db;
+}
+

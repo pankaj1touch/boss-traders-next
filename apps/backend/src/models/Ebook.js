@@ -64,6 +64,19 @@ const ebookSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    demoPages: {
+      type: Number,
+      default: 5, // number of pages to show in demo
+    },
+    totalPages: {
+      type: Number,
+      default: 0,
+    },
+    previewUrl: String, // URL for demo/preview version
+    isDemoAvailable: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );

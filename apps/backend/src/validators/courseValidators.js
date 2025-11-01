@@ -8,13 +8,14 @@ const createCourseSchema = Joi.object({
   salePrice: Joi.number().min(0).optional(),
   language: Joi.string().default('English'),
   level: Joi.string().valid('beginner', 'intermediate', 'advanced').default('beginner'),
-  tags: Joi.array().items(Joi.string()).optional(),
-  thumbnail: Joi.string().uri().optional(),
+  tags: Joi.array().items(Joi.string()).default([]),
+  thumbnail: Joi.string().uri().allow('').optional(),
   description: Joi.string().min(10).required(),
-  outcomes: Joi.array().items(Joi.string()).optional(),
-  prerequisites: Joi.array().items(Joi.string()).optional(),
+  outcomes: Joi.array().items(Joi.string()).default([]),
+  prerequisites: Joi.array().items(Joi.string()).default([]),
   modality: Joi.string().valid('live', 'recorded', 'hybrid').default('recorded'),
   publishStatus: Joi.string().valid('draft', 'published', 'archived').default('draft'),
+  instructorId: Joi.string().optional(),
 });
 
 const updateCourseSchema = Joi.object({

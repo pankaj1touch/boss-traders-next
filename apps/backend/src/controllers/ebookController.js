@@ -140,3 +140,75 @@ exports.deleteEbook = async (req, res, next) => {
   }
 };
 
+// Admin-only endpoints
+exports.adminGetAllEbooks = async (req, res, next) => {
+  try {
+    const { 
+      category, 
+      publishStatus, 
+      search, 
+      page = 1, 
+      limit = 20, 
+      sort = '-createdAt' 
+    } = req.query;
+
+    const query = {};
+
+    if (category) query.category = category;
+    if (publishStatus) query.publishStatus = publishStatus;
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { author: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    const skip = (page - 1) * limit;
+
+    const ebooks = await Ebook.find(query)
+      .sort(sort)
+      .skip(skip)
+      .limit(Number(limit));
+
+    const total = await Ebook.countDocuments(query);
+
+    res.json({
+      ebooks,
+      pagination: {
+        total,
+        page: Number(page),
+        pages: Math.ceil(total / limit),
+        limit: Number(limit),
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.adminGetEbookById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const ebook = await Ebook.findById(id);
+
+    if (!ebook) {
+      return res.status(404).json({ code: 'NOT_FOUND', message: 'Ebook not found' });
+    }
+
+    // Get purchase count
+    const purchaseCount = await Order.countDocuments({
+      'items.ebookId': id,
+      status: 'completed',
+    });
+
+    res.json({
+      ebook,
+      purchaseCount,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+

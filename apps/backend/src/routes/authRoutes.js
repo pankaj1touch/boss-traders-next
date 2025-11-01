@@ -14,14 +14,14 @@ const {
   updateProfileSchema,
 } = require('../validators/authValidators');
 
-router.post('/signup', authLimiter, validate(signupSchema), authController.signup);
-router.post('/login', authLimiter, validate(loginSchema), authController.login);
+router.post('/signup', /* authLimiter, */ validate(signupSchema), authController.signup);
+router.post('/login', /* authLimiter, */ validate(loginSchema), authController.login);
 router.post('/refresh', validate(refreshTokenSchema), authController.refresh);
 router.post('/logout', authController.logout);
 router.post('/verify-email', validate(verifyEmailSchema), authController.verifyEmail);
-router.post('/forgot-password', authLimiter, validate(forgotPasswordSchema), authController.forgotPassword);
+router.post('/forgot-password', /* authLimiter, */ validate(forgotPasswordSchema), authController.forgotPassword);
 router.get('/validate-reset-token', authController.validateResetToken);
-router.post('/reset-password', authLimiter, validate(resetPasswordSchema), authController.resetPassword);
+router.post('/reset-password', /* authLimiter, */ validate(resetPasswordSchema), authController.resetPassword);
 router.get('/me', authenticate, authController.getProfile);
 router.patch('/me', authenticate, validate(updateProfileSchema), authController.updateProfile);
 

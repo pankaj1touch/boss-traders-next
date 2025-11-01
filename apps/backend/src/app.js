@@ -18,6 +18,8 @@ const feedbackRoutes = require('./routes/feedbackRoutes');
 const batchRoutes = require('./routes/batchRoutes');
 const locationRoutes = require('./routes/locationRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const blogRoutes = require('./routes/blogRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
 
 const app = express();
 
@@ -30,7 +32,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Rate limiting
-app.use('/api', generalLimiter);
+// app.use('/api', generalLimiter); // Commented out for testing
 
 // Request logging
 app.use((req, res, next) => {
@@ -55,6 +57,8 @@ app.use('/api/feedback', feedbackRoutes);
 app.use('/api/batches', batchRoutes);
 app.use('/api/locations', locationRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/blogs', blogRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // 404 handler
 app.use(notFound);

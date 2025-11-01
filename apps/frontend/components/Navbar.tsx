@@ -41,6 +41,7 @@ export function Navbar() {
   };
 
   const navLinks = [
+    { href: '/blog', label: 'Blog', icon: FileText },
     { href: '/courses', label: 'Courses', icon: BookOpen },
     { href: '/live', label: 'Live Classes', icon: Video },
     { href: '/ebooks', label: 'eBooks', icon: FileText },
@@ -114,6 +115,36 @@ export function Navbar() {
                       exit={{ opacity: 0, y: -10 }}
                       className="absolute right-0 mt-2 w-48 rounded-2xl border border-gray-200 bg-white py-2 shadow-lg dark:border-gray-800 dark:bg-gray-900"
                     >
+                      {/* Student Portal - Show for students only */}
+                      {user?.roles?.includes('student') && !user?.roles?.includes('admin') && (
+                        <>
+                          <Link
+                            href="/student"
+                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary-600 hover:bg-gray-100 dark:text-primary-400 dark:hover:bg-gray-800"
+                            onClick={() => setUserMenuOpen(false)}
+                          >
+                            <User className="h-4 w-4" />
+                            Student Portal
+                          </Link>
+                          <hr className="my-2 border-gray-200 dark:border-gray-800" />
+                        </>
+                      )}
+                      
+                      {/* Admin Panel - Show for admins only */}
+                      {user?.roles?.includes('admin') && (
+                        <>
+                          <Link
+                            href="/admin"
+                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary-600 hover:bg-gray-100 dark:text-primary-400 dark:hover:bg-gray-800"
+                            onClick={() => setUserMenuOpen(false)}
+                          >
+                            <Settings className="h-4 w-4" />
+                            Admin Panel
+                          </Link>
+                          <hr className="my-2 border-gray-200 dark:border-gray-800" />
+                        </>
+                      )}
+                      
                       <Link
                         href="/account"
                         className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800"

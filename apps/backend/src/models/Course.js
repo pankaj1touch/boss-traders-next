@@ -68,6 +68,31 @@ const courseSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
+    videos: [{
+      title: {
+        type: String,
+        required: true,
+      },
+      description: String,
+      videoUrl: {
+        type: String,
+        required: true,
+      },
+      duration: Number, // in seconds
+      isFree: {
+        type: Boolean,
+        default: false,
+      },
+      order: {
+        type: Number,
+        default: 0,
+      },
+      thumbnail: String,
+    }],
+    totalDuration: {
+      type: Number,
+      default: 0, // total duration in seconds
+    },
   },
   { timestamps: true }
 );

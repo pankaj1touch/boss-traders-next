@@ -144,10 +144,30 @@ exports.createCourse = async (req, res, next) => {
     const courseData = req.body;
     courseData.instructorId = req.user._id;
 
+    console.log('Creating course with data:', courseData);
+
     const course = await Course.create(courseData);
 
     res.status(201).json({ message: 'Course created successfully', course });
   } catch (error) {
+    console.error('Course creation error:', error);
+    
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ 
+        code: 'VALIDATION_ERROR', 
+        message: 'Validation failed',
+        errors: validationErrors
+      });
+    }
+    
+    if (error.code === 11000) {
+      return res.status(400).json({ 
+        code: 'DUPLICATE_ERROR', 
+        message: 'Course with this slug already exists' 
+      });
+    }
+    
     next(error);
   }
 };
@@ -191,6 +211,88 @@ exports.deleteCourse = async (req, res, next) => {
     await Course.findByIdAndDelete(id);
 
     res.json({ message: 'Course deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Admin-only endpoints
+exports.adminGetAllCourses = async (req, res, next) => {
+  try {
+    const {
+      category,
+      level,
+      modality,
+      language,
+      publishStatus,
+      search,
+      page = 1,
+      limit = 20,
+      sort = '-createdAt',
+    } = req.query;
+
+    const query = {};
+
+    if (category) query.category = category;
+    if (level) query.level = level;
+    if (modality) query.modality = modality;
+    if (language) query.language = language;
+    if (publishStatus) query.publishStatus = publishStatus;
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    const skip = (page - 1) * limit;
+
+    const courses = await Course.find(query)
+      .sort(sort)
+      .skip(skip)
+      .limit(Number(limit))
+      .populate('instructorId', 'name email avatarUrl');
+
+    const total = await Course.countDocuments(query);
+
+    res.json({
+      courses,
+      pagination: {
+        total,
+        page: Number(page),
+        pages: Math.ceil(total / limit),
+        limit: Number(limit),
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.adminGetCourseById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const course = await Course.findById(id)
+      .populate('instructorId', 'name email avatarUrl');
+
+    if (!course) {
+      return res.status(404).json({ code: 'NOT_FOUND', message: 'Course not found' });
+    }
+
+    // Get modules and lessons
+    const modules = await Module.find({ courseId: course._id }).sort('order');
+    const lessons = await Lesson.find({ courseId: course._id }).sort('order');
+
+    // Get enrollment count
+    const enrollmentCount = await Enrollment.countDocuments({ courseId: course._id });
+
+    res.json({
+      course,
+      modules,
+      lessons,
+      enrollmentCount,
+    });
   } catch (error) {
     next(error);
   }
