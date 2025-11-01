@@ -146,7 +146,7 @@ export default function BlogPostPage() {
 
               <div className="mt-6 flex items-center gap-4">
                 <Button
-                  variant={liked ? 'default' : 'outline'}
+                  variant={liked ? 'primary' : 'outline'}
                   onClick={handleLike}
                   className="gap-2"
                 >
@@ -199,7 +199,7 @@ export default function BlogPostPage() {
                 <h3 className="mb-4 text-lg font-semibold">Tags</h3>
                 <div className="flex flex-wrap gap-2">
                   {blog.tags.map((tag) => (
-                    <Badge key={tag} variant="outline">
+                    <Badge key={tag} variant="secondary">
                       {tag}
                     </Badge>
                   ))}

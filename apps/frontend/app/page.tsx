@@ -219,7 +219,7 @@ export default function HomePage() {
                 <div key={i} className="h-96 animate-pulse rounded-2xl bg-gray-200 dark:bg-gray-800" />
               ))}
             </div>
-          ) : blogsData?.blogs.length > 0 ? (
+          ) : blogsData?.blogs && blogsData.blogs.length > 0 ? (
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               {blogsData.blogs.map((blog, index) => (
                 <motion.div

@@ -4,7 +4,8 @@ import { HTMLAttributes, forwardRef } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-export interface CardProps extends HTMLAttributes<HTMLDivElement> {
+// Omit conflicting animation and drag props that conflict with framer-motion's MotionProps
+export interface CardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onAnimationStart' | 'onAnimationEnd' | 'onAnimationIteration' | 'onDragStart' | 'onDragEnd' | 'onDrag'> {
   hover?: boolean;
 }
 

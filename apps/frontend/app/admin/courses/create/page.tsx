@@ -102,7 +102,7 @@ export default function CreateCoursePage() {
       alert('Please enter a description (at least 10 characters)');
       return;
     }
-    if (!formData.price || formData.price <= 0) {
+    if (!formData.price || Number(formData.price) <= 0 || isNaN(Number(formData.price))) {
       alert('Please enter a valid price');
       return;
     }

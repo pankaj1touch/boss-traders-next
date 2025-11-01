@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -24,7 +24,7 @@ const resetPasswordSchema = z.object({
 
 type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
@@ -42,18 +42,13 @@ export default function ResetPasswordPage() {
     resolver: zodResolver(resetPasswordSchema),
   });
 
-  useEffect(() => {
+  const validateToken = useCallback(async () => {
     if (!token) {
       dispatch(addToast({ type: 'error', message: 'Invalid or missing reset token' }));
       router.push('/auth/forgot');
       return;
     }
 
-    // Validate token
-    validateToken();
-  }, [token, dispatch, router]);
-
-  const validateToken = async () => {
     try {
       const response = await fetch(`https://api.bosstradersinvestorclass.com/api/auth/validate-reset-token?token=${token}`, {
         method: 'GET',
@@ -71,7 +66,12 @@ export default function ResetPasswordPage() {
       dispatch(addToast({ type: 'error', message: 'Failed to validate reset token' }));
       router.push('/auth/forgot');
     }
-  };
+  }, [token, dispatch, router]);
+
+  useEffect(() => {
+    // Validate token (handles null token case internally)
+    validateToken();
+  }, [validateToken]);
 
   const onSubmit = async (data: ResetPasswordFormData) => {
     try {
@@ -202,5 +202,20 @@ export default function ResetPasswordPage() {
         </div>
       </motion.div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary-50 to-secondary-50 p-4 dark:from-gray-900 dark:to-gray-800">
+        <div className="text-center">
+          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary-600 border-t-transparent"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </div>
+    }>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }

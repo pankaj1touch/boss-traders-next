@@ -18,12 +18,12 @@ export default function AdminBlogsPage() {
   const dispatch = useAppDispatch();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
-  const [publishStatus, setPublishStatus] = useState('');
+  const [publishStatus, setPublishStatus] = useState<'draft' | 'published' | 'archived' | ''>('');
 
   const { data, isLoading } = useAdminGetBlogsQuery({
     search,
     category: category || undefined,
-    publishStatus: publishStatus || undefined,
+    publishStatus: publishStatus ? (publishStatus as 'draft' | 'published' | 'archived') : undefined,
     limit: 20,
   });
 
@@ -61,13 +61,13 @@ export default function AdminBlogsPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'published':
-        return <Badge className="bg-green-500 text-white">Published</Badge>;
+        return <Badge variant="success">Published</Badge>;
       case 'draft':
-        return <Badge variant="outline">Draft</Badge>;
+        return <Badge variant="default">Draft</Badge>;
       case 'archived':
         return <Badge variant="secondary">Archived</Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge variant="default">{status}</Badge>;
     }
   };
 
@@ -132,7 +132,7 @@ export default function AdminBlogsPage() {
 
             <select
               value={publishStatus}
-              onChange={(e) => setPublishStatus(e.target.value)}
+              onChange={(e) => setPublishStatus(e.target.value as 'draft' | 'published' | 'archived' | '')}
               className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-primary-400"
             >
               {statusOptions.map((option) => (

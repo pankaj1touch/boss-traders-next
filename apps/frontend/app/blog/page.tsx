@@ -17,14 +17,14 @@ import { useGetBlogsQuery } from '@/store/api/blogApi';
 export default function BlogPage() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
-  const [sort, setSort] = useState('newest');
+  const [sort, setSort] = useState<'featured' | 'newest' | 'oldest' | 'popular'>('newest');
   const [featured, setFeatured] = useState<boolean | undefined>(undefined);
 
   const { data, isLoading, error } = useGetBlogsQuery({
     search,
     category: category || undefined,
     featured,
-    sort,
+    sort: sort as 'featured' | 'newest' | 'oldest' | 'popular',
     limit: 12,
   });
 
@@ -109,7 +109,7 @@ export default function BlogPage() {
 
             <select
               value={sort}
-              onChange={(e) => setSort(e.target.value)}
+              onChange={(e) => setSort(e.target.value as 'featured' | 'newest' | 'oldest' | 'popular')}
               className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-primary-400"
             >
               {sortOptions.map((option) => (
@@ -121,7 +121,7 @@ export default function BlogPage() {
 
             <div className="flex gap-2">
               <Button
-                variant={featured === true ? 'default' : 'outline'}
+                variant={featured === true ? 'primary' : 'outline'}
                 onClick={() => setFeatured(featured === true ? undefined : true)}
                 className="flex-1"
               >
@@ -230,12 +230,12 @@ export default function BlogPage() {
                           {blog.tags.length > 0 && (
                             <div className="mt-4 flex flex-wrap gap-1">
                               {blog.tags.slice(0, 3).map((tag) => (
-                                <Badge key={tag} variant="outline" className="text-xs">
+                                <Badge key={tag} variant="secondary" className="text-xs">
                                   {tag}
                                 </Badge>
                               ))}
                               {blog.tags.length > 3 && (
-                                <Badge variant="outline" className="text-xs">
+                                <Badge variant="secondary" className="text-xs">
                                   +{blog.tags.length - 3}
                                 </Badge>
                               )}
@@ -255,7 +255,7 @@ export default function BlogPage() {
                     {Array.from({ length: data.pagination.pages }, (_, i) => i + 1).map((page) => (
                       <Button
                         key={page}
-                        variant={page === data.pagination.page ? 'default' : 'outline'}
+                        variant={page === data.pagination.page ? 'primary' : 'outline'}
                         size="sm"
                       >
                         {page}

@@ -47,6 +47,7 @@ export interface BlogQueryParams {
   featured?: boolean;
   search?: string;
   sort?: 'newest' | 'oldest' | 'popular' | 'featured';
+  publishStatus?: 'draft' | 'published' | 'archived';
 }
 
 export const blogApi = apiSlice.injectEndpoints({

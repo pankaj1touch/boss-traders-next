@@ -14,7 +14,7 @@ export const uploadApi = apiSlice.injectEndpoints({
         url: '/upload/image',
         method: 'POST',
         body: formData,
-        prepareHeaders: (headers) => {
+        prepareHeaders: (headers: Headers) => {
           // Content-Type will be set automatically for FormData
           return headers;
         },
