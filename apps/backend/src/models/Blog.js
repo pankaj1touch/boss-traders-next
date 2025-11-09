@@ -66,10 +66,14 @@ blogSchema.index({ featured: 1, publishStatus: 1 });
 blogSchema.index({ tags: 1 });
 
 // Virtual for reading time estimation
-blogSchema.virtual('readingTime').get(function() {
+blogSchema.virtual('readingTime').get(function () {
   const wordsPerMinute = 200;
-  const wordCount = this.content.split(/\s+/).length;
-  return Math.ceil(wordCount / wordsPerMinute);
+  const content = typeof this.content === 'string' ? this.content : '';
+  if (!content.trim()) {
+    return 1;
+  }
+  const wordCount = content.trim().split(/\s+/).length;
+  return Math.max(1, Math.ceil(wordCount / wordsPerMinute));
 });
 
 // Ensure virtual fields are serialized
