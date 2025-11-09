@@ -29,11 +29,14 @@ const updateBlogSchema = Joi.object({
 const blogQuerySchema = Joi.object({
   page: Joi.number().integer().min(1).optional(),
   limit: Joi.number().integer().min(1).max(50).optional(),
-  category: Joi.string().valid('technology', 'business', 'education', 'lifestyle', 'news', 'tutorials').optional(),
-  tag: Joi.string().trim().optional(),
+  category: Joi.string()
+    .valid('technology', 'business', 'education', 'lifestyle', 'news', 'tutorials')
+    .optional()
+    .empty(''),
+  tag: Joi.string().trim().optional().empty(''),
   featured: Joi.boolean().optional(),
-  search: Joi.string().trim().max(100).optional(),
-  sort: Joi.string().valid('newest', 'oldest', 'popular', 'featured').optional(),
+  search: Joi.string().trim().max(100).optional().empty(''),
+  sort: Joi.string().valid('newest', 'oldest', 'popular', 'featured').optional().empty(''),
 });
 
 module.exports = {

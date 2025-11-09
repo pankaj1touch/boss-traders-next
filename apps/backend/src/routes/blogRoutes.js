@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const blogController = require('../controllers/blogController');
 const { authenticate, authorize } = require('../middleware/auth');
-const { validate } = require('../middleware/validate');
+const { validate, validateQuery } = require('../middleware/validate');
 const {
   createBlogSchema,
   updateBlogSchema,
@@ -10,11 +10,11 @@ const {
 } = require('../validators/blogValidators');
 
 // Public routes
-router.get('/', validate(blogQuerySchema), blogController.getAllBlogs);
+router.get('/', validateQuery(blogQuerySchema), blogController.getAllBlogs);
 router.get('/related/:slug', blogController.getRelatedBlogs);
 
 // Admin routes
-router.get('/admin/all', authenticate, authorize('admin'), validate(blogQuerySchema), blogController.adminGetAllBlogs);
+router.get('/admin/all', authenticate, authorize('admin'), validateQuery(blogQuerySchema), blogController.adminGetAllBlogs);
 router.get('/admin/:id', authenticate, authorize('admin'), blogController.adminGetBlogById);
 router.post('/', authenticate, authorize('admin'), validate(createBlogSchema), blogController.createBlog);
 router.patch('/admin/:id', authenticate, authorize('admin'), validate(updateBlogSchema), blogController.updateBlog);

@@ -19,6 +19,9 @@ const batchRoutes = require('./routes/batchRoutes');
 const locationRoutes = require('./routes/locationRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const blogRoutes = require('./routes/blogRoutes');
+const blogController = require('./controllers/blogController');
+const { validateQuery } = require('./middleware/validate');
+const { blogQuerySchema } = require('./validators/blogValidators');
 const uploadRoutes = require('./routes/uploadRoutes');
 
 const app = express();
@@ -57,6 +60,11 @@ app.use('/api/feedback', feedbackRoutes);
 app.use('/api/batches', batchRoutes);
 app.use('/api/locations', locationRoutes);
 app.use('/api/notifications', notificationRoutes);
+// Public blog routes are served twice to ensure compatibility with legacy deployments
+// The explicit handlers below prevent regressions if router mounting fails during deployment.
+app.get('/api/blogs', validateQuery(blogQuerySchema), blogController.getAllBlogs);
+app.get('/api/blogs/related/:slug', blogController.getRelatedBlogs);
+app.get('/api/blogs/:slug', blogController.getBlogBySlug);
 app.use('/api/blogs', blogRoutes);
 app.use('/api/upload', uploadRoutes);
 

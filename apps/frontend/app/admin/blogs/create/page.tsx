@@ -59,7 +59,25 @@ export default function CreateBlogPage() {
         tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
       };
 
-      await createBlog(blogData).unwrap();
+      const sanitizedData = Object.entries(blogData).reduce<Record<string, unknown>>((acc, [key, value]) => {
+        if (typeof value === 'string') {
+          const trimmed = value.trim();
+          if (trimmed === '') {
+            return acc;
+          }
+          acc[key] = trimmed;
+          return acc;
+        }
+
+        if (Array.isArray(value) && value.length === 0) {
+          return acc;
+        }
+
+        acc[key] = value;
+        return acc;
+      }, {});
+
+      await createBlog(sanitizedData).unwrap();
       dispatch(addToast({ type: 'success', message: 'Blog created successfully!' }));
       router.push('/admin/blogs');
     } catch (error) {
