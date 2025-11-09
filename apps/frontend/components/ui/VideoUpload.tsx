@@ -2,9 +2,10 @@
 
 import { useState, useRef } from 'react';
 import { Upload, X, Video, Loader2 } from 'lucide-react';
-import { Button } from './Button';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addToast } from '@/store/slices/uiSlice';
+import { API_BASE_URL } from '@/lib/config';
+import { Button } from './Button';
 
 interface VideoUploadProps {
   value?: string;
@@ -64,10 +65,10 @@ const VideoUpload = ({
         fileName: file.name,
         fileSize: file.size,
         fileType: file.type,
-        apiUrl: `${process.env.NEXT_PUBLIC_API_BASE}/upload/video`
+        apiUrl: `${API_BASE_URL}/upload/video`
       });
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/upload/video?type=${type}`, {
+      const response = await fetch(`${API_BASE_URL}/upload/video?type=${type}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,

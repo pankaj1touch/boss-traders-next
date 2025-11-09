@@ -2,9 +2,10 @@
 
 import { useState, useRef } from 'react';
 import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
-import { Button } from './Button';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addToast } from '@/store/slices/uiSlice';
+import { API_BASE_URL } from '@/lib/config';
+import { Button } from './Button';
 
 interface ImageUploadProps {
   value?: string;
@@ -64,10 +65,10 @@ const ImageUpload = ({
         fileName: file.name,
         fileSize: file.size,
         fileType: file.type,
-        apiUrl: `${process.env.NEXT_PUBLIC_API_BASE}/upload/image`
+        apiUrl: `${API_BASE_URL}/upload/image`
       });
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/upload/image?type=${type}`, {
+      const response = await fetch(`${API_BASE_URL}/upload/image?type=${type}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
