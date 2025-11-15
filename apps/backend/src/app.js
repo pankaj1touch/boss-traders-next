@@ -34,6 +34,11 @@ app.options('*', cors(corsOptions));
 
 // Security middleware
 app.use(helmet());
+<<<<<<< HEAD
+=======
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
+>>>>>>> b3b7bd5 (for second build)
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
