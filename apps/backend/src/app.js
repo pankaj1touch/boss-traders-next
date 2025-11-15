@@ -26,9 +26,14 @@ const uploadRoutes = require('./routes/uploadRoutes');
 
 const app = express();
 
+
+app.use(cors(corsOptions));
+
+// ✅ CORS preflight (OPTIONS) for all routes
+app.options('*', cors(corsOptions));
+
 // Security middleware
 app.use(helmet());
-app.use(cors(corsOptions));
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
