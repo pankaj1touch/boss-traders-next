@@ -159,6 +159,56 @@ exports.getOrderById = async (req, res, next) => {
   }
 };
 
+// Admin: list all orders with optional filters
+exports.getAllOrders = async (req, res, next) => {
+  try {
+    const {
+      page = 1,
+      limit = 20,
+      status,
+      search,
+    } = req.query;
+
+    const pageNum = Math.max(parseInt(page, 10) || 1, 1);
+    const limitNum = Math.min(Math.max(parseInt(limit, 10) || 20, 1), 100);
+
+    const filter = {};
+
+    if (status) {
+      filter.status = status;
+    }
+
+    if (search) {
+      const regex = new RegExp(search, 'i');
+      filter.$or = [
+        { orderNumber: regex },
+        { paymentId: regex },
+      ];
+    }
+
+    const [orders, total] = await Promise.all([
+      Order.find(filter)
+        .populate('userId', 'name email')
+        .sort('-createdAt')
+        .skip((pageNum - 1) * limitNum)
+        .limit(limitNum),
+      Order.countDocuments(filter),
+    ]);
+
+    res.json({
+      orders,
+      pagination: {
+        total,
+        page: pageNum,
+        pages: Math.ceil(total / limitNum),
+        limit: limitNum,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Verify payment - User submits payment details (Auto-enrollment enabled)
 exports.verifyPayment = async (req, res, next) => {
   try {

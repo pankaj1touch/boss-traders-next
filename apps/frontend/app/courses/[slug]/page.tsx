@@ -24,6 +24,7 @@ export default function CourseDetailPage() {
   const { isAuthenticated } = useAppSelector((state) => state.auth);
 
   const { data, isLoading } = useGetCourseBySlugQuery(slug);
+  const redirectToCart = encodeURIComponent('/cart');
 
   const handleAddToCart = () => {
     if (data?.course) {
@@ -41,11 +42,19 @@ export default function CourseDetailPage() {
   };
 
   const handleEnroll = () => {
+    handleAddToCart();
+
     if (!isAuthenticated) {
-      router.push('/auth/login');
+      dispatch(
+        addToast({
+          type: 'info',
+          message: 'Create your student account to confirm enrollment.',
+        })
+      );
+      router.push(`/auth/signup?redirect=${redirectToCart}`);
       return;
     }
-    handleAddToCart();
+
     router.push('/cart');
   };
 

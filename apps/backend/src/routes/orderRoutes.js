@@ -7,6 +7,7 @@ router.post('/', authenticate, orderController.createOrder);
 router.post('/payment', authenticate, orderController.processPayment);
 router.post('/verify-payment', authenticate, orderController.verifyPayment);
 router.post('/confirm-payment', authenticate, authorize('admin'), orderController.confirmPayment);
+router.get('/admin/all', authenticate, authorize('admin'), orderController.getAllOrders);
 router.get('/', authenticate, orderController.getUserOrders);
 router.get('/:id', authenticate, orderController.getOrderById);
 

@@ -1,13 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { ArrowRight, BookOpen, Users, Award, TrendingUp } from 'lucide-react';
+import { ArrowRight, BookOpen, Users, Award, TrendingUp, AlertCircle, Newspaper } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
 import { CourseCard } from '@/components/CourseCard';
+import { BlogCard } from '@/components/BlogCard';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { ToastContainer } from '@/components/ui/Toast';
@@ -15,8 +14,18 @@ import { useGetCoursesQuery } from '@/store/api/courseApi';
 import { useGetBlogsQuery } from '@/store/api/blogApi';
 
 export default function HomePage() {
-  const { data: coursesData, isLoading } = useGetCoursesQuery({ limit: 6 });
-  const { data: blogsData, isLoading: blogsLoading } = useGetBlogsQuery({ featured: true, limit: 3 });
+  const {
+    data: coursesData,
+    isLoading,
+    isError: coursesError,
+    refetch: refetchCourses,
+  } = useGetCoursesQuery({ limit: 6 });
+  const {
+    data: blogsData,
+    isLoading: blogsLoading,
+    isError: blogsError,
+    refetch: refetchBlogs,
+  } = useGetBlogsQuery({ limit: 12, sort: 'newest' });
 
   const features = [
     {
@@ -119,6 +128,82 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Featured Blog Posts */}
+      <section className="py-20">
+        <div className="container-custom">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-12 text-center"
+          >
+            <h2 className="mb-4 text-4xl font-bold">Latest Blog Posts</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400">
+              Stay updated with our latest insights and tutorials
+            </p>
+          </motion.div>
+
+          {blogsLoading ? (
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {[...Array(10)].map((_, i) => (
+                <div key={i} className="h-96 animate-pulse rounded-2xl bg-gray-200 dark:bg-gray-800" />
+              ))}
+            </div>
+          ) : blogsError ? (
+            <div className="rounded-3xl border border-red-200 bg-red-50 p-10 text-center dark:border-red-900/50 dark:bg-red-900/20">
+              <AlertCircle className="mx-auto h-12 w-12 text-red-500" />
+              <h3 className="mt-6 text-2xl font-semibold">Unable to load blog posts</h3>
+              <p className="mt-2 text-gray-600 dark:text-gray-300">
+                Please refresh the page or try again. You can still read all articles from the blog page.
+              </p>
+              <div className="mt-6 flex flex-wrap justify-center gap-4">
+                <Button onClick={() => refetchBlogs()}>Retry loading</Button>
+                <Link href="/blog">
+                  <Button variant="outline">Visit blog</Button>
+                </Link>
+              </div>
+            </div>
+          ) : blogsData?.blogs && blogsData.blogs.length > 0 ? (
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {blogsData.blogs.slice(0, 10).map((blog, index) => (
+                <motion.div
+                  key={blog._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <BlogCard blog={blog} index={index} />
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-3xl border border-dashed border-gray-300 p-10 text-center dark:border-gray-700">
+              <Newspaper className="mx-auto h-12 w-12 text-primary-500" />
+              <h3 className="mt-6 text-2xl font-semibold">No blog posts yet</h3>
+              <p className="mt-2 text-gray-600 dark:text-gray-400">
+                Our editorial team is preparing fresh insights. Explore all articles or check back soon.
+              </p>
+              <Link href="/blog" className="mt-6 inline-block">
+                <Button>
+                  Go to blog
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+            </div>
+          )}
+
+          <div className="mt-12 text-center">
+            <Link href="/blog">
+              <Button size="lg">
+                View All Blog Posts
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Features */}
       <section className="py-20">
         <div className="container-custom">
@@ -179,11 +264,36 @@ export default function HomePage() {
                 <div key={i} className="h-96 animate-pulse rounded-2xl bg-gray-200 dark:bg-gray-800" />
               ))}
             </div>
-          ) : (
+          ) : coursesError ? (
+            <div className="rounded-3xl border border-red-200 bg-red-50 p-10 text-center dark:border-red-900/50 dark:bg-red-900/20">
+              <AlertCircle className="mx-auto h-12 w-12 text-red-500" />
+              <h3 className="mt-6 text-2xl font-semibold">Courses failed to load</h3>
+              <p className="mt-2 text-gray-600 dark:text-gray-300">
+                Something went wrong while fetching featured courses. Please try again.
+              </p>
+              <Button className="mt-6" onClick={() => refetchCourses()}>
+                Retry loading
+              </Button>
+            </div>
+          ) : coursesData?.courses?.length ? (
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               {coursesData?.courses.map((course, index) => (
                 <CourseCard key={course._id} course={course} index={index} />
               ))}
+            </div>
+          ) : (
+            <div className="rounded-3xl border border-dashed border-gray-300 p-10 text-center dark:border-gray-700">
+              <BookOpen className="mx-auto h-12 w-12 text-primary-500" />
+              <h3 className="mt-6 text-2xl font-semibold">No featured courses yet</h3>
+              <p className="mt-2 text-gray-600 dark:text-gray-400">
+                Check back soon for curated picks, or browse the course catalog to start learning today.
+              </p>
+              <Link href="/courses" className="mt-6 inline-block">
+                <Button>
+                  Browse all courses
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
             </div>
           )}
 
@@ -191,90 +301,6 @@ export default function HomePage() {
             <Link href="/courses">
               <Button size="lg">
                 View All Courses
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Blog Posts */}
-      <section className="py-20">
-        <div className="container-custom">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-12 text-center"
-          >
-            <h2 className="mb-4 text-4xl font-bold">Latest Blog Posts</h2>
-            <p className="text-xl text-gray-600 dark:text-gray-400">
-              Stay updated with our latest insights and tutorials
-            </p>
-          </motion.div>
-
-          {blogsLoading ? (
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-96 animate-pulse rounded-2xl bg-gray-200 dark:bg-gray-800" />
-              ))}
-            </div>
-          ) : blogsData?.blogs && blogsData.blogs.length > 0 ? (
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {blogsData.blogs.map((blog, index) => (
-                <motion.div
-                  key={blog._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Link href={`/blog/${blog.slug}`}>
-                    <Card className="group h-full overflow-hidden transition-all hover:shadow-lg">
-                      {blog.featuredImage && (
-                        <div className="relative h-48 overflow-hidden">
-                          <Image
-                            src={blog.featuredImage}
-                            alt={blog.title}
-                            fill
-                            className="object-cover transition-transform group-hover:scale-105"
-                          />
-                        </div>
-                      )}
-                      <CardContent className="p-6">
-                        <div className="mb-3 flex items-center gap-2">
-                          <Badge variant="secondary">
-                            {blog.category.charAt(0).toUpperCase() + blog.category.slice(1)}
-                          </Badge>
-                          {blog.featured && (
-                            <Badge className="bg-yellow-500 text-white">Featured</Badge>
-                          )}
-                        </div>
-
-                        <h3 className="mb-2 line-clamp-2 font-bold text-lg group-hover:text-primary-600">
-                          {blog.title}
-                        </h3>
-
-                        <p className="mb-4 line-clamp-3 text-gray-600 dark:text-gray-400">
-                          {blog.excerpt}
-                        </p>
-
-                        <div className="flex items-center justify-between text-sm text-gray-500">
-                          <span>By {blog.author.name}</span>
-                          <span>{blog.readingTime} min read</span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          ) : null}
-
-          <div className="mt-12 text-center">
-            <Link href="/blog">
-              <Button size="lg">
-                View All Blog Posts
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>

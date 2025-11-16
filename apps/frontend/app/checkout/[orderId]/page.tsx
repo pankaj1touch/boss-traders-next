@@ -3,18 +3,19 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CreditCard, CheckCircle, Phone, Copy, Check } from 'lucide-react';
+import { Phone, Copy, CheckCircle, ClipboardCheck } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { ToastContainer } from '@/components/ui/Toast';
-import { useGetOrderByIdQuery, useProcessPaymentMutation, useVerifyPaymentMutation } from '@/store/api/orderApi';
+import { useGetOrderByIdQuery } from '@/store/api/orderApi';
 import { formatPrice } from '@/lib/utils';
 import { useAppDispatch } from '@/store/hooks';
-import { clearCart } from '@/store/slices/cartSlice';
 import { addToast } from '@/store/slices/uiSlice';
+
+const SUPPORT_NUMBER = '+91 92292 55662';
+const SUPPORT_TEL = 'tel:+919229255662';
 
 export default function CheckoutPage() {
   const params = useParams();
@@ -23,56 +24,23 @@ export default function CheckoutPage() {
   const orderId = params.orderId as string;
 
   const { data, isLoading } = useGetOrderByIdQuery(orderId);
-  const [processPayment, { isLoading: isProcessing }] = useProcessPaymentMutation();
-  const [verifyPayment, { isLoading: isVerifying }] = useVerifyPaymentMutation();
-
-  const [paymentMethod, setPaymentMethod] = useState('call');
-  const [transactionId, setTransactionId] = useState('');
-  const [copied, setCopied] = useState(false);
-
-  const handlePayment = async () => {
-    try {
-      await processPayment({ orderId, paymentMethod }).unwrap();
-      dispatch(clearCart());
-      dispatch(addToast({ type: 'success', message: 'Payment successful!' }));
-      router.push(`/success?orderId=${orderId}`);
-    } catch (error: any) {
-      dispatch(addToast({ type: 'error', message: error.data?.message || 'Payment failed' }));
-      router.push(`/fail?orderId=${orderId}`);
-    }
-  };
-
-  const handleCallPayment = async () => {
-    if (!transactionId.trim()) {
-      dispatch(addToast({ type: 'error', message: 'Please enter transaction ID' }));
-      return;
-    }
-
-    try {
-      await verifyPayment({ 
-        orderId, 
-        transactionId: transactionId.trim() 
-      }).unwrap();
-      dispatch(clearCart());
-      dispatch(addToast({ 
-        type: 'success', 
-        message: '🎉 Payment successful! Your course is now active. Start learning!' 
-      }));
-      router.push(`/success?orderId=${orderId}`);
-    } catch (error: any) {
-      dispatch(addToast({ 
-        type: 'error', 
-        message: error.data?.message || 'Payment submission failed' 
-      }));
-    }
-  };
+  const [copiedPhone, setCopiedPhone] = useState(false);
+  const [copiedOrder, setCopiedOrder] = useState(false);
 
   const handleCopyPhone = () => {
-    const phoneNumber = '+91 1234567890'; // Replace with actual phone number from config/order
-    navigator.clipboard.writeText(phoneNumber);
-    setCopied(true);
-    dispatch(addToast({ type: 'success', message: 'Phone number copied!' }));
-    setTimeout(() => setCopied(false), 2000);
+    if (typeof window === 'undefined' || !navigator?.clipboard) return;
+    navigator.clipboard.writeText(SUPPORT_NUMBER);
+    setCopiedPhone(true);
+    setTimeout(() => setCopiedPhone(false), 2000);
+    dispatch(addToast({ type: 'success', message: 'Support number copied!' }));
+  };
+
+  const handleCopyOrderId = (orderNumber: string) => {
+    if (typeof window === 'undefined' || !navigator?.clipboard) return;
+    navigator.clipboard.writeText(orderNumber);
+    setCopiedOrder(true);
+    setTimeout(() => setCopiedOrder(false), 2000);
+    dispatch(addToast({ type: 'success', message: 'Order number copied!' }));
   };
 
   if (isLoading) {
@@ -106,163 +74,111 @@ export default function CheckoutPage() {
 
       <div className="container-custom py-12">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="mb-8 text-4xl font-bold">Checkout</h1>
+          <h1 className="mb-8 text-4xl font-bold">Confirm Enrollment</h1>
 
           <div className="grid gap-8 lg:grid-cols-3">
-            <div className="lg:col-span-2">
+            <div className="space-y-6 lg:col-span-2">
               <Card>
                 <CardHeader>
-                  <CardTitle>Payment Method</CardTitle>
+                  <CardTitle>Call to activate your courses</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="space-y-4">
-                    {/* Call Payment Option */}
-                    <label className={`flex items-center gap-3 rounded-xl border-2 p-4 cursor-pointer transition-colors ${
-                      paymentMethod === 'call' ? 'border-primary-500 bg-primary-50 dark:bg-primary-950' : 'border-gray-200 hover:border-primary-500'
-                    }`}>
-                      <input
-                        type="radio"
-                        name="payment"
-                        value="call"
-                        checked={paymentMethod === 'call'}
-                        onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="accent-primary-500"
-                      />
-                      <Phone className="h-6 w-6 text-primary-600" />
-                      <div>
-                        <span className="font-medium">Call to Pay</span>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Call us to complete your payment</p>
-                      </div>
-                    </label>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    Your order has been saved. Call our enrollment desk now and share the details below so our team can
+                    manually add the courses to your student portal.
+                  </p>
 
-                    {/* Card Payment Option */}
-                    <label className={`flex items-center gap-3 rounded-xl border-2 p-4 cursor-pointer transition-colors ${
-                      paymentMethod === 'card' ? 'border-primary-500 bg-primary-50 dark:bg-primary-950' : 'border-gray-200 hover:border-primary-500'
-                    }`}>
-                      <input
-                        type="radio"
-                        name="payment"
-                        value="card"
-                        checked={paymentMethod === 'card'}
-                        onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="accent-primary-500"
-                      />
-                      <CreditCard className="h-6 w-6 text-primary-600" />
-                      <span className="font-medium">Credit / Debit Card</span>
-                    </label>
+                  <div className="space-y-4 rounded-2xl border border-primary-200 p-4 dark:border-primary-800">
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Order number</p>
+                        <p className="text-2xl font-semibold text-primary-600">{order.orderNumber}</p>
+                      </div>
+                      <button
+                        onClick={() => handleCopyOrderId(order.orderNumber)}
+                        className="inline-flex items-center gap-2 rounded-2xl border border-gray-200 px-4 py-2 text-sm font-medium hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                        aria-label="Copy order number"
+                      >
+                        {copiedOrder ? (
+                          <>
+                            <CheckCircle className="h-4 w-4 text-green-600" />
+                            Copied
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="h-4 w-4" />
+                            Copy ID
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Enrollment desk</p>
+                        <p className="text-2xl font-semibold text-primary-600">{SUPPORT_NUMBER}</p>
+                      </div>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={handleCopyPhone}
+                          className="inline-flex items-center gap-2 rounded-2xl border border-gray-200 px-4 py-2 text-sm font-medium hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                          aria-label="Copy phone number"
+                        >
+                          {copiedPhone ? (
+                            <>
+                              <CheckCircle className="h-4 w-4 text-green-600" />
+                              Copied
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="h-4 w-4" />
+                              Copy number
+                            </>
+                          )}
+                        </button>
+                        <a
+                          href={SUPPORT_TEL}
+                          className="inline-flex items-center gap-2 rounded-2xl bg-primary-600 px-5 py-2 font-semibold text-white hover:bg-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+                        >
+                          <Phone className="h-4 w-4" />
+                          Call now
+                        </a>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Call Payment Display */}
-                  {paymentMethod === 'call' && (
-                    <div className="space-y-4 rounded-xl bg-gradient-to-br from-primary-50 to-blue-50 p-6 dark:from-primary-950 dark:to-blue-950">
-                      <div className="text-center">
-                        <h3 className="mb-2 text-xl font-semibold text-primary-900 dark:text-primary-100">
-                          Call Us to Complete Payment
-                        </h3>
-                        <p className="mb-4 text-2xl font-bold text-primary-600 dark:text-primary-400">
-                          ₹{order.total.toFixed(2)}
-                        </p>
-                        
-                        {/* Phone Number Display */}
-                        <div className="mx-auto mb-4 w-fit rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-900">
-                          <div className="flex flex-col items-center gap-4">
-                            <Phone className="h-12 w-12 text-primary-600" />
-                            <div className="flex flex-col items-center gap-2">
-                              <p className="text-sm text-gray-600 dark:text-gray-400">Call us at</p>
-                              <div className="flex items-center gap-2">
-                                <a
-                                  href="tel:+911234567890"
-                                  className="text-2xl font-bold text-primary-600 hover:text-primary-700 dark:text-primary-400"
-                                  aria-label="Call phone number"
-                                >
-                                  +91 1234567890
-                                </a>
-                                <button
-                                  onClick={handleCopyPhone}
-                                  className="rounded-lg p-1 hover:bg-gray-100 dark:hover:bg-gray-800"
-                                  aria-label="Copy phone number"
-                                >
-                                  {copied ? (
-                                    <Check className="h-5 w-5 text-green-600" />
-                                  ) : (
-                                    <Copy className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-                                  )}
-                                </button>
-                              </div>
-                            </div>
-                            <a
-                              href="tel:+911234567890"
-                              className="mt-2 inline-flex items-center gap-2 rounded-xl bg-primary-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                              aria-label="Call now"
-                            >
-                              <Phone className="h-5 w-5" />
-                              Call Now
-                            </a>
-                          </div>
-                        </div>
-                        
-                        <p className="text-xs text-gray-600 dark:text-gray-400">
-                          📞 Our team will assist you with payment and course activation
-                        </p>
-                      </div>
-
-                      {/* Payment Confirmation Form */}
-                      <div className="mt-6 space-y-4 rounded-xl border-t-2 border-primary-200 bg-white pt-4 dark:border-primary-800 dark:bg-gray-900">
-                        <p className="font-semibold text-gray-900 dark:text-gray-100">
-                          ✅ After payment via call, submit details:
-                        </p>
-                        
-                        <Input
-                          label="Transaction ID / Reference Number"
-                          placeholder="Enter transaction ID provided by our team"
-                          value={transactionId}
-                          onChange={(e) => setTransactionId(e.target.value)}
-                          required
-                        />
-
-                        <div className="rounded-lg bg-amber-50 p-3 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-200">
-                          <p className="font-medium">📌 Important:</p>
-                          <p className="text-xs">After completing payment over the call, enter the transaction ID provided by our team. We will verify and activate your course within 24 hours.</p>
-                        </div>
-
-                        <Button
-                          className="w-full"
-                          size="lg"
-                          onClick={handleCallPayment}
-                          disabled={!transactionId.trim()}
-                          isLoading={isVerifying}
-                        >
-                          Submit Payment Details
-                        </Button>
+                  <div className="space-y-4 rounded-2xl bg-gray-50 p-6 dark:bg-gray-900/60">
+                    <div className="flex items-start gap-3">
+                      <ClipboardCheck className="h-6 w-6 text-primary-600" />
+                      <div>
+                        <p className="font-semibold">What to share on the call</p>
+                        <ul className="mt-2 list-disc space-y-2 pl-5 text-sm text-gray-600 dark:text-gray-400">
+                          <li>Registered student name & email</li>
+                          <li>Your order number and the courses/eBooks selected</li>
+                          <li>Preferred batch or live class (if applicable)</li>
+                        </ul>
                       </div>
                     </div>
-                  )}
-
-                  {/* Card Payment Form */}
-                  {paymentMethod === 'card' && (
-                    <div className="space-y-4">
-                      <Input label="Card Number" placeholder="1234 5678 9012 3456" />
-                      <div className="grid gap-4 md:grid-cols-2">
-                        <Input label="Expiry Date" placeholder="MM/YY" />
-                        <Input label="CVV" placeholder="123" />
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="h-6 w-6 text-green-600" />
+                      <div>
+                        <p className="font-semibold">After the call</p>
+                        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                          Our admin team will activate the enrollment from the dashboard within 1 working day. You will
+                          receive an email once the courses are added to your account.
+                        </p>
                       </div>
-                      <Input label="Cardholder Name" placeholder="John Doe" />
-
-                      <div className="rounded-xl bg-blue-50 p-4 text-sm text-blue-800 dark:bg-blue-950 dark:text-blue-200">
-                        <p className="font-medium">Demo Mode:</p>
-                        <p>This is a mock payment. Your actual payment method will not be charged.</p>
-                      </div>
-
-                      <Button
-                        className="w-full"
-                        size="lg"
-                        onClick={handlePayment}
-                        isLoading={isProcessing}
-                      >
-                        Complete Payment
-                      </Button>
                     </div>
-                  )}
+                  </div>
+
+                  <div className="flex flex-wrap gap-3">
+                    <Button variant="outline" onClick={() => router.back()}>
+                      Go back
+                    </Button>
+                    <Button variant="secondary" onClick={() => router.push('/student')}>
+                      Go to student portal
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -289,10 +205,12 @@ export default function CheckoutPage() {
                       <span>Subtotal</span>
                       <span>{formatPrice(order.subtotal)}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Tax</span>
-                      <span>{formatPrice(order.tax)}</span>
-                    </div>
+                    {order.tax > 0 && (
+                      <div className="flex justify-between">
+                        <span>Tax</span>
+                        <span>{formatPrice(order.tax)}</span>
+                      </div>
+                    )}
                   </div>
 
                   <hr className="border-gray-200 dark:border-gray-800" />
@@ -300,6 +218,11 @@ export default function CheckoutPage() {
                   <div className="flex justify-between text-xl font-bold">
                     <span>Total</span>
                     <span className="text-primary-600">{formatPrice(order.total)}</span>
+                  </div>
+
+                  <div className="mt-4 rounded-2xl bg-primary-50 p-4 text-sm text-primary-900 dark:bg-primary-950 dark:text-primary-100">
+                    Share this summary with the admin team when you call. They will verify the total and grant access
+                    from the dashboard.
                   </div>
                 </CardContent>
               </Card>

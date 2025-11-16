@@ -1,9 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -30,6 +29,7 @@ type SignupFormData = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
   const [signup, { isLoading }] = useSignupMutation();
 
@@ -42,6 +42,9 @@ export default function SignupPage() {
   });
 
   const onSubmit = async (data: SignupFormData) => {
+    const redirectParam = searchParams.get('redirect');
+    const safeRedirect = redirectParam && redirectParam.startsWith('/') ? redirectParam : null;
+
     try {
       await signup({
         name: data.name,
@@ -49,11 +52,20 @@ export default function SignupPage() {
         password: data.password,
       }).unwrap();
       dispatch(addToast({ type: 'success', message: 'Account created successfully! You can now login.' }));
-      router.push('/auth/login');
+      if (safeRedirect) {
+        router.push(`/auth/login?redirect=${encodeURIComponent(safeRedirect)}`);
+      } else {
+        router.push('/auth/login');
+      }
     } catch (error: any) {
       dispatch(addToast({ type: 'error', message: error.data?.message || 'Signup failed' }));
     }
   };
+
+  const loginRedirectSuffix = (() => {
+    const redirectParam = searchParams.get('redirect');
+    return redirectParam && redirectParam.startsWith('/') ? `?redirect=${encodeURIComponent(redirectParam)}` : '';
+  })();
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary-50 to-secondary-50 p-4 dark:from-gray-900 dark:to-gray-800">
@@ -119,7 +131,7 @@ export default function SignupPage() {
 
           <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
             Already have an account?{' '}
-            <Link href="/auth/login" className="font-medium text-primary-600 hover:underline">
+            <Link href={`/auth/login${loginRedirectSuffix}`} className="font-medium text-primary-600 hover:underline">
               Login
             </Link>
           </p>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -27,6 +27,10 @@ export function Navbar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
   const cartItems = useAppSelector((state) => state.cart.items);
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
   const dispatch = useAppDispatch();
   const [logoutMutation] = useLogoutMutation();
 
@@ -86,7 +90,7 @@ export function Navbar() {
             <Link href="/cart" className="relative">
               <Button variant="ghost" size="sm">
                 <ShoppingCart className="h-5 w-5" />
-                {cartItems.length > 0 && (
+                {hydrated && cartItems.length > 0 && (
                   <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary-600 text-xs text-white">
                     {cartItems.length}
                   </span>

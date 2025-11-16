@@ -80,6 +80,39 @@ interface EbookDetailResponse {
   purchaseCount: number;
 }
 
+interface AdminOrderItem {
+  courseId?: string;
+  ebookId?: string;
+  title: string;
+  price: number;
+  quantity: number;
+}
+
+interface AdminOrder {
+  _id: string;
+  orderNumber: string;
+  userId: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+  items: AdminOrderItem[];
+  subtotal: number;
+  tax: number;
+  total: number;
+  currency: string;
+  status: string;
+  paymentVerified?: boolean;
+  paymentId?: string;
+  paymentMethod?: string;
+  createdAt: string;
+}
+
+interface AdminOrdersResponse {
+  orders: AdminOrder[];
+  pagination: Pagination;
+}
+
 export const adminApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // Course Management
@@ -176,6 +209,32 @@ export const adminApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Ebook'],
     }),
+
+    // Orders
+    adminGetOrders: builder.query<
+      AdminOrdersResponse,
+      {
+        page?: number;
+        limit?: number;
+        status?: string;
+        search?: string;
+      }
+    >({
+      query: (params) => ({
+        url: '/orders/admin/all',
+        params,
+      }),
+      providesTags: ['Order'],
+    }),
+
+    adminConfirmPayment: builder.mutation<{ message: string; order: AdminOrder }, { orderId: string }>({
+      query: (data) => ({
+        url: '/orders/confirm-payment',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['Order', 'User'],
+    }),
   }),
 });
 
@@ -190,7 +249,11 @@ export const {
   useAdminCreateEbookMutation,
   useAdminUpdateEbookMutation,
   useAdminDeleteEbookMutation,
+  useAdminGetOrdersQuery,
+  useAdminConfirmPaymentMutation,
 } = adminApi;
+
+export type { AdminOrder };
 
 
 
