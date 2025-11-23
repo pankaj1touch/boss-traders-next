@@ -82,10 +82,10 @@ export default function LoginPage() {
         <div className="mb-8 text-center">
           <Link href="/" className="inline-flex items-center gap-2">
             <Image
-              src="/logo.jpeg"
+              src="/logo.png"
               alt="Boss Traders Investor Class"
-              width={40}
-              height={40}
+              width={150}
+              height={150}
               className="rounded-lg"
               priority
             />

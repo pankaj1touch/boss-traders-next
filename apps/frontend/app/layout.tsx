@@ -11,9 +11,9 @@ export const metadata: Metadata = {
     'Premium trading and investment education platform with live classes, expert courses, and professional guidance for traders and investors',
   keywords: 'trading, investment, stock market, forex, crypto, financial education, trading courses, investment strategies',
   icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon.ico',
-    apple: '/logo.jpeg',
+    icon: '/favicon.png',
+    shortcut: '/favicon.png',
+    apple: '/logo.png',
   },
 };
 

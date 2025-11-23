@@ -54,20 +54,27 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-40 border-b border-gray-200 bg-white/80 backdrop-blur-lg dark:border-gray-800 dark:bg-gray-900/80">
       <div className="container-custom">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3">
-            <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
+          <Link href="/" className="flex shrink-0 items-center gap-2 md:gap-3">
+            <motion.div 
+              whileHover={{ scale: 1.05 }} 
+              transition={{ duration: 0.2 }}
+              className="relative h-10 w-10 shrink-0 md:h-12 md:w-12"
+            >
               <Image
-                src="/logo.jpeg"
+                src="/logo.png"
                 alt="Boss Traders Investor Class"
-                width={40}
-                height={40}
-                className="rounded-lg"
+                fill
+                className="rounded-lg object-contain"
                 priority
+                sizes="(max-width: 768px) 40px, 48px"
               />
             </motion.div>
-            <span className="text-xl font-bold text-gray-900 dark:text-white">Boss Traders Investor Class</span>
+            <span className="hidden text-sm font-bold text-gray-900 dark:text-white sm:block md:text-base lg:text-xl">
+              <span className="block leading-tight">BOSS TRADERS</span>
+              <span className="text-xs font-normal text-gray-600 dark:text-gray-400 md:text-sm">INVESTOR CLASS</span>
+            </span>
           </Link>
 
           {/* Desktop Nav */}

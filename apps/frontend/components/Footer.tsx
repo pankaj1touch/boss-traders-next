@@ -41,10 +41,10 @@ export function Footer() {
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-3">
               <Image
-                src="/logo.jpeg"
+                src="/logo.png"
                 alt="Boss Traders Investor Class"
-                width={40}
-                height={40}
+                width={100}
+                height={100}
                 className="rounded-lg"
               />
               <span className="text-xl font-bold text-gray-900 dark:text-white">Boss Traders Investor Class</span>

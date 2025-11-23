@@ -1,8 +1,9 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { ArrowRight, BookOpen, Users, Award, TrendingUp, AlertCircle, Newspaper } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, BookOpen, Users, Award, TrendingUp, AlertCircle, Newspaper, LineChart, BarChart3, DollarSign, Target, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { CourseCard } from '@/components/CourseCard';
@@ -12,6 +13,8 @@ import { Footer } from '@/components/Footer';
 import { ToastContainer } from '@/components/ui/Toast';
 import { useGetCoursesQuery } from '@/store/api/courseApi';
 import { useGetBlogsQuery } from '@/store/api/blogApi';
+import { useGetActiveBannersQuery } from '@/store/api/bannerApi';
+import Image from 'next/image';
 
 export default function HomePage() {
   const {
@@ -26,27 +29,45 @@ export default function HomePage() {
     isError: blogsError,
     refetch: refetchBlogs,
   } = useGetBlogsQuery({ limit: 12, sort: 'newest' });
+  const {
+    data: bannersData,
+    isLoading: bannersLoading,
+  } = useGetActiveBannersQuery();
+  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+
+  const banners = bannersData?.banners || [];
+
+  // Auto-rotate banners every 3 seconds
+  useEffect(() => {
+    if (banners.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentBannerIndex((prev) => (prev + 1) % banners.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [banners.length]);
 
   const features = [
     {
-      icon: BookOpen,
-      title: 'Expert-Led Courses',
-      description: 'Learn from industry experts with years of real-world experience',
+      icon: LineChart,
+      title: 'Technical Analysis',
+      description: 'Master candlestick patterns, indicators, and chart analysis from expert traders',
     },
     {
       icon: Users,
-      title: 'Live Classes',
-      description: 'Interactive sessions with instructors and fellow learners',
+      title: 'Live Trading Sessions',
+      description: 'Watch real-time market analysis and live trading with professional instructors',
     },
     {
       icon: Award,
-      title: 'Certificates',
-      description: 'Earn recognized certificates upon course completion',
+      title: 'Trading Certificates',
+      description: 'Get certified in stock market trading and technical analysis',
     },
     {
       icon: TrendingUp,
-      title: 'Career Growth',
-      description: 'Advance your career with in-demand skills',
+      title: 'Profit Strategies',
+      description: 'Learn proven strategies to maximize profits and minimize risks',
     },
   ];
 
@@ -56,37 +77,188 @@ export default function HomePage() {
       <ToastContainer />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary-50 to-secondary-50 py-20 dark:from-gray-900 dark:to-gray-800">
-        <div className="container-custom">
+      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50 py-20 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <motion.div
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.1, 0.2, 0.1],
+            }}
+            transition={{ duration: 8, repeat: Infinity }}
+            className="absolute -left-20 -top-20 h-96 w-96 rounded-full bg-gradient-to-r from-emerald-400 to-blue-500 blur-3xl"
+          />
+          <motion.div
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.1, 0.2, 0.1],
+            }}
+            transition={{ duration: 10, repeat: Infinity, delay: 2 }}
+            className="absolute -right-20 -bottom-20 h-96 w-96 rounded-full bg-gradient-to-r from-purple-400 to-pink-500 blur-3xl"
+          />
+        </div>
+
+        <div className="container-custom relative z-10">
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <h1 className="mb-6 text-5xl font-bold leading-tight lg:text-6xl">
-                Learn Without{' '}
-                <span className="bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                  Limits
-                </span>
-              </h1>
-              <p className="mb-8 text-xl text-gray-600 dark:text-gray-300">
-                Access thousands of courses, live classes, and expert instructors. Start learning
-                today and transform your future.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <Link href="/courses">
-                  <Button size="lg">
-                    Explore Courses
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </Link>
-                <Link href="/auth/signup">
-                  <Button size="lg" variant="outline">
-                    Get Started Free
-                  </Button>
-                </Link>
-              </div>
+              <AnimatePresence mode="wait">
+                {bannersLoading ? (
+                  <div className="flex items-center justify-center py-20">
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
+                  </div>
+                ) : banners.length > 0 ? (
+                  <motion.div
+                    key={currentBannerIndex}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.5, ease: 'easeInOut' }}
+                  >
+                    {/* Badge */}
+                    <motion.div
+                      initial={{ opacity: 0, y: -20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: 0.2 }}
+                      className="mb-6 inline-flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                    >
+                      <Zap className="h-4 w-4" />
+                      Master Trading & Investing
+                    </motion.div>
+
+                    {/* Banner Title */}
+                    <motion.h1
+                      key={`banner-title-${currentBannerIndex}`}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.5, delay: 0.1 }}
+                      className="mb-6 text-5xl font-bold leading-tight lg:text-6xl"
+                    >
+                      {banners[currentBannerIndex]?.title || (
+                        <>
+                          Master the Art of{' '}
+                          <span className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+                            Trading
+                          </span>
+                        </>
+                      )}
+                    </motion.h1>
+
+                    {/* Banner Description */}
+                    <motion.p
+                      key={`banner-desc-${currentBannerIndex}`}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.5, delay: 0.2 }}
+                      className="mb-8 text-xl text-gray-700 dark:text-gray-300"
+                    >
+                      {banners[currentBannerIndex]?.description || 
+                        'Learn from expert traders, master technical analysis, and build profitable trading strategies. Join live trading sessions and transform your financial future.'}
+                    </motion.p>
+                    
+                    {/* Stats */}
+                    <div className="mb-8 flex flex-wrap gap-6">
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/30">
+                          <TrendingUp className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-gray-900 dark:text-white">10K+</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Active Traders</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30">
+                          <Target className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-gray-900 dark:text-white">95%</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Success Rate</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-4">
+                      <Link href="/courses">
+                        <Button size="lg" className="bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700">
+                          Explore Trading Courses
+                          <ArrowRight className="ml-2 h-5 w-5" />
+                        </Button>
+                      </Link>
+                      <Link href="/auth/signup">
+                        <Button size="lg" variant="outline" className="border-2">
+                          Start Free Trial
+                        </Button>
+                      </Link>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <div>
+                    {/* Badge */}
+                    <motion.div
+                      initial={{ opacity: 0, y: -20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: 0.2 }}
+                      className="mb-6 inline-flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                    >
+                      <Zap className="h-4 w-4" />
+                      Master Trading & Investing
+                    </motion.div>
+
+                    <h1 className="mb-6 text-5xl font-bold leading-tight lg:text-6xl">
+                      Master the Art of{' '}
+                      <span className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        Trading
+                      </span>
+                    </h1>
+                    <p className="mb-8 text-xl text-gray-700 dark:text-gray-300">
+                      Learn from expert traders, master technical analysis, and build profitable trading strategies. 
+                      Join live trading sessions and transform your financial future.
+                    </p>
+                    
+                    {/* Stats */}
+                    <div className="mb-8 flex flex-wrap gap-6">
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/30">
+                          <TrendingUp className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-gray-900 dark:text-white">10K+</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Active Traders</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30">
+                          <Target className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-gray-900 dark:text-white">95%</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Success Rate</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-4">
+                      <Link href="/courses">
+                        <Button size="lg" className="bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700">
+                          Explore Trading Courses
+                          <ArrowRight className="ml-2 h-5 w-5" />
+                        </Button>
+                      </Link>
+                      <Link href="/auth/signup">
+                        <Button size="lg" variant="outline" className="border-2">
+                          Start Free Trial
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </AnimatePresence>
             </motion.div>
 
             <motion.div
@@ -95,34 +267,64 @@ export default function HomePage() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="relative"
             >
-              <div className="relative h-[400px] w-full rounded-3xl bg-gradient-to-br from-primary-400 to-secondary-600 p-8 shadow-2xl">
-                <motion.div
-                  animate={{ y: [0, -20, 0] }}
-                  transition={{ duration: 4, repeat: Infinity }}
-                  className="absolute right-8 top-8 rounded-2xl bg-white p-4 shadow-lg"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-full bg-primary-100" />
-                    <div>
-                      <div className="mb-1 h-3 w-24 rounded bg-gray-200" />
-                      <div className="h-2 w-16 rounded bg-gray-100" />
+              {/* Banner Image with Auto-Rotation - Full Image Display */}
+              {bannersLoading ? (
+                <div className="relative h-[450px] w-full rounded-3xl bg-gray-200 dark:bg-gray-800 flex items-center justify-center">
+                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
+                </div>
+              ) : banners.length > 0 ? (
+                <div className="relative h-[450px] w-full rounded-3xl overflow-hidden bg-gray-900 shadow-2xl flex items-center justify-center">
+                  <AnimatePresence mode="wait">
+                    {banners[currentBannerIndex]?.imageUrl && (
+                      <motion.div
+                        key={currentBannerIndex}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 1.05 }}
+                        transition={{ 
+                          duration: 0.8, 
+                          ease: [0.4, 0, 0.2, 1] // Custom easing for smoother animation
+                        }}
+                        className="absolute inset-0 flex items-center justify-center"
+                      >
+                        <Image
+                          src={banners[currentBannerIndex].imageUrl}
+                          alt={banners[currentBannerIndex].title || 'Banner'}
+                          fill
+                          className="object-contain"
+                          priority={currentBannerIndex === 0}
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Dots Indicator */}
+                  {banners.length > 1 && (
+                    <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 gap-2">
+                      {banners.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setCurrentBannerIndex(index)}
+                          className={`h-2 rounded-full transition-all duration-300 ${
+                            index === currentBannerIndex
+                              ? 'w-8 bg-white'
+                              : 'w-2 bg-white/50 hover:bg-white/75'
+                          }`}
+                          aria-label={`Go to banner ${index + 1}`}
+                        />
+                      ))}
                     </div>
+                  )}
+                </div>
+              ) : (
+                <div className="relative h-[450px] w-full rounded-3xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center shadow-2xl">
+                  <div className="text-center text-white">
+                    <h2 className="text-3xl font-bold mb-4">Master Trading & Investing</h2>
+                    <p className="text-lg text-white/80">Start your journey today</p>
                   </div>
-                </motion.div>
-                <motion.div
-                  animate={{ y: [0, 20, 0] }}
-                  transition={{ duration: 5, repeat: Infinity, delay: 1 }}
-                  className="absolute bottom-8 left-8 rounded-2xl bg-white p-4 shadow-lg"
-                >
-                  <div className="flex items-center gap-2">
-                    <Award className="h-8 w-8 text-yellow-500" />
-                    <div>
-                      <div className="mb-1 h-3 w-20 rounded bg-gray-200" />
-                      <div className="h-2 w-16 rounded bg-gray-100" />
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
+                </div>
+              )}
             </motion.div>
           </div>
         </div>
@@ -213,9 +415,9 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="mb-12 text-center"
           >
-            <h2 className="mb-4 text-4xl font-bold">Why Choose Us</h2>
+            <h2 className="mb-4 text-4xl font-bold">Why Choose Boss Traders</h2>
             <p className="text-xl text-gray-600 dark:text-gray-400">
-              Everything you need to succeed in your learning journey
+              Everything you need to master trading and build a profitable portfolio
             </p>
           </motion.div>
 
@@ -317,9 +519,9 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="rounded-3xl bg-gradient-to-r from-primary-600 to-secondary-600 p-12 text-center text-white"
           >
-            <h2 className="mb-4 text-4xl font-bold">Ready to Start Learning?</h2>
+            <h2 className="mb-4 text-4xl font-bold">Ready to Master Trading?</h2>
             <p className="mb-8 text-xl">
-              Join thousands of learners and start your journey today
+              Join thousands of successful traders and start your profitable journey today
             </p>
             <Link href="/auth/signup">
               <Button size="lg" variant="outline" className="border-white bg-white text-primary-600 hover:bg-gray-100">

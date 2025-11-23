@@ -24,6 +24,7 @@ const blogController = require('./controllers/blogController');
 const { validateQuery } = require('./middleware/validate');
 const { blogQuerySchema } = require('./validators/blogValidators');
 const uploadRoutes = require('./routes/uploadRoutes');
+const bannerRoutes = require('./routes/bannerRoutes');
 
 const app = express();
 
@@ -73,6 +74,7 @@ app.get('/api/blogs/related/:slug', blogController.getRelatedBlogs);
 app.get('/api/blogs/:slug', blogController.getBlogBySlug);
 app.use('/api/blogs', blogRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/banners', bannerRoutes);
 
 // 404 handler
 app.use(notFound);

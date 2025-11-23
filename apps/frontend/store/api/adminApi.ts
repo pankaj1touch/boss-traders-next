@@ -113,6 +113,28 @@ interface AdminOrdersResponse {
   pagination: Pagination;
 }
 
+interface Banner {
+  _id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  isActive: boolean;
+  order: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface BannersResponse {
+  success: boolean;
+  banners: Banner[];
+  count: number;
+}
+
+interface BannerResponse {
+  success: boolean;
+  banner: Banner;
+}
+
 export const adminApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // Course Management
@@ -235,6 +257,46 @@ export const adminApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Order', 'User'],
     }),
+
+    // Banner Management
+    adminGetAllBanners: builder.query<BannersResponse, { isActive?: string; sort?: string }>({
+      query: (params) => ({
+        url: '/banners',
+        params,
+      }),
+      providesTags: ['Banner'],
+    }),
+
+    adminGetBanner: builder.query<BannerResponse, string>({
+      query: (id) => `/banners/${id}`,
+      providesTags: (result, error, id) => [{ type: 'Banner', id }],
+    }),
+
+    adminCreateBanner: builder.mutation<{ success: boolean; message: string; banner: Banner }, Partial<Banner>>({
+      query: (data) => ({
+        url: '/banners',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['Banner'],
+    }),
+
+    adminUpdateBanner: builder.mutation<{ success: boolean; message: string; banner: Banner }, { id: string; data: Partial<Banner> }>({
+      query: ({ id, data }) => ({
+        url: `/banners/${id}`,
+        method: 'PATCH',
+        body: data,
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'Banner', id }, 'Banner'],
+    }),
+
+    adminDeleteBanner: builder.mutation<{ success: boolean; message: string }, string>({
+      query: (id) => ({
+        url: `/banners/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Banner'],
+    }),
   }),
 });
 
@@ -251,6 +313,11 @@ export const {
   useAdminDeleteEbookMutation,
   useAdminGetOrdersQuery,
   useAdminConfirmPaymentMutation,
+  useAdminGetAllBannersQuery,
+  useAdminGetBannerQuery,
+  useAdminCreateBannerMutation,
+  useAdminUpdateBannerMutation,
+  useAdminDeleteBannerMutation,
 } = adminApi;
 
 export type { AdminOrder };
