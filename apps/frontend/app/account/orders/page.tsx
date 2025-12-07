@@ -17,7 +17,10 @@ import { useAppSelector } from '@/store/hooks';
 export default function OrdersPage() {
   const router = useRouter();
   const { isAuthenticated } = useAppSelector((state) => state.auth);
-  const { data, isLoading } = useGetUserOrdersQuery();
+  const { data, isLoading, refetch } = useGetUserOrdersQuery(undefined, {
+    // Refetch every 30 seconds to get latest approval status
+    pollingInterval: 30000,
+  });
 
   if (!isAuthenticated) {
     router.push('/auth/login');
@@ -106,15 +109,72 @@ export default function OrdersPage() {
                         </div>
                       </div>
 
-                      <div className="space-y-2 border-t border-gray-200 pt-4 dark:border-gray-800">
-                        {order.items.map((item, index) => (
-                          <div key={index} className="flex justify-between text-sm">
-                            <span className="text-gray-600 dark:text-gray-400">
-                              {item.title}
-                            </span>
-                            <span className="font-medium">{formatPrice(item.price)}</span>
-                          </div>
-                        ))}
+                      <div className="space-y-3 border-t border-gray-200 pt-4 dark:border-gray-800">
+                        {order.items.map((item, index) => {
+                          // Find registration status for demo class items
+                          const registration = item.demoClassId 
+                            ? order.demoClassRegistrations?.find(
+                                reg => reg.demoClassId === item.demoClassId
+                              )
+                            : null;
+
+                          const isApproved = registration?.approvalStatus === 'approved';
+                          const isRejected = registration?.approvalStatus === 'rejected';
+                          const isPending = registration?.approvalStatus === 'pending' || !registration;
+
+                          return (
+                            <div key={index} className={`rounded-lg p-3 ${isApproved ? 'bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900' : isRejected ? 'bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900' : 'bg-gray-50 dark:bg-gray-900/50'}`}>
+                              <div className="flex justify-between items-start text-sm mb-2">
+                                <div className="flex items-center gap-2 flex-1">
+                                  <span className={`font-medium ${isApproved ? 'text-green-900 dark:text-green-100' : isRejected ? 'text-red-900 dark:text-red-100' : 'text-gray-900 dark:text-gray-100'}`}>
+                                    {item.title}
+                                  </span>
+                                  {item.demoClassId && (
+                                    <Badge variant="secondary" className="text-xs">
+                                      Demo Class
+                                    </Badge>
+                                  )}
+                                </div>
+                                <span className="font-semibold text-gray-900 dark:text-gray-100">{formatPrice(item.price)}</span>
+                              </div>
+                              {registration && (
+                                <div className="flex flex-wrap items-center gap-2 mt-2">
+                                  <Badge 
+                                    variant={
+                                      isApproved ? 'success' :
+                                      isRejected ? 'danger' :
+                                      'warning'
+                                    }
+                                    className="text-xs font-semibold"
+                                  >
+                                    {isApproved ? '✓ Approved by Admin' :
+                                     isRejected ? '✗ Rejected' :
+                                     '⏳ Awaiting Admin Approval'}
+                                  </Badge>
+                                  {registration.paymentStatus && (
+                                    <Badge 
+                                      variant={
+                                        registration.paymentStatus === 'completed' ? 'success' :
+                                        registration.paymentStatus === 'failed' ? 'danger' :
+                                        'warning'
+                                      }
+                                      className="text-xs"
+                                    >
+                                      Payment: {registration.paymentStatus === 'completed' ? 'Completed' : 
+                                                registration.paymentStatus === 'failed' ? 'Failed' : 
+                                                'Pending'}
+                                    </Badge>
+                                  )}
+                                  {isApproved && (
+                                    <span className="text-xs text-green-700 dark:text-green-300 font-medium">
+                                      ✓ Your registration has been confirmed!
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     </CardContent>
                   </Card>

@@ -2,6 +2,7 @@ const Order = require('../models/Order');
 const Course = require('../models/Course');
 const Ebook = require('../models/Ebook');
 const Enrollment = require('../models/Enrollment');
+const { DemoClassRegistration } = require('../models/DemoClass');
 const { generateOrderNumber } = require('../utils/orderNumber');
 const { sendOrderConfirmationEmail } = require('../utils/emailjs');
 const { generateUPIString, generateQRCode } = require('../utils/qrCode');
@@ -113,6 +114,13 @@ exports.processPayment = async (req, res, next) => {
         }
       }
 
+      // Update demo class registration payment status if order is for demo class
+      const demoClassRegistration = await DemoClassRegistration.findOne({ orderId: order._id });
+      if (demoClassRegistration) {
+        demoClassRegistration.paymentStatus = 'completed';
+        await demoClassRegistration.save();
+      }
+
       // Send confirmation email
       await sendOrderConfirmationEmail(req.user, order);
 
@@ -133,7 +141,34 @@ exports.getUserOrders = async (req, res, next) => {
 
     const orders = await Order.find({ userId }).sort('-createdAt');
 
-    res.json({ orders });
+    // For each order, check if it has demo class items and get registration status
+    const ordersWithRegistrationStatus = await Promise.all(
+      orders.map(async (order) => {
+        const orderObj = order.toObject();
+        
+        // Check if order has demo class items
+        const demoClassItems = order.items.filter(item => item.demoClassId);
+        
+        if (demoClassItems.length > 0) {
+          // Get registration status for demo class orders
+          const registrations = await DemoClassRegistration.find({
+            userId,
+            orderId: order._id,
+          }).select('approvalStatus paymentStatus demoClassId');
+          
+          // Add registration info to order
+          orderObj.demoClassRegistrations = registrations.map(reg => ({
+            demoClassId: reg.demoClassId,
+            approvalStatus: reg.approvalStatus,
+            paymentStatus: reg.paymentStatus,
+          }));
+        }
+        
+        return orderObj;
+      })
+    );
+
+    res.json({ orders: ordersWithRegistrationStatus });
   } catch (error) {
     next(error);
   }
@@ -247,6 +282,13 @@ exports.verifyPayment = async (req, res, next) => {
       }
     }
 
+    // Update demo class registration payment status if order is for demo class
+    const demoClassRegistration = await DemoClassRegistration.findOne({ orderId: order._id });
+    if (demoClassRegistration) {
+      demoClassRegistration.paymentStatus = 'completed';
+      await demoClassRegistration.save();
+    }
+
     // Send confirmation email
     try {
       await sendOrderConfirmationEmail(order.userId, order);
@@ -292,6 +334,13 @@ exports.confirmPayment = async (req, res, next) => {
           { upsert: true, new: true }
         );
       }
+    }
+
+    // Update demo class registration payment status if order is for demo class
+    const demoClassRegistration = await DemoClassRegistration.findOne({ orderId: order._id });
+    if (demoClassRegistration) {
+      demoClassRegistration.paymentStatus = 'completed';
+      await demoClassRegistration.save();
     }
 
     // Send confirmation email

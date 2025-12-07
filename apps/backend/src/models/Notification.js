@@ -16,6 +16,7 @@ const notificationSchema = new mongoose.Schema(
         'password_reset',
         'announcement',
         'feedback_response',
+        'demo_class_registration',
         'other',
       ],
       required: true,

@@ -47,6 +47,7 @@ export function Navbar() {
   const navLinks = [
     { href: '/blog', label: 'Blog', icon: FileText },
     { href: '/courses', label: 'Courses', icon: BookOpen },
+    { href: '/demo-classes', label: 'Demo Classes', icon: Video },
     { href: '/live', label: 'Live Classes', icon: Video },
     { href: '/ebooks', label: 'eBooks', icon: FileText },
   ];

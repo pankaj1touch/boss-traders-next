@@ -83,6 +83,7 @@ interface EbookDetailResponse {
 interface AdminOrderItem {
   courseId?: string;
   ebookId?: string;
+  demoClassId?: string;
   title: string;
   price: number;
   quantity: number;
@@ -297,6 +298,91 @@ export const adminApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Banner'],
     }),
+
+    // Demo Class Management
+    adminGetAllDemoClasses: builder.query<{ demoClasses: any[] }, {
+      page?: number;
+      limit?: number;
+      search?: string;
+      status?: string;
+      courseId?: string;
+    }>({
+      query: (params) => ({
+        url: '/demo-classes',
+        params,
+      }),
+      providesTags: ['DemoClass'],
+    }),
+
+    adminGetDemoClass: builder.query<{ demoClass: any }, string>({
+      query: (id) => `/demo-classes/${id}`,
+      providesTags: (result, error, id) => [{ type: 'DemoClass', id }],
+    }),
+
+    adminCreateDemoClass: builder.mutation<{ message: string; demoClass: any }, any>({
+      query: (data) => ({
+        url: '/demo-classes',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['DemoClass'],
+    }),
+
+    adminUpdateDemoClass: builder.mutation<{ message: string; demoClass: any }, { id: string; data: any }>({
+      query: ({ id, data }) => ({
+        url: `/demo-classes/${id}`,
+        method: 'PATCH',
+        body: data,
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'DemoClass', id }, 'DemoClass'],
+    }),
+
+    adminDeleteDemoClass: builder.mutation<{ message: string }, string>({
+      query: (id) => ({
+        url: `/demo-classes/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['DemoClass'],
+    }),
+
+    // Demo Class Registrations
+    adminGetPendingRegistrations: builder.query<{ registrations: any[] }, { demoClassId?: string; status?: string; approvalStatus?: string }>({
+      query: (params) => ({
+        url: '/demo-classes/admin/registrations',
+        params,
+      }),
+      providesTags: ['DemoClass'],
+    }),
+
+    adminApproveRegistration: builder.mutation<{ message: string; registration: any }, { id: string; adminNotes?: string }>({
+      query: ({ id, adminNotes }) => ({
+        url: `/demo-classes/admin/registrations/${id}/approve`,
+        method: 'POST',
+        body: { adminNotes },
+      }),
+      invalidatesTags: ['DemoClass', 'Order'],
+    }),
+
+    adminRejectRegistration: builder.mutation<{ message: string; registration: any }, { id: string; adminNotes?: string }>({
+      query: ({ id, adminNotes }) => ({
+        url: `/demo-classes/admin/registrations/${id}/reject`,
+        method: 'POST',
+        body: { adminNotes },
+      }),
+      invalidatesTags: ['DemoClass', 'Order'],
+    }),
+
+    // Demo Class Registration Statistics
+    adminGetDemoClassStats: builder.query<{
+      totalRegistrations: number;
+      pendingRegistrations: number;
+      approvedRegistrations: number;
+      rejectedRegistrations: number;
+      totalDemoClasses: number;
+    }, void>({
+      query: () => '/demo-classes/admin/stats',
+      providesTags: ['DemoClass'],
+    }),
   }),
 });
 
@@ -318,6 +404,15 @@ export const {
   useAdminCreateBannerMutation,
   useAdminUpdateBannerMutation,
   useAdminDeleteBannerMutation,
+  useAdminGetAllDemoClassesQuery,
+  useAdminGetDemoClassQuery,
+  useAdminCreateDemoClassMutation,
+  useAdminUpdateDemoClassMutation,
+  useAdminDeleteDemoClassMutation,
+  useAdminGetPendingRegistrationsQuery,
+  useAdminApproveRegistrationMutation,
+  useAdminRejectRegistrationMutation,
+  useAdminGetDemoClassStatsQuery,
 } = adminApi;
 
 export type { AdminOrder };

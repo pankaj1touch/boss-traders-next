@@ -1,12 +1,13 @@
 'use client';
 
-import { useAdminGetAllCoursesQuery, useAdminGetAllEbooksQuery } from '@/store/api/adminApi';
-import { BookOpen, BookText, TrendingUp, Users } from 'lucide-react';
+import { useAdminGetAllCoursesQuery, useAdminGetAllEbooksQuery, useAdminGetDemoClassStatsQuery } from '@/store/api/adminApi';
+import { BookOpen, BookText, TrendingUp, Users, Video, Clock, CheckCircle, XCircle } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminDashboard() {
   const { data: coursesData } = useAdminGetAllCoursesQuery({ limit: 5 });
   const { data: ebooksData } = useAdminGetAllEbooksQuery({ limit: 5 });
+  const { data: demoClassStats } = useAdminGetDemoClassStatsQuery();
 
   const stats = [
     {
@@ -36,6 +37,34 @@ export default function AdminDashboard() {
       icon: Users,
       href: '/admin/ebooks?status=published',
       color: 'bg-orange-500',
+    },
+    {
+      label: 'Total Demo Classes',
+      value: demoClassStats?.totalDemoClasses || 0,
+      icon: Video,
+      href: '/admin/demo-classes',
+      color: 'bg-indigo-500',
+    },
+    {
+      label: 'Total Registrations',
+      value: demoClassStats?.totalRegistrations || 0,
+      icon: Users,
+      href: '/admin/demo-classes/registrations',
+      color: 'bg-teal-500',
+    },
+    {
+      label: 'Pending Approvals',
+      value: demoClassStats?.pendingRegistrations || 0,
+      icon: Clock,
+      href: '/admin/demo-classes/registrations?approvalStatus=pending',
+      color: 'bg-yellow-500',
+    },
+    {
+      label: 'Approved Registrations',
+      value: demoClassStats?.approvedRegistrations || 0,
+      icon: CheckCircle,
+      href: '/admin/demo-classes/registrations?approvalStatus=approved',
+      color: 'bg-green-600',
     },
   ];
 

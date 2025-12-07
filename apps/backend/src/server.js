@@ -2,6 +2,7 @@ const config = require('./config/env');
 const connectDB = require('./config/db');
 const app = require('./app');
 const logger = require('./config/logger');
+const { initializeSocket } = require('./socket/socketServer');
 
 // Connect to database
 connectDB();
@@ -11,6 +12,9 @@ const PORT = config.port;
 const server = app.listen(PORT, () => {
   logger.info(`Server running in ${config.nodeEnv} mode on port ${PORT}`);
 });
+
+// Initialize Socket.IO
+initializeSocket(server);
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {

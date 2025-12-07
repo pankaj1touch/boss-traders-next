@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAppSelector } from '@/store/hooks';
-import { BookOpen, BookText, LayoutDashboard, LogOut, FileText, ShoppingBag, Image as ImageIcon } from 'lucide-react';
+import { BookOpen, BookText, LayoutDashboard, LogOut, FileText, ShoppingBag, Image as ImageIcon, Video } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -37,6 +37,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
     { href: '/admin/orders', icon: ShoppingBag, label: 'Orders' },
     { href: '/admin/courses', icon: BookOpen, label: 'Courses' },
+    { href: '/admin/demo-classes', icon: Video, label: 'Demo Classes' },
     { href: '/admin/ebooks', icon: BookText, label: 'Ebooks' },
     { href: '/admin/blogs', icon: FileText, label: 'Blogs' },
     { href: '/admin/banners', icon: ImageIcon, label: 'Banners' },

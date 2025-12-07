@@ -3,9 +3,16 @@ import { apiSlice } from './apiSlice';
 export interface OrderItem {
   courseId?: string;
   ebookId?: string;
+  demoClassId?: string;
   title: string;
   price: number;
   quantity: number;
+}
+
+export interface DemoClassRegistrationInfo {
+  demoClassId: string;
+  approvalStatus?: 'pending' | 'approved' | 'rejected';
+  paymentStatus?: 'pending' | 'completed' | 'failed';
 }
 
 export interface Order {
@@ -25,6 +32,7 @@ export interface Order {
   paymentVerified?: boolean;
   paymentId?: string;
   paymentMethod?: string;
+  demoClassRegistrations?: DemoClassRegistrationInfo[];
 }
 
 export const orderApi = apiSlice.injectEndpoints({
@@ -77,7 +85,7 @@ export const orderApi = apiSlice.injectEndpoints({
     }),
     getUserOrders: builder.query<{ orders: Order[] }, void>({
       query: () => '/orders',
-      providesTags: ['Order'],
+      providesTags: ['Order', 'DemoClass'],
     }),
     getOrderById: builder.query<{ order: Order }, string>({
       query: (id) => `/orders/${id}`,

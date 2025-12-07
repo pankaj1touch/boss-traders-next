@@ -3,7 +3,7 @@
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Star, Clock, BookOpen, Users, Check, Play } from 'lucide-react';
+import { Star, Clock, BookOpen, Users, Check, Play, Calendar, Video } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -11,10 +11,13 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { ToastContainer } from '@/components/ui/Toast';
 import { useGetCourseBySlugQuery } from '@/store/api/courseApi';
+import { useGetDemoClassesQuery } from '@/store/api/demoClassApi';
 import { formatPrice, formatDate } from '@/lib/utils';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addToCart } from '@/store/slices/cartSlice';
 import { addToast } from '@/store/slices/uiSlice';
+import Link from 'next/link';
+import { format } from 'date-fns';
 
 export default function CourseDetailPage() {
   const params = useParams();
@@ -24,6 +27,7 @@ export default function CourseDetailPage() {
   const { isAuthenticated } = useAppSelector((state) => state.auth);
 
   const { data, isLoading } = useGetCourseBySlugQuery(slug);
+  const { data: demoClassesData } = useGetDemoClassesQuery({ courseId: data?.course?._id });
   const redirectToCart = encodeURIComponent('/cart');
 
   const handleAddToCart = () => {
@@ -218,6 +222,78 @@ export default function CourseDetailPage() {
                   ))}
                 </CardContent>
               </Card>
+
+              {/* Demo Classes */}
+              {demoClassesData?.demoClasses && demoClassesData.demoClasses.filter((dc) => dc.status === 'scheduled').length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Video className="h-5 w-5" />
+                      Available Demo Classes
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {demoClassesData.demoClasses
+                      .filter((dc) => dc.status === 'scheduled')
+                      .slice(0, 3)
+                      .map((demoClass) => (
+                        <div
+                          key={demoClass._id}
+                          className="rounded-xl border border-gray-200 p-4 transition-shadow hover:shadow-md dark:border-gray-800"
+                        >
+                          <div className="mb-2 flex items-start justify-between">
+                            <h4 className="font-semibold">{demoClass.title}</h4>
+                            <Button
+                              size="sm"
+                              onClick={() => {
+                                if (!isAuthenticated) {
+                                  const redirectPath = `/demo-classes/${demoClass._id}/register`;
+                                  dispatch(
+                                    addToast({
+                                      type: 'info',
+                                      message: 'Please login or signup to register for demo classes',
+                                    })
+                                  );
+                                  router.push(`/auth/login?redirect=${encodeURIComponent(redirectPath)}`);
+                                  return;
+                                }
+                                router.push(`/demo-classes/${demoClass._id}/register`);
+                              }}
+                            >
+                              Register
+                            </Button>
+                          </div>
+                          {demoClass.description && (
+                            <p className="mb-3 text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                              {demoClass.description}
+                            </p>
+                          )}
+                          <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
+                            <div className="flex items-center gap-1">
+                              <Calendar className="h-4 w-4" />
+                              <span>{format(new Date(demoClass.scheduledAt), 'MMM dd, yyyy • hh:mm a')}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Clock className="h-4 w-4" />
+                              <span>{demoClass.duration} min</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Users className="h-4 w-4" />
+                              <span>
+                                {demoClass.registeredCount}/{demoClass.maxAttendees}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    {demoClassesData.demoClasses.filter((dc) => dc.status === 'scheduled').length > 3 && (
+                      <Link href="/demo-classes" className="block text-center text-primary-600 hover:underline">
+                        View all demo classes →
+                      </Link>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Reviews */}
               {feedback.length > 0 && (

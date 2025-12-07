@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, BookOpen, Users, Award, TrendingUp, AlertCircle, Newspaper, LineChart, BarChart3, DollarSign, Target, Zap } from 'lucide-react';
+import { ArrowRight, BookOpen, Users, Award, TrendingUp, AlertCircle, Newspaper, LineChart, BarChart3, DollarSign, Target, Zap, Calendar, Clock, MapPin, User, Video } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { CourseCard } from '@/components/CourseCard';
@@ -14,7 +15,12 @@ import { ToastContainer } from '@/components/ui/Toast';
 import { useGetCoursesQuery } from '@/store/api/courseApi';
 import { useGetBlogsQuery } from '@/store/api/blogApi';
 import { useGetActiveBannersQuery } from '@/store/api/bannerApi';
+import { useGetDemoClassesQuery } from '@/store/api/demoClassApi';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { addToast } from '@/store/slices/uiSlice';
+import { format } from 'date-fns';
 import Image from 'next/image';
+import { Badge } from '@/components/ui/Badge';
 
 export default function HomePage() {
   const {
@@ -33,6 +39,13 @@ export default function HomePage() {
     data: bannersData,
     isLoading: bannersLoading,
   } = useGetActiveBannersQuery();
+  const {
+    data: demoClassesData,
+    isLoading: demoClassesLoading,
+  } = useGetDemoClassesQuery({});
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
 
   const banners = bannersData?.banners || [];
@@ -442,6 +455,157 @@ export default function HomePage() {
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Demo Classes Section */}
+      <section className="py-20">
+        <div className="container-custom">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-12 text-center"
+          >
+            <h2 className="mb-4 text-4xl font-bold">Upcoming Demo Classes</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400">
+              Experience our courses with free demo sessions before you enroll
+            </p>
+          </motion.div>
+
+          {demoClassesLoading ? (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-64 animate-pulse rounded-2xl bg-gray-200 dark:bg-gray-800" />
+              ))}
+            </div>
+          ) : demoClassesData?.demoClasses && demoClassesData.demoClasses.filter((dc) => dc.status === 'scheduled').length > 0 ? (
+            <>
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {demoClassesData.demoClasses
+                  .filter((dc) => dc.status === 'scheduled')
+                  .slice(0, 3)
+                  .map((demoClass, index) => (
+                    <motion.div
+                      key={demoClass._id}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      <Card className="h-full transition-shadow hover:shadow-lg">
+                        <CardContent className="p-6">
+                          <div className="mb-4 flex items-start justify-between">
+                            <Badge variant="primary">Demo Class</Badge>
+                            {demoClass.courseId && (
+                              <Link
+                                href={`/courses/${demoClass.courseId.slug}`}
+                                className="text-xs text-primary-600 hover:underline"
+                              >
+                                View Course
+                              </Link>
+                            )}
+                          </div>
+                          <h3 className="mb-2 text-xl font-bold">{demoClass.title}</h3>
+                          {demoClass.description && (
+                            <p className="mb-4 text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                              {demoClass.description}
+                            </p>
+                          )}
+                          <div className="mb-4 space-y-2 text-sm">
+                            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                              <Calendar className="h-4 w-4" />
+                              <span>{format(new Date(demoClass.scheduledAt), 'MMM dd, yyyy • hh:mm a')}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                              <Clock className="h-4 w-4" />
+                              <span>{demoClass.duration} minutes</span>
+                            </div>
+                            {demoClass.locationId && (
+                              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                                <MapPin className="h-4 w-4" />
+                                <span className="line-clamp-1">
+                                  {demoClass.locationId.name}
+                                  {demoClass.locationId.city && `, ${demoClass.locationId.city}`}
+                                </span>
+                              </div>
+                            )}
+                            {demoClass.instructorId && (
+                              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                                <User className="h-4 w-4" />
+                                <span>{demoClass.instructorId.name}</span>
+                              </div>
+                            )}
+                            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                              <Users className="h-4 w-4" />
+                              <span>
+                                {demoClass.registeredCount} / {demoClass.maxAttendees} registered
+                              </span>
+                            </div>
+                            {demoClass.price !== undefined && demoClass.price > 0 && (
+                              <div className="flex items-center gap-2 font-semibold text-primary-600">
+                                <span>₹{demoClass.price}</span>
+                              </div>
+                            )}
+                          </div>
+                          <Button
+                            className="w-full"
+                            disabled={demoClass.registeredCount >= demoClass.maxAttendees}
+                            onClick={() => {
+                              if (!isAuthenticated) {
+                                const redirectPath = `/demo-classes/${demoClass._id}/register`;
+                                dispatch(
+                                  addToast({
+                                    type: 'info',
+                                    message: 'Please login or signup to register for demo classes',
+                                  })
+                                );
+                                router.push(`/auth/login?redirect=${encodeURIComponent(redirectPath)}`);
+                                return;
+                              }
+                              router.push(`/demo-classes/${demoClass._id}/register`);
+                            }}
+                          >
+                            {demoClass.registeredCount >= demoClass.maxAttendees
+                              ? 'Class Full'
+                              : demoClass.price && demoClass.price > 0
+                                ? `Register - ₹${demoClass.price}`
+                                : 'Register for Demo Class'}
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+              </div>
+              <div className="mt-12 text-center">
+                <Link href="/demo-classes">
+                  <Button size="lg">
+                    View All Demo Classes
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+              </div>
+            </>
+          ) : (
+            <div className="rounded-3xl border border-dashed border-gray-300 p-10 text-center dark:border-gray-700">
+              <Video className="mx-auto h-12 w-12 text-primary-500" />
+              <h3 className="mt-6 text-2xl font-semibold">No demo classes scheduled</h3>
+              <p className="mt-2 text-gray-600 dark:text-gray-400">
+                Check back soon for upcoming demo sessions, or explore our courses to get started.
+              </p>
+              <div className="mt-6 flex flex-wrap justify-center gap-4">
+                <Link href="/courses">
+                  <Button>
+                    Explore Courses
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+                <Link href="/demo-classes">
+                  <Button variant="outline">View Demo Classes</Button>
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

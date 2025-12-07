@@ -22,6 +22,10 @@ const orderSchema = new mongoose.Schema(
           type: mongoose.Schema.Types.ObjectId,
           ref: 'Ebook',
         },
+        demoClassId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'DemoClass',
+        },
         title: String,
         price: Number,
         quantity: {

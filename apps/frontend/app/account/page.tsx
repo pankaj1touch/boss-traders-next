@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { User, ShoppingBag, Bell, Settings, BookOpen } from 'lucide-react';
+import { User, ShoppingBag, Bell, Settings, BookOpen, Video } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
@@ -42,6 +42,14 @@ export default function AccountPage() {
       href: '/account/orders',
       color: 'text-purple-600',
       bg: 'bg-purple-50 dark:bg-purple-950',
+    },
+    {
+      icon: Video,
+      title: 'Demo Classes',
+      description: 'View your demo class registrations',
+      href: '/account/demo-classes',
+      color: 'text-indigo-600',
+      bg: 'bg-indigo-50 dark:bg-indigo-950',
     },
     {
       icon: Bell,

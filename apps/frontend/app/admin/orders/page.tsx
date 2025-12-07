@@ -2,8 +2,9 @@
 
 import { useMemo, useState } from 'react';
 import { format } from 'date-fns';
+import Link from 'next/link';
 import { Search, Eye } from 'lucide-react';
-import { useAdminConfirmPaymentMutation, useAdminGetOrdersQuery, type AdminOrder } from '@/store/api/adminApi';
+import { useAdminConfirmPaymentMutation, useAdminGetOrdersQuery, useAdminGetPendingRegistrationsQuery, type AdminOrder } from '@/store/api/adminApi';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardContent } from '@/components/ui/Card';
@@ -33,6 +34,12 @@ export default function AdminOrdersPage() {
     status: statusFilter || undefined,
   });
   const [confirmPayment, { isLoading: isConfirming }] = useAdminConfirmPaymentMutation();
+  
+  // Get pending demo class registrations count
+  const { data: registrationsData } = useAdminGetPendingRegistrationsQuery({
+    approvalStatus: 'pending',
+  });
+  const pendingDemoRegistrationsCount = registrationsData?.registrations?.length || 0;
 
   const orders = data?.orders ?? [];
   const pagination = data?.pagination;
@@ -73,6 +80,29 @@ export default function AdminOrdersPage() {
         <h1 className="text-3xl font-bold text-foreground">Orders</h1>
         <p className="text-muted-foreground">Review student purchases and activate enrollments manually.</p>
       </div>
+
+      {/* Pending Demo Class Registrations Alert */}
+      {pendingDemoRegistrationsCount > 0 && (
+        <Card className="border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-semibold text-amber-900 dark:text-amber-100">
+                  {pendingDemoRegistrationsCount} Pending Demo Class Registration{pendingDemoRegistrationsCount > 1 ? 's' : ''}
+                </p>
+                <p className="text-sm text-amber-700 dark:text-amber-300">
+                  Review and approve demo class registrations
+                </p>
+              </div>
+              <Link href="/admin/demo-classes/registrations">
+                <Button variant="outline" size="sm" className="border-amber-300 text-amber-900 hover:bg-amber-100 dark:border-amber-700 dark:text-amber-100 dark:hover:bg-amber-900">
+                  View Registrations
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
@@ -184,7 +214,17 @@ export default function AdminOrdersPage() {
                     </td>
                     <td className="px-6 py-4 text-sm text-foreground">
                       <div className="flex flex-col gap-1">
-                        <span>{order.items[0]?.title}</span>
+                        <div className="flex items-center gap-2">
+                          <span>{order.items[0]?.title}</span>
+                          {order.items[0]?.demoClassId && (
+                            <Link
+                              href="/admin/demo-classes/registrations"
+                              className="text-xs text-primary-600 hover:text-primary-700 hover:underline"
+                            >
+                              (Demo Class)
+                            </Link>
+                          )}
+                        </div>
                         {order.items.length > 1 && (
                           <span className="text-xs text-muted-foreground">+{order.items.length - 1} more</span>
                         )}
@@ -270,16 +310,26 @@ export default function AdminOrdersPage() {
             <div className="space-y-3">
               <h3 className="text-lg font-semibold text-foreground">Items</h3>
               <div className="rounded-2xl border border-border">
-                {selectedOrder.items.map((item) => (
+                {selectedOrder.items.map((item: any) => (
                   <div
-                    key={`${item.title}-${item.courseId || item.ebookId}`}
+                    key={`${item.title}-${item.courseId || item.ebookId || item.demoClassId}`}
                     className="flex items-center justify-between border-b border-border px-4 py-3 last:border-0"
                   >
                     <div>
                       <p className="text-sm font-medium text-foreground">{item.title}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {item.courseId ? 'Course' : item.ebookId ? 'eBook' : 'Item'}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-xs text-muted-foreground">
+                          {item.courseId ? 'Course' : item.ebookId ? 'eBook' : item.demoClassId ? 'Demo Class' : 'Item'}
+                        </p>
+                        {item.demoClassId && (
+                          <Link
+                            href="/admin/demo-classes/registrations"
+                            className="text-xs text-primary-600 hover:text-primary-700 hover:underline"
+                          >
+                            View Registration
+                          </Link>
+                        )}
+                      </div>
                     </div>
                     <p className="text-sm font-semibold text-foreground">{formatPrice(item.price)}</p>
                   </div>
