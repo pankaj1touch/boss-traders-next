@@ -12,9 +12,18 @@
   --foreground: #ededed;
 }
 
+html {
+  @apply bg-background text-foreground;
+}
+
 @layer base {
+  * {
+    @apply border-gray-200 dark:border-gray-800;
+  }
+  
   body {
     @apply bg-background text-foreground antialiased;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 }
 

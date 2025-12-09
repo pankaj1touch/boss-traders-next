@@ -1,4 +1,6 @@
 import { apiSlice } from './apiSlice';
+import type { Coupon, CouponsResponse, CouponResponse, CouponStatsResponse } from './couponApi';
+import type { Announcement } from './announcementApi';
 
 interface Course {
   _id: string;
@@ -134,6 +136,17 @@ interface BannersResponse {
 interface BannerResponse {
   success: boolean;
   banner: Banner;
+}
+
+interface AnnouncementsResponse {
+  success: boolean;
+  announcements: Announcement[];
+  count: number;
+}
+
+interface AnnouncementResponse {
+  success: boolean;
+  announcement: Announcement;
 }
 
 export const adminApi = apiSlice.injectEndpoints({
@@ -383,6 +396,102 @@ export const adminApi = apiSlice.injectEndpoints({
       query: () => '/demo-classes/admin/stats',
       providesTags: ['DemoClass'],
     }),
+
+    // Coupon Management
+    adminGetAllCoupons: builder.query<CouponsResponse, {
+      isActive?: string;
+      type?: string;
+      applicableTo?: string;
+      sort?: string;
+    }>({
+      query: (params) => ({
+        url: '/coupons/admin/all',
+        params,
+      }),
+      providesTags: ['Coupon'],
+    }),
+
+    adminGetCoupon: builder.query<CouponResponse, string>({
+      query: (id) => `/coupons/admin/${id}`,
+      providesTags: (result, error, id) => [{ type: 'Coupon', id }],
+    }),
+
+    adminGetCouponStats: builder.query<CouponStatsResponse, string>({
+      query: (id) => `/coupons/admin/${id}/stats`,
+      providesTags: (result, error, id) => [{ type: 'Coupon', id }],
+    }),
+
+    adminCreateCoupon: builder.mutation<CouponResponse, Partial<Coupon>>({
+      query: (data) => ({
+        url: '/coupons/admin',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['Coupon'],
+    }),
+
+    adminUpdateCoupon: builder.mutation<CouponResponse, { id: string; data: Partial<Coupon> }>({
+      query: ({ id, data }) => ({
+        url: `/coupons/admin/${id}`,
+        method: 'PATCH',
+        body: data,
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'Coupon', id }, 'Coupon'],
+    }),
+
+    adminDeleteCoupon: builder.mutation<{ success: boolean; message: string }, string>({
+      query: (id) => ({
+        url: `/coupons/admin/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Coupon'],
+    }),
+
+    // Announcement Management
+    adminGetAllAnnouncements: builder.query<AnnouncementsResponse, {
+      status?: string;
+      type?: string;
+      priority?: string;
+      isActive?: string;
+      sort?: string;
+    }>({
+      query: (params) => ({
+        url: '/announcements',
+        params,
+      }),
+      providesTags: ['Announcement'],
+    }),
+
+    adminGetAnnouncement: builder.query<AnnouncementResponse, string>({
+      query: (id) => `/announcements/${id}`,
+      providesTags: (result, error, id) => [{ type: 'Announcement', id }],
+    }),
+
+    adminCreateAnnouncement: builder.mutation<AnnouncementResponse, Partial<Announcement>>({
+      query: (data) => ({
+        url: '/announcements',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['Announcement'],
+    }),
+
+    adminUpdateAnnouncement: builder.mutation<AnnouncementResponse, { id: string; data: Partial<Announcement> }>({
+      query: ({ id, data }) => ({
+        url: `/announcements/${id}`,
+        method: 'PATCH',
+        body: data,
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'Announcement', id }, 'Announcement'],
+    }),
+
+    adminDeleteAnnouncement: builder.mutation<{ success: boolean; message: string }, string>({
+      query: (id) => ({
+        url: `/announcements/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Announcement'],
+    }),
   }),
 });
 
@@ -413,6 +522,17 @@ export const {
   useAdminApproveRegistrationMutation,
   useAdminRejectRegistrationMutation,
   useAdminGetDemoClassStatsQuery,
+  useAdminGetAllAnnouncementsQuery,
+  useAdminGetAnnouncementQuery,
+  useAdminCreateAnnouncementMutation,
+  useAdminUpdateAnnouncementMutation,
+  useAdminDeleteAnnouncementMutation,
+  useAdminGetAllCouponsQuery,
+  useAdminGetCouponQuery,
+  useAdminGetCouponStatsQuery,
+  useAdminCreateCouponMutation,
+  useAdminUpdateCouponMutation,
+  useAdminDeleteCouponMutation,
 } = adminApi;
 
 export type { AdminOrder };

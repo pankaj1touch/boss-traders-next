@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { CourseCard } from '@/components/CourseCard';
 import { BlogCard } from '@/components/BlogCard';
+import { AnnouncementBanner } from '@/components/AnnouncementBanner';
+import { AnnouncementCard } from '@/components/AnnouncementCard';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { ToastContainer } from '@/components/ui/Toast';
@@ -16,11 +18,14 @@ import { useGetCoursesQuery } from '@/store/api/courseApi';
 import { useGetBlogsQuery } from '@/store/api/blogApi';
 import { useGetActiveBannersQuery } from '@/store/api/bannerApi';
 import { useGetDemoClassesQuery } from '@/store/api/demoClassApi';
+import { useGetActiveAnnouncementsQuery, useTrackAnnouncementClickMutation } from '@/store/api/announcementApi';
+import { useGetActiveCouponsQuery } from '@/store/api/couponApi';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addToast } from '@/store/slices/uiSlice';
 import { format } from 'date-fns';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/Badge';
+import { CouponCard } from '@/components/CouponCard';
 
 export default function HomePage() {
   const {
@@ -43,6 +48,15 @@ export default function HomePage() {
     data: demoClassesData,
     isLoading: demoClassesLoading,
   } = useGetDemoClassesQuery({});
+  const {
+    data: announcementsData,
+    isLoading: announcementsLoading,
+  } = useGetActiveAnnouncementsQuery({});
+  const {
+    data: couponsData,
+    isLoading: couponsLoading,
+  } = useGetActiveCouponsQuery();
+  const [trackAnnouncementClick] = useTrackAnnouncementClickMutation();
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { isAuthenticated } = useAppSelector((state) => state.auth);
@@ -50,13 +64,13 @@ export default function HomePage() {
 
   const banners = bannersData?.banners || [];
 
-  // Auto-rotate banners every 3 seconds
+  // Auto-rotate banners every 20 seconds
   useEffect(() => {
     if (banners.length <= 1) return;
 
     const interval = setInterval(() => {
       setCurrentBannerIndex((prev) => (prev + 1) % banners.length);
-    }, 3000);
+    }, 20000);
 
     return () => clearInterval(interval);
   }, [banners.length]);
@@ -84,10 +98,29 @@ export default function HomePage() {
     },
   ];
 
+  const announcements = announcementsData?.announcements || [];
+  const highPriorityAnnouncements = announcements.filter((a) => a.priority === 'high');
+  const otherAnnouncements = announcements.filter((a) => a.priority !== 'high').slice(0, 3);
+
+  const handleAnnouncementClick = async (announcement: any) => {
+    if (announcement.linkUrl) {
+      try {
+        await trackAnnouncementClick(announcement._id).unwrap();
+      } catch (error) {
+        console.error('Failed to track click:', error);
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <ToastContainer />
+
+      {/* High Priority Announcement Banner */}
+      {highPriorityAnnouncements.length > 0 && (
+        <AnnouncementBanner priority="high" maxAnnouncements={1} />
+      )}
 
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50 py-20 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -342,6 +375,42 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Announcements Section */}
+      {otherAnnouncements.length > 0 && (
+        <section className="py-12 bg-gray-50 dark:bg-gray-900/50">
+          <div className="container-custom">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mb-8 text-center"
+            >
+              <h2 className="mb-2 text-3xl font-bold text-foreground">Announcements</h2>
+              <p className="text-muted-foreground">Stay updated with our latest news and updates</p>
+            </motion.div>
+
+            {announcementsLoading ? (
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="h-64 animate-pulse rounded-2xl bg-gray-200 dark:bg-gray-800" />
+                ))}
+              </div>
+            ) : (
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {otherAnnouncements.map((announcement, index) => (
+                  <AnnouncementCard
+                    key={announcement._id}
+                    announcement={announcement}
+                    index={index}
+                    onClick={handleAnnouncementClick}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Featured Blog Posts */}
       <section className="py-20">
@@ -608,6 +677,41 @@ export default function HomePage() {
           )}
         </div>
       </section>
+
+      {/* Active Coupons Section */}
+      {!couponsLoading && couponsData?.coupons && Array.isArray(couponsData.coupons) && couponsData.coupons.length > 0 && (
+        <section className="py-20">
+          <div className="container-custom">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mb-12 text-center"
+            >
+              <h2 className="mb-4 text-4xl font-bold">Special Offers & Coupons</h2>
+              <p className="text-xl text-gray-600 dark:text-gray-400">
+                Use these coupon codes to get amazing discounts on your purchases
+              </p>
+            </motion.div>
+
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {couponsData.coupons.slice(0, 6).map((coupon) => {
+                if (!coupon || !coupon._id) return null;
+                return (
+                  <CouponCard
+                    key={coupon._id}
+                    coupon={coupon}
+                    onApply={(code) => {
+                      router.push('/cart');
+                      dispatch(addToast({ type: 'info', message: `Coupon ${code} copied! Go to cart to apply.` }));
+                    }}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Featured Courses */}
       <section className="bg-gray-50 py-20 dark:bg-gray-900">

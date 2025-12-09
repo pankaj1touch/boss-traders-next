@@ -37,7 +37,7 @@ export interface Order {
 
 export const orderApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    createOrder: builder.mutation<{ message: string; order: Order }, { items: { courseId?: string; ebookId?: string }[] }>({
+    createOrder: builder.mutation<{ message: string; order: Order }, { items: { courseId?: string; ebookId?: string }[]; couponCode?: string }>({
       query: (data) => ({
         url: '/orders',
         method: 'POST',

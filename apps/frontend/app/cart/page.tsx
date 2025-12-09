@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { Trash2, ShoppingCart, Phone, Copy, CheckCircle } from 'lucide-react';
+import { Trash2, ShoppingCart, Phone, Copy, CheckCircle, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
@@ -15,6 +16,27 @@ import { removeFromCart } from '@/store/slices/cartSlice';
 import { addToast } from '@/store/slices/uiSlice';
 import { formatPrice } from '@/lib/utils';
 import { useCreateOrderMutation } from '@/store/api/orderApi';
+import { useValidateCouponMutation } from '@/store/api/couponApi';
+
+// Dynamically import CouponSection with SSR disabled to prevent hydration errors
+const CouponSection = dynamic(() => import('@/components/CouponSection').then(mod => ({ default: mod.CouponSection })), {
+  ssr: false,
+  loading: () => (
+    <div className="space-y-4">
+      <div className="flex gap-2">
+        <Input
+          type="text"
+          placeholder="Enter coupon code"
+          className="flex-1 uppercase"
+          disabled
+        />
+        <Button variant="outline" size="sm" disabled>
+          Apply
+        </Button>
+      </div>
+    </div>
+  ),
+});
 
 const SUPPORT_NUMBER = '+91 92292 55662';
 const SUPPORT_TEL = 'tel:+919229255662';
@@ -23,15 +45,80 @@ export default function CartPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { items, total } = useAppSelector((state) => state.cart);
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
   const [createOrder, { isLoading }] = useCreateOrderMutation();
+  const [validateCoupon, { isLoading: isValidatingCoupon }] = useValidateCouponMutation();
+  const [mounted, setMounted] = useState(false);
   const [copiedNumber, setCopiedNumber] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string;
+    discount: number;
+    finalTotal: number;
+  } | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const redirectQuery = encodeURIComponent('/cart');
 
   const handleRemove = (id: string) => {
     dispatch(removeFromCart(id));
     dispatch(addToast({ type: 'success', message: 'Item removed from cart' }));
+  };
+
+  const handleApplyCoupon = async (code?: string) => {
+    const codeToUse = (code || couponCode || '').toString().trim();
+    if (!codeToUse) {
+      dispatch(addToast({ type: 'error', message: 'Please enter a coupon code' }));
+      return;
+    }
+
+    if (items.length === 0) {
+      dispatch(addToast({ type: 'error', message: 'Your cart is empty' }));
+      return;
+    }
+
+    try {
+      const orderItems = items.map((item) => ({
+        [item.type === 'course' ? 'courseId' : 'ebookId']: item.id,
+        price: item.price,
+      }));
+
+      const result = await validateCoupon({
+        code: codeToUse.toUpperCase(),
+        items: items.map((item) => ({
+          ...(item.type === 'course' && { courseId: String(item.id) }),
+          ...(item.type === 'ebook' && { ebookId: String(item.id) }),
+        })),
+        userId: user?.id,
+      }).unwrap();
+
+      if (result.success && (result.valid !== false) && result.discount !== undefined) {
+        const appliedCode = result.coupon?.code || codeToUse.toUpperCase();
+        setAppliedCoupon({
+          code: appliedCode,
+          discount: result.discount,
+          finalTotal: result.finalTotal || total - result.discount,
+        });
+        setCouponCode(appliedCode);
+        dispatch(addToast({ type: 'success', message: result.message || 'Coupon applied successfully!' }));
+      } else {
+        dispatch(addToast({ type: 'error', message: result.message || 'Invalid coupon code' }));
+        setAppliedCoupon(null);
+      }
+    } catch (error: any) {
+      const errorMessage = error?.data?.message || error?.message || 'Failed to validate coupon';
+      dispatch(addToast({ type: 'error', message: errorMessage }));
+      setAppliedCoupon(null);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode('');
+    dispatch(addToast({ type: 'success', message: 'Coupon removed' }));
   };
 
   const handleCheckout = async () => {
@@ -45,7 +132,10 @@ export default function CartPage() {
         [item.type === 'course' ? 'courseId' : 'ebookId']: item.id,
       }));
 
-      const result = await createOrder({ items: orderItems }).unwrap();
+      const result = await createOrder({
+        items: orderItems,
+        couponCode: appliedCoupon?.code,
+      }).unwrap();
       router.push(`/checkout/${result.order._id}`);
     } catch (error: any) {
       dispatch(addToast({ type: 'error', message: error.data?.message || 'Failed to create order' }));
@@ -66,13 +156,32 @@ export default function CartPage() {
     router.push(`/auth/${type}?redirect=${redirectQuery}`);
   };
 
+  // Show loading state until mounted to prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <ToastContainer />
+        <div className="container-custom py-12">
+          <div>
+            <h1 className="mb-8 text-4xl font-bold">Shopping Cart</h1>
+            <div className="animate-pulse">
+              <div className="h-64 rounded-lg bg-gray-200 dark:bg-gray-800" />
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <ToastContainer />
 
       <div className="container-custom py-12">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <div>
           <h1 className="mb-8 text-4xl font-bold">Shopping Cart</h1>
 
           {items.length === 0 ? (
@@ -88,13 +197,7 @@ export default function CartPage() {
             <div className="grid gap-8 lg:grid-cols-3">
               <div className="space-y-4 lg:col-span-2">
                 {items.map((item) => (
-                  <motion.div
-                    key={item.id}
-                    layout
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                  >
+                  <div key={item.id}>
                     <Card>
                       <CardContent className="flex gap-4 p-6">
                         {item.thumbnail && (
@@ -124,7 +227,7 @@ export default function CartPage() {
                         </div>
                       </CardContent>
                     </Card>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
 
@@ -156,6 +259,16 @@ export default function CartPage() {
                     <CardTitle>Enrollment Summary</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
+                    {/* Coupon Section */}
+                    <CouponSection
+                      couponCode={couponCode}
+                      setCouponCode={setCouponCode}
+                      onApplyCoupon={handleApplyCoupon}
+                      isValidatingCoupon={isValidatingCoupon}
+                      appliedCoupon={appliedCoupon}
+                      onRemoveCoupon={handleRemoveCoupon}
+                    />
+
                     <div>
                       <div className="flex justify-between text-sm">
                         <span>Items</span>
@@ -165,6 +278,12 @@ export default function CartPage() {
                         <span>Subtotal</span>
                         <span>{formatPrice(total)}</span>
                       </div>
+                      {appliedCoupon && (
+                        <div className="flex justify-between text-sm text-green-600">
+                          <span>Discount ({appliedCoupon.code})</span>
+                          <span>-{formatPrice(appliedCoupon.discount)}</span>
+                        </div>
+                      )}
                       <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
                         <span>Admin assistance</span>
                         <span>Included</span>
@@ -173,7 +292,9 @@ export default function CartPage() {
                     <hr className="border-gray-200 dark:border-gray-800" />
                     <div className="flex justify-between text-xl font-bold">
                       <span>Total due</span>
-                      <span className="text-primary-600">{formatPrice(total)}</span>
+                      <span className="text-primary-600">
+                        {formatPrice(appliedCoupon?.finalTotal || total)}
+                      </span>
                     </div>
                     <Button
                       className="w-full"
@@ -235,7 +356,7 @@ export default function CartPage() {
               </div>
             </div>
           )}
-        </motion.div>
+        </div>
       </div>
 
       <Footer />

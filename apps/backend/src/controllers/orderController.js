@@ -1,6 +1,7 @@
 const Order = require('../models/Order');
 const Course = require('../models/Course');
 const Ebook = require('../models/Ebook');
+const Coupon = require('../models/Coupon');
 const Enrollment = require('../models/Enrollment');
 const { DemoClassRegistration } = require('../models/DemoClass');
 const { generateOrderNumber } = require('../utils/orderNumber');
@@ -9,7 +10,7 @@ const { generateUPIString, generateQRCode } = require('../utils/qrCode');
 
 exports.createOrder = async (req, res, next) => {
   try {
-    const { items } = req.body;
+    const { items, couponCode } = req.body;
     const userId = req.user._id;
 
     // Validate and calculate totals
@@ -47,7 +48,70 @@ exports.createOrder = async (req, res, next) => {
     }
 
     const tax = subtotal * 0.1; // 10% tax
-    const total = subtotal + tax;
+    
+    // Apply coupon if provided
+    let discount = 0;
+    let coupon = null;
+    let discountType = null;
+    
+    if (couponCode) {
+      coupon = await Coupon.findOne({ code: couponCode.toUpperCase().trim() });
+      
+      if (coupon && coupon.isActive) {
+        const now = new Date();
+        const isValid = 
+          (!coupon.endDate || now <= coupon.endDate) &&
+          (!coupon.startDate || now >= coupon.startDate) &&
+          (!coupon.usageLimit || coupon.usageCount < coupon.usageLimit) &&
+          !coupon.hasExceededUserLimit(userId) &&
+          subtotal >= coupon.minPurchaseAmount;
+        
+        if (isValid) {
+          // Check applicable items
+          let isApplicable = true;
+          if (coupon.applicableTo !== 'all') {
+            const applicableTypes = {
+              courses: 'course',
+              ebooks: 'ebook',
+              'demo-classes': 'demo-class',
+            };
+            const requiredType = applicableTypes[coupon.applicableTo];
+            isApplicable = orderItems.some((item) => {
+              if (requiredType === 'course' && item.courseId) return true;
+              if (requiredType === 'ebook' && item.ebookId) return true;
+              if (requiredType === 'demo-class' && item.demoClassId) return true;
+              return false;
+            });
+            
+            // Check specific items if applicable
+            if (isApplicable && coupon.applicableTo === 'specific' && coupon.specificItems.length > 0) {
+              const itemIds = orderItems.map((item) => 
+                item.courseId?.toString() || item.ebookId?.toString() || item.demoClassId?.toString()
+              );
+              isApplicable = coupon.specificItems.some((itemId) => 
+                itemIds.includes(itemId.toString())
+              );
+            }
+          }
+          
+          if (isApplicable) {
+            discount = coupon.calculateDiscount(subtotal);
+            discountType = 'coupon';
+            
+            // Update coupon usage
+            coupon.usageCount += 1;
+            coupon.usedBy.push({
+              userId: userId,
+              orderId: null, // Will update after order creation
+              usedAt: new Date(),
+              usageCount: 1,
+            });
+          }
+        }
+      }
+    }
+    
+    const total = Math.max(0, subtotal + tax - discount);
 
     // Generate order number
     const orderNumber = generateOrderNumber();
@@ -62,6 +126,10 @@ exports.createOrder = async (req, res, next) => {
       items: orderItems,
       subtotal,
       tax,
+      discount,
+      couponCode: coupon ? coupon.code : null,
+      couponId: coupon ? coupon._id : null,
+      discountType,
       total,
       currency: 'INR',
       status: 'pending',
@@ -69,6 +137,15 @@ exports.createOrder = async (req, res, next) => {
       qrCodeImageUrl: qrCodeImage,
       upiId: process.env.UPI_ID || 'Not configured',
     });
+    
+    // Update coupon with order ID if coupon was applied
+    if (coupon && discount > 0) {
+      const lastUsage = coupon.usedBy[coupon.usedBy.length - 1];
+      if (lastUsage) {
+        lastUsage.orderId = order._id;
+      }
+      await coupon.save();
+    }
 
     res.status(201).json({ message: 'Order created successfully', order });
   } catch (error) {

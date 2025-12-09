@@ -2,6 +2,7 @@
 
 import { Provider } from 'react-redux';
 import { useEffect, useRef } from 'react';
+import { ThemeProvider } from 'next-themes';
 import { store } from '@/store/store';
 import { initializeAuth } from '@/store/slices/authSlice';
 import { initializeSocket } from '@/lib/socket';
@@ -47,9 +48,17 @@ function AuthInitializer({ children }: { children: React.ReactNode }) {
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <Provider store={store}>
-      <AuthInitializer>{children}</AuthInitializer>
-    </Provider>
+    <ThemeProvider 
+      attribute="class" 
+      defaultTheme="light" 
+      enableSystem={false}
+      storageKey="boss-traders-theme"
+      disableTransitionOnChange={false}
+    >
+      <Provider store={store}>
+        <AuthInitializer>{children}</AuthInitializer>
+      </Provider>
+    </ThemeProvider>
   );
 }
 

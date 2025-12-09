@@ -26,6 +26,8 @@ const { blogQuerySchema } = require('./validators/blogValidators');
 const uploadRoutes = require('./routes/uploadRoutes');
 const bannerRoutes = require('./routes/bannerRoutes');
 const demoClassRoutes = require('./routes/demoClassRoutes');
+const announcementRoutes = require('./routes/announcementRoutes');
+const couponRoutes = require('./routes/couponRoutes');
 
 const app = express();
 
@@ -77,6 +79,8 @@ app.use('/api/blogs', blogRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/banners', bannerRoutes);
 app.use('/api/demo-classes', demoClassRoutes);
+app.use('/api/announcements', announcementRoutes);
+app.use('/api/coupons', couponRoutes);
 app.use('/api/users', require('./routes/userRoutes'));
 
 // 404 handler

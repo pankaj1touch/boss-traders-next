@@ -13,13 +13,13 @@ export function BannerCarousel() {
 
   const banners = data?.banners || [];
 
-  // Auto-rotate banners every 5 seconds
+  // Auto-rotate banners every 20 seconds
   useEffect(() => {
     if (banners.length <= 1) return;
 
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % banners.length);
-    }, 5000);
+    }, 20000);
 
     return () => clearInterval(interval);
   }, [banners.length]);

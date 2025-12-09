@@ -16,6 +16,7 @@ import {
   LogOut,
   Settings,
 } from 'lucide-react';
+import { ThemeToggle } from './ThemeToggle';
 import { Button } from './ui/Button';
 import { Badge } from './ui/Badge';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
@@ -94,6 +95,9 @@ export function Navbar() {
 
           {/* Right Side */}
           <div className="flex items-center gap-4">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
             {/* Cart */}
             <Link href="/cart" className="relative">
               <Button variant="ghost" size="sm">
@@ -228,6 +232,10 @@ export function Navbar() {
             className="overflow-hidden border-t border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 md:hidden"
           >
             <div className="container-custom py-4">
+              <div className="flex items-center justify-between border-b border-gray-200 pb-4 dark:border-gray-800">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Theme</span>
+                <ThemeToggle />
+              </div>
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
