@@ -3,8 +3,9 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAppSelector } from '@/store/hooks';
-import { BookOpen, BookText, LayoutDashboard, LogOut, FileText, ShoppingBag, Image as ImageIcon, Video, Tag, Megaphone } from 'lucide-react';
+import { BookOpen, BookText, LayoutDashboard, FileText, ShoppingBag, Image as ImageIcon, Video, Tag, Megaphone } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -50,10 +51,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Sidebar */}
       <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card">
         <div className="flex h-full flex-col">
-          {/* Logo */}
-          <div className="flex h-16 items-center border-b border-border px-6">
+          {/* Logo - Clickable to Home */}
+          <Link 
+            href="/" 
+            className="flex h-16 items-center gap-3 border-b border-border px-6 hover:bg-accent/50 transition-colors"
+          >
+            <div className="relative h-8 w-8 shrink-0">
+              <Image
+                src="/logo.png"
+                alt="Boss Traders Investor Class"
+                fill
+                className="rounded-lg object-contain"
+                sizes="32px"
+              />
+            </div>
             <h1 className="text-xl font-bold text-foreground">Admin Panel</h1>
-          </div>
+          </Link>
 
           {/* Navigation */}
           <nav className="flex-1 space-y-1 px-3 py-4">
@@ -71,7 +84,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
           {/* User info */}
           <div className="border-t border-border p-4">
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground font-semibold">
                 {user.name?.[0]?.toUpperCase()}
               </div>
@@ -80,13 +93,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <p className="text-xs text-muted-foreground truncate">{user.email}</p>
               </div>
             </div>
-            <Link
-              href="/"
-              className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-            >
-              <LogOut className="h-4 w-4" />
-              Back to Site
-            </Link>
           </div>
         </div>
       </aside>
