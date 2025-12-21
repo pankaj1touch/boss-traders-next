@@ -1,5 +1,29 @@
 require('dotenv').config();
 
+// Helper function to get first URL from CLIENT_URL (in case of comma-separated values)
+const getClientUrl = () => {
+  const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+  
+  // Remove any extra whitespace
+  let url = clientUrl.trim();
+  
+  // If comma-separated, take the first one
+  if (url.includes(',')) {
+    url = url.split(',')[0].trim();
+  }
+  
+  // Remove trailing slash if present
+  url = url.replace(/\/+$/, '');
+  
+  // Validate it's a proper URL format
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    console.warn(`⚠️  CLIENT_URL "${url}" doesn't start with http:// or https://. Using default.`);
+    return 'http://localhost:3000';
+  }
+  
+  return url;
+};
+
 const config = {
   nodeEnv: process.env.NODE_ENV || 'development',
   port: process.env.PORT || 4000,
@@ -12,7 +36,7 @@ const config = {
       pass: process.env.SMTP_PASS,
     },
   },
-  clientUrl: process.env.CLIENT_URL || 'http://localhost:3000',
+  clientUrl: getClientUrl(),
   aws: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,

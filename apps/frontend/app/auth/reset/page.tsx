@@ -13,6 +13,7 @@ import { PasswordInput } from '@/components/ui/PasswordInput';
 import { ToastContainer } from '@/components/ui/Toast';
 import { addToast } from '@/store/slices/uiSlice';
 import { useAppDispatch } from '@/store/hooks';
+import { API_BASE_URL } from '@/lib/config';
 
 const resetPasswordSchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters'),
@@ -50,7 +51,7 @@ function ResetPasswordContent() {
     }
 
     try {
-      const response = await fetch(`https://api.bosstradersinvestorclass.com/api/auth/validate-reset-token?token=${token}`, {
+      const response = await fetch(`${API_BASE_URL}/auth/validate-reset-token?token=${token}`, {
         method: 'GET',
       });
 
@@ -77,7 +78,7 @@ function ResetPasswordContent() {
     try {
       setIsLoading(true);
       
-      const response = await fetch('https://api.bosstradersinvestorclass.com/api/auth/reset-password', {
+      const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

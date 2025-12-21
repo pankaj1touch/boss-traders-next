@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/Input';
 import { ToastContainer } from '@/components/ui/Toast';
 import { addToast } from '@/store/slices/uiSlice';
 import { useAppDispatch } from '@/store/hooks';
+import { API_BASE_URL } from '@/lib/config';
 
 const forgotPasswordSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -40,7 +41,7 @@ export default function ForgotPasswordPage() {
       setIsLoading(true);
       
       // Call forgot password API
-      const response = await fetch('https://api.bosstradersinvestorclass.com/api/auth/forgot-password', {
+      const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -167,8 +167,16 @@ const sendPasswordResetEmail = async (user, resetToken) => {
   console.log('📮 SMTP User:', config.email.smtp.user || 'NOT CONFIGURED');
   console.log('🔐 SMTP Pass:', config.email.smtp.pass ? '✅ EXISTS (hidden)' : '❌ NOT CONFIGURED');
   
-  const resetLink = `${config.clientUrl}/auth/reset?token=${resetToken}`;
+  // Ensure clientUrl is clean (no trailing slash, no commas)
+  let cleanClientUrl = config.clientUrl.trim();
+  if (cleanClientUrl.includes(',')) {
+    cleanClientUrl = cleanClientUrl.split(',')[0].trim();
+  }
+  cleanClientUrl = cleanClientUrl.replace(/\/+$/, ''); // Remove trailing slashes
+  
+  const resetLink = `${cleanClientUrl}/auth/reset?token=${resetToken}`;
   console.log('🔗 Reset link generated:', resetLink);
+  console.log('🔍 Cleaned Client URL:', cleanClientUrl);
   
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
