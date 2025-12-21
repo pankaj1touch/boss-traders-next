@@ -284,60 +284,60 @@ export default function AdminOrdersPage() {
         size="xl"
       >
         {selectedOrder && (
-          <div className="space-y-6 p-6">
+          <div className="space-y-6 p-6 bg-white dark:bg-gray-900">
             <div className="grid gap-4 md:grid-cols-2">
-              <Card>
+              <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
                 <CardContent className="space-y-2 p-5">
-                  <p className="text-sm text-muted-foreground">Student</p>
-                  <p className="text-lg font-semibold text-foreground">{selectedOrder.userId?.name}</p>
-                  <p className="text-sm text-muted-foreground">{selectedOrder.userId?.email}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Student</p>
+                  <p className="text-lg font-semibold text-gray-900 dark:text-white">{selectedOrder.userId?.name}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{selectedOrder.userId?.email}</p>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
                 <CardContent className="space-y-2 p-5">
-                  <p className="text-sm text-muted-foreground">Payment</p>
-                  <p className="text-lg font-semibold text-foreground">{formatPrice(selectedOrder.total)}</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Payment</p>
+                  <p className="text-lg font-semibold text-gray-900 dark:text-white">{formatPrice(selectedOrder.total)}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
                     Tax {formatPrice(selectedOrder.tax)} • Method {selectedOrder.paymentMethod || 'Call'}
                   </p>
                   {selectedOrder.paymentId && (
-                    <p className="text-sm text-muted-foreground">Transaction ID: {selectedOrder.paymentId}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Transaction ID: {selectedOrder.paymentId}</p>
                   )}
                 </CardContent>
               </Card>
             </div>
 
             <div className="space-y-3">
-              <h3 className="text-lg font-semibold text-foreground">Items</h3>
-              <div className="rounded-2xl border border-border">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Items</h3>
+              <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                 {selectedOrder.items.map((item: any) => (
                   <div
                     key={`${item.title}-${item.courseId || item.ebookId || item.demoClassId}`}
-                    className="flex items-center justify-between border-b border-border px-4 py-3 last:border-0"
+                    className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 px-4 py-3 last:border-0"
                   >
                     <div>
-                      <p className="text-sm font-medium text-foreground">{item.title}</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">{item.title}</p>
                       <div className="flex items-center gap-2">
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-xs text-gray-600 dark:text-gray-400">
                           {item.courseId ? 'Course' : item.ebookId ? 'eBook' : item.demoClassId ? 'Demo Class' : 'Item'}
                         </p>
                         {item.demoClassId && (
                           <Link
                             href="/admin/demo-classes/registrations"
-                            className="text-xs text-primary-600 hover:text-primary-700 hover:underline"
+                            className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline"
                           >
                             View Registration
                           </Link>
                         )}
                       </div>
                     </div>
-                    <p className="text-sm font-semibold text-foreground">{formatPrice(item.price)}</p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{formatPrice(item.price)}</p>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
               <div>{renderStatusBadge(selectedOrder.status, selectedOrder.paymentVerified)}</div>
               <div className="flex gap-3">
                 <Button variant="outline" onClick={() => setSelectedOrder(null)}>
