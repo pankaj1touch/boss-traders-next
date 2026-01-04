@@ -63,14 +63,21 @@ export default function MyCoursesPage() {
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Progress</p>
                     <div className="h-2 w-32 rounded-full bg-accent/50 overflow-hidden">
-                      <div className="h-full bg-primary" style={{ width: `${item.progress}%` }} />
+                      <div className="h-full bg-primary transition-all" style={{ width: `${item.progress}%` }} />
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">{item.progress}% completed</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {item.progress}% completed
+                      {item.course.videos && (
+                        <span className="ml-2">
+                          ({item.course.videos.length} {item.course.videos.length === 1 ? 'video' : 'videos'})
+                        </span>
+                      )}
+                    </p>
                   </div>
-                  <Link href={`/courses/${item.course.slug}`}>
+                  <Link href={`/courses/${item.course.slug}/learn`}>
                     <button className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
                       <Play className="h-4 w-4" />
-                      Continue
+                      {item.progress > 0 ? 'Continue Learning' : 'Start Learning'}
                     </button>
                   </Link>
                 </div>

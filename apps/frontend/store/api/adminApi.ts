@@ -26,6 +26,20 @@ interface Course {
     email: string;
     avatarUrl?: string;
   };
+  videos?: Array<{
+    title: string;
+    description?: string;
+    videoUrl: string;
+    duration?: number;
+    isFree?: boolean;
+    order?: number;
+    thumbnail?: string;
+    chapters?: Array<{
+      title: string;
+      timestamp: number;
+      description?: string;
+    }>;
+  }>;
   createdAt: string;
   updatedAt: string;
 }

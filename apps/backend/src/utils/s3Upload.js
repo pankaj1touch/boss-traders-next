@@ -129,11 +129,79 @@ const deleteImageFromS3 = async (imageUrl) => {
   }
 };
 
+/**
+ * Generate a signed URL for S3 video access
+ * @param {string} videoUrl - The S3 video URL
+ * @param {number} expiresIn - Expiration time in seconds (default: 1 hour)
+ * @returns {string} Signed URL with time-limited access
+ */
+const getSignedVideoUrl = (videoUrl, expiresIn = 3600) => {
+  try {
+    if (!videoUrl) return null;
+
+    // If URL is not an S3 URL, return as-is (might be CDN or external URL)
+    if (!videoUrl.includes('s3') && !videoUrl.includes('amazonaws.com')) {
+      return videoUrl;
+    }
+
+    // Extract key from S3 URL
+    let key;
+    try {
+      const url = new URL(videoUrl);
+      key = url.pathname.substring(1); // Remove leading slash
+    } catch (e) {
+      // If URL parsing fails, try to extract key from path
+      const match = videoUrl.match(/videos\/[^\/]+\/(.+)$/);
+      if (match) {
+        key = match[1];
+      } else {
+        console.error('Could not extract S3 key from URL:', videoUrl);
+        return videoUrl; // Return original URL if extraction fails
+      }
+    }
+
+    // Generate signed URL
+    const signedUrl = s3.getSignedUrl('getObject', {
+      Bucket: config.aws.s3Bucket,
+      Key: key,
+      Expires: expiresIn, // 1 hour default
+    });
+
+    return signedUrl;
+  } catch (error) {
+    console.error('Error generating signed URL:', error);
+    // Return original URL if signing fails
+    return videoUrl;
+  }
+};
+
+/**
+ * Generate signed URLs for multiple videos
+ * @param {Array} videos - Array of video objects with videoUrl
+ * @param {number} expiresIn - Expiration time in seconds
+ * @returns {Array} Videos with signed URLs
+ */
+const getSignedVideoUrls = (videos, expiresIn = 3600) => {
+  if (!Array.isArray(videos)) return videos;
+
+  return videos.map((video) => {
+    if (video.videoUrl) {
+      return {
+        ...video,
+        videoUrl: getSignedVideoUrl(video.videoUrl, expiresIn),
+      };
+    }
+    return video;
+  });
+};
+
 module.exports = {
   uploadSingleImage,
   createUploadSingleImage,
   createUploadSingleVideo,
   createUploadSingleFile,
   deleteImageFromS3,
+  getSignedVideoUrl,
+  getSignedVideoUrls,
   s3,
 };

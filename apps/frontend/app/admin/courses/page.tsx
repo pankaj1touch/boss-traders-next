@@ -106,6 +106,9 @@ export default function AdminCoursesPage() {
                       Level
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Videos
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Price
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -130,6 +133,11 @@ export default function AdminCoursesPage() {
                       </td>
                       <td className="px-6 py-4 text-sm text-foreground capitalize">{course.category}</td>
                       <td className="px-6 py-4 text-sm text-foreground capitalize">{course.level}</td>
+                      <td className="px-6 py-4 text-sm text-foreground">
+                        <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                          {course.videos?.length || 0}
+                        </span>
+                      </td>
                       <td className="px-6 py-4 text-sm text-foreground">
                         {course.salePrice ? (
                           <div>

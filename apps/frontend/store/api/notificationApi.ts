@@ -4,34 +4,46 @@ export interface Notification {
   _id: string;
   userId: string;
   type: string;
-  channel: string;
-  payload: {
+  title: string;
+  message: string;
+  link?: string;
+  courseId?: {
+    _id: string;
     title: string;
-    message: string;
-    link?: string;
-    data?: any;
+    slug: string;
+    thumbnail?: string;
   };
+  videoId?: string;
   read: boolean;
+  readAt?: string;
+  metadata?: any;
   createdAt: string;
+  updatedAt: string;
 }
 
 export const notificationApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getNotifications: builder.query<{ notifications: Notification[]; unreadCount: number }, { read?: boolean; limit?: number }>({
+    getNotifications: builder.query<
+      { notifications: Notification[]; unreadCount: number; total: number },
+      { read?: boolean; limit?: number }
+    >({
       query: (params) => ({
         url: '/notifications',
         params,
       }),
       providesTags: ['Notification'],
     }),
-    markAsRead: builder.mutation<{ message: string }, string>({
-      query: (id) => ({
-        url: `/notifications/${id}/read`,
+    markNotificationAsRead: builder.mutation<
+      { message: string; notification: Notification },
+      string
+    >({
+      query: (notificationId) => ({
+        url: `/notifications/${notificationId}/read`,
         method: 'PATCH',
       }),
       invalidatesTags: ['Notification'],
     }),
-    markAllAsRead: builder.mutation<{ message: string }, void>({
+    markAllNotificationsAsRead: builder.mutation<{ message: string }, void>({
       query: () => ({
         url: '/notifications/read-all',
         method: 'PATCH',
@@ -39,8 +51,8 @@ export const notificationApi = apiSlice.injectEndpoints({
       invalidatesTags: ['Notification'],
     }),
     deleteNotification: builder.mutation<{ message: string }, string>({
-      query: (id) => ({
-        url: `/notifications/${id}`,
+      query: (notificationId) => ({
+        url: `/notifications/${notificationId}`,
         method: 'DELETE',
       }),
       invalidatesTags: ['Notification'],
@@ -50,8 +62,7 @@ export const notificationApi = apiSlice.injectEndpoints({
 
 export const {
   useGetNotificationsQuery,
-  useMarkAsReadMutation,
-  useMarkAllAsReadMutation,
+  useMarkNotificationAsReadMutation,
+  useMarkAllNotificationsAsReadMutation,
   useDeleteNotificationMutation,
 } = notificationApi;
-

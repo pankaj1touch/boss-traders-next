@@ -37,6 +37,11 @@ export default function CreateCoursePage() {
       isFree: boolean;
       order: number;
       thumbnail: string;
+      chapters: Array<{
+        title: string;
+        timestamp: number;
+        description: string;
+      }>;
     }>,
   });
 
@@ -63,10 +68,55 @@ export default function CreateCoursePage() {
       isFree: false,
       order: formData.videos.length,
       thumbnail: '',
+      chapters: [],
     };
     setFormData(prev => ({
       ...prev,
       videos: [...prev.videos, newVideo]
+    }));
+  };
+
+  const addChapter = (videoIndex: number) => {
+    setFormData(prev => ({
+      ...prev,
+      videos: prev.videos.map((video, i) =>
+        i === videoIndex
+          ? {
+              ...video,
+              chapters: [...(video.chapters || []), { title: '', timestamp: 0, description: '' }],
+            }
+          : video
+      ),
+    }));
+  };
+
+  const updateChapter = (videoIndex: number, chapterIndex: number, field: string, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      videos: prev.videos.map((video, i) =>
+        i === videoIndex
+          ? {
+              ...video,
+              chapters: (video.chapters || []).map((chapter, j) =>
+                j === chapterIndex ? { ...chapter, [field]: value } : chapter
+              ),
+            }
+          : video
+      ),
+    }));
+  };
+
+  const removeChapter = (videoIndex: number, chapterIndex: number) => {
+    setFormData(prev => ({
+      ...prev,
+      videos: prev.videos.map((video, i) =>
+        i === videoIndex
+          ? {
+              ...video,
+              chapters: (video.chapters || []).filter((_, j) => j !== chapterIndex),
+            }
+          : video
+      ),
     }));
   };
 
@@ -400,6 +450,63 @@ export default function CreateCoursePage() {
                           onChange={(url) => updateVideo(index, 'videoUrl', url)}
                           type="courses"
                         />
+                      </div>
+
+                      {/* Video Chapters */}
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <label className="block text-sm font-medium text-foreground">
+                            Video Chapters (Optional)
+                          </label>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => addChapter(index)}
+                            className="flex items-center gap-1"
+                          >
+                            <Plus className="h-3 w-3" />
+                            Add Chapter
+                          </Button>
+                        </div>
+                        {video.chapters && video.chapters.length > 0 && (
+                          <div className="space-y-2 mt-2 p-4 rounded-lg border border-border bg-muted/50">
+                            {video.chapters.map((chapter, chapterIndex) => (
+                              <div key={chapterIndex} className="flex gap-2 items-start">
+                                <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
+                                  <Input
+                                    type="text"
+                                    placeholder="Chapter title"
+                                    value={chapter.title}
+                                    onChange={(e) => updateChapter(index, chapterIndex, 'title', e.target.value)}
+                                  />
+                                  <Input
+                                    type="number"
+                                    placeholder="Timestamp (seconds)"
+                                    value={chapter.timestamp}
+                                    onChange={(e) => updateChapter(index, chapterIndex, 'timestamp', Number(e.target.value))}
+                                    min="0"
+                                  />
+                                  <Input
+                                    type="text"
+                                    placeholder="Description (optional)"
+                                    value={chapter.description || ''}
+                                    onChange={(e) => updateChapter(index, chapterIndex, 'description', e.target.value)}
+                                  />
+                                </div>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeChapter(index, chapterIndex)}
+                                  className="text-red-600 hover:text-red-700"
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                       
                       <div className="flex items-center gap-4">

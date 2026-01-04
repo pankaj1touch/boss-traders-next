@@ -1,0 +1,31 @@
+
+> edtech-frontend@1.0.0 build
+> next build
+
+  ▲ Next.js 14.2.33
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+Failed to compile.
+
+./components/course/VideoAnnotations.tsx:51:37
+Type error: Property 'role' does not exist on type 'User'. Did you mean 'roles'?
+
+[0m [90m 49 |[39m[0m
+[0m [90m 50 |[39m   [36mconst[39m annotations [33m=[39m data[33m?[39m[33m.[39mannotations [33m||[39m [][33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 51 |[39m   [36mconst[39m isAdminOrInstructor [33m=[39m user[33m?[39m[33m.[39mrole [33m===[39m [32m'admin'[39m [33m||[39m user[33m?[39m[33m.[39mrole [33m===[39m [32m'instructor'[39m[33m;[39m[0m
+[0m [90m    |[39m                                     [31m[1m^[22m[39m[0m
+[0m [90m 52 |[39m[0m
+[0m [90m 53 |[39m   [36mconst[39m formatTime [33m=[39m (seconds[33m:[39m number) [33m=>[39m {[0m
+[0m [90m 54 |[39m     [36mconst[39m mins [33m=[39m [33mMath[39m[33m.[39mfloor(seconds [33m/[39m [35m60[39m)[33m;[39m[0m
+Next.js build worker exited with code: 1 and signal: null
+npm error Lifecycle script `build` failed with error:
+npm error code 1
+npm error path C:\Users\Pankaj Singh\Desktop\boss-traders\apps\frontend
+npm error workspace edtech-frontend@1.0.0
+npm error location C:\Users\Pankaj Singh\Desktop\boss-traders\apps\frontend
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c next build

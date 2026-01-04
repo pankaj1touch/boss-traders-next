@@ -6,6 +6,8 @@ import { ThemeProvider } from 'next-themes';
 import { store } from '@/store/store';
 import { initializeAuth } from '@/store/slices/authSlice';
 import { initializeSocket } from '@/lib/socket';
+import PWAServiceWorker from '@/components/PWAServiceWorker';
+import PWAInstallPrompt from '@/components/PWAInstallPrompt';
 
 function AuthInitializer({ children }: { children: React.ReactNode }) {
   const initialized = useRef(false);
@@ -56,6 +58,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
       disableTransitionOnChange={false}
     >
       <Provider store={store}>
+        <PWAServiceWorker />
+        <PWAInstallPrompt />
         <AuthInitializer>{children}</AuthInitializer>
       </Provider>
     </ThemeProvider>

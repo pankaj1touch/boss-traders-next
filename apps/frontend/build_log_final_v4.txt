@@ -1,0 +1,36 @@
+
+> edtech-frontend@1.0.0 build
+> next build
+
+  ▲ Next.js 14.2.33
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+
+./components/course/VideoPlayer.tsx
+86:6  Warning: React Hook useEffect has an unnecessary dependency: 'playbackSpeeds'. Either exclude it or remove the dependency array. Outer scope values like 'playbackSpeeds' aren't valid dependencies because mutating them doesn't re-render the component.  react-hooks/exhaustive-deps
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
+Failed to compile.
+
+./components/course/LiveStreamPlayer.tsx:112:24
+Type error: Type '"outline"' is not assignable to type '"default" | "success" | "warning" | "danger" | "primary" | "secondary" | undefined'.
+
+[0m [90m 110 |[39m                   [33m<[39m[33mspan[39m className[33m=[39m[32m"text-sm font-semibold"[39m[33m>[39m[33mLIVE[39m[33m<[39m[33m/[39m[33mspan[39m[33m>[39m[0m
+[0m [90m 111 |[39m                 [33m<[39m[33m/[39m[33mdiv[39m[33m>[39m[0m
+[0m[31m[1m>[22m[39m[90m 112 |[39m                 [33m<[39m[33mBadge[39m variant[33m=[39m[32m"outline"[39m className[33m=[39m[32m"bg-black/50 text-white border-white/20"[39m[33m>[39m[0m
+[0m [90m     |[39m                        [31m[1m^[22m[39m[0m
+[0m [90m 113 |[39m                   [33m<[39m[33mUsers[39m className[33m=[39m[32m"h-3 w-3 mr-1"[39m [33m/[39m[33m>[39m[0m
+[0m [90m 114 |[39m                   {viewers} viewers[0m
+[0m [90m 115 |[39m                 [33m<[39m[33m/[39m[33mBadge[39m[33m>[39m[0m
+Next.js build worker exited with code: 1 and signal: null
+npm error Lifecycle script `build` failed with error:
+npm error code 1
+npm error path C:\Users\Pankaj Singh\Desktop\boss-traders\apps\frontend
+npm error workspace edtech-frontend@1.0.0
+npm error location C:\Users\Pankaj Singh\Desktop\boss-traders\apps\frontend
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c next build

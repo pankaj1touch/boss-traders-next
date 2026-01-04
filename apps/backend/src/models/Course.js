@@ -78,6 +78,13 @@ const courseSchema = new mongoose.Schema(
         type: String,
         required: true,
       },
+      videoQualities: [{
+        quality: {
+          type: String,
+          enum: ['360p', '480p', '720p', '1080p', 'auto'],
+        },
+        url: String,
+      }],
       duration: Number, // in seconds
       isFree: {
         type: Boolean,
@@ -88,6 +95,17 @@ const courseSchema = new mongoose.Schema(
         default: 0,
       },
       thumbnail: String,
+      chapters: [{
+        title: {
+          type: String,
+          required: true,
+        },
+        timestamp: {
+          type: Number, // in seconds
+          required: true,
+        },
+        description: String,
+      }],
     }],
     totalDuration: {
       type: Number,
@@ -100,6 +118,16 @@ const courseSchema = new mongoose.Schema(
 courseSchema.index({ slug: 1 });
 courseSchema.index({ category: 1, publishStatus: 1 });
 courseSchema.index({ tags: 1 });
+
+// Pre-save hook to calculate totalDuration
+courseSchema.pre('save', function (next) {
+  if (this.videos && Array.isArray(this.videos)) {
+    this.totalDuration = this.videos.reduce((total, video) => {
+      return total + (video.duration || 0);
+    }, 0);
+  }
+  next();
+});
 
 module.exports = mongoose.model('Course', courseSchema);
 

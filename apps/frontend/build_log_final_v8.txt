@@ -1,0 +1,31 @@
+
+> edtech-frontend@1.0.0 build
+> next build
+
+  ▲ Next.js 14.2.33
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+Failed to compile.
+
+./components/course/VideoAnnotations.tsx:336:34
+Type error: Type '"outline"' is not assignable to type '"default" | "success" | "warning" | "danger" | "primary" | "secondary" | undefined'.
+
+[0m [90m 334 |[39m                             style[33m=[39m{{ backgroundColor[33m:[39m annotation[33m.[39mcolor [33m||[39m [32m'#3b82f6'[39m }}[0m
+[0m [90m 335 |[39m                           [33m/[39m[33m>[39m[0m
+[0m[31m[1m>[22m[39m[90m 336 |[39m                           [33m<[39m[33mBadge[39m variant[33m=[39m[32m"outline"[39m className[33m=[39m[32m"text-xs"[39m[33m>[39m[0m
+[0m [90m     |[39m                                  [31m[1m^[22m[39m[0m
+[0m [90m 337 |[39m                             {annotation[33m.[39mtype}[0m
+[0m [90m 338 |[39m                           [33m<[39m[33m/[39m[33mBadge[39m[33m>[39m[0m
+[0m [90m 339 |[39m                           {[33m![39mannotation[33m.[39misPublic [33m&&[39m ([0m
+Next.js build worker exited with code: 1 and signal: null
+npm error Lifecycle script `build` failed with error:
+npm error code 1
+npm error path C:\Users\Pankaj Singh\Desktop\boss-traders\apps\frontend
+npm error workspace edtech-frontend@1.0.0
+npm error location C:\Users\Pankaj Singh\Desktop\boss-traders\apps\frontend
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c next build

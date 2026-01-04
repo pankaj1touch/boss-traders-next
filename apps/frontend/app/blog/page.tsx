@@ -71,7 +71,7 @@ export default function BlogPage() {
     { value: 'featured', label: 'Featured' },
   ];
 
-  const blogs = data?.blogs ?? [];
+  const blogs = useMemo(() => data?.blogs ?? [], [data?.blogs]);
 
   const timeframeFilteredBlogs = useMemo(() => {
     if (!blogs.length) return [];

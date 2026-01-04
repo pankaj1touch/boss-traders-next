@@ -2,9 +2,13 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
+import { useGetActiveSocialLinksQuery } from '@/store/api/socialLinkApi';
+import { platformIcons } from '@/store/api/socialLinkApi';
 
 export function Footer() {
+  const { data, isLoading } = useGetActiveSocialLinksQuery();
+  const socialLinks = data?.socialLinks || [];
+
   const footerLinks = {
     product: [
       { label: 'Courses', href: '/courses' },
@@ -25,13 +29,6 @@ export function Footer() {
       { label: 'Cookie Policy', href: '/cookies' },
     ],
   };
-
-  const socialLinks = [
-    { icon: Facebook, href: '#', label: 'Facebook' },
-    { icon: Twitter, href: '#', label: 'Twitter' },
-    { icon: Linkedin, href: '#', label: 'LinkedIn' },
-    { icon: Instagram, href: '#', label: 'Instagram' },
-  ];
 
   return (
     <footer className="border-t border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-950">
@@ -54,18 +51,23 @@ export function Footer() {
               and achieve financial success through expert guidance.
             </p>
             <div className="mt-6 flex gap-4">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  className="rounded-full p-2 hover:bg-gray-200 dark:hover:bg-gray-800"
-                  aria-label={social.label}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <social.icon className="h-5 w-5" />
-                </a>
-              ))}
+              {!isLoading && socialLinks.map((social) => {
+                const Icon = platformIcons[social.platform];
+                if (!Icon) return null;
+                
+                return (
+                  <a
+                    key={social._id}
+                    href={social.url}
+                    className="rounded-full p-2 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
+                    aria-label={social.platform}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Icon className="h-5 w-5" />
+                  </a>
+                );
+              })}
             </div>
           </div>
 

@@ -28,6 +28,8 @@ const bannerRoutes = require('./routes/bannerRoutes');
 const demoClassRoutes = require('./routes/demoClassRoutes');
 const announcementRoutes = require('./routes/announcementRoutes');
 const couponRoutes = require('./routes/couponRoutes');
+const pageContentRoutes = require('./routes/pageContentRoutes');
+const socialLinkRoutes = require('./routes/socialLinkRoutes');
 
 const app = express();
 
@@ -81,6 +83,8 @@ app.use('/api/banners', bannerRoutes);
 app.use('/api/demo-classes', demoClassRoutes);
 app.use('/api/announcements', announcementRoutes);
 app.use('/api/coupons', couponRoutes);
+app.use('/api/page-content', pageContentRoutes);
+app.use('/api/social-links', socialLinkRoutes);
 app.use('/api/users', require('./routes/userRoutes'));
 
 // 404 handler

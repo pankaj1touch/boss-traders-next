@@ -6,47 +6,59 @@ const notificationSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
+      index: true,
     },
     type: {
       type: String,
       enum: [
-        'course_enrolled',
-        'live_session_reminder',
-        'order_confirmation',
-        'password_reset',
-        'announcement',
-        'feedback_response',
-        'demo_class_registration',
-        'other',
+        'course_new_video',
+        'course_completed',
+        'live_stream_scheduled',
+        'live_stream_starting',
+        'assignment_due',
+        'quiz_available',
+        'certificate_earned',
+        'comment_reply',
+        'course_reminder',
+        'achievement_unlocked',
       ],
       required: true,
     },
-    channel: {
+    title: {
       type: String,
-      enum: ['email', 'push', 'inapp'],
-      default: 'inapp',
+      required: true,
     },
-    payload: {
-      title: String,
-      message: String,
-      link: String,
-      data: mongoose.Schema.Types.Mixed,
+    message: {
+      type: String,
+      required: true,
+    },
+    link: {
+      type: String,
+    },
+    courseId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Course',
+    },
+    videoId: {
+      type: String,
     },
     read: {
       type: Boolean,
       default: false,
+      index: true,
     },
-    sentAt: Date,
-    status: {
-      type: String,
-      enum: ['pending', 'sent', 'failed'],
-      default: 'pending',
+    readAt: {
+      type: Date,
+    },
+    metadata: {
+      type: mongoose.Schema.Types.Mixed,
     },
   },
   { timestamps: true }
 );
 
+// Indexes
 notificationSchema.index({ userId: 1, read: 1, createdAt: -1 });
+notificationSchema.index({ userId: 1, createdAt: -1 });
 
 module.exports = mongoose.model('Notification', notificationSchema);
-

@@ -34,14 +34,14 @@ export default function AdminOrdersPage() {
     status: statusFilter || undefined,
   });
   const [confirmPayment, { isLoading: isConfirming }] = useAdminConfirmPaymentMutation();
-  
+
   // Get pending demo class registrations count
   const { data: registrationsData } = useAdminGetPendingRegistrationsQuery({
     approvalStatus: 'pending',
   });
   const pendingDemoRegistrationsCount = registrationsData?.registrations?.length || 0;
 
-  const orders = data?.orders ?? [];
+  const orders = useMemo(() => data?.orders ?? [], [data?.orders]);
   const pagination = data?.pagination;
 
   const pendingCount = useMemo(

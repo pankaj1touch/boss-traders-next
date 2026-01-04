@@ -23,6 +23,13 @@ export interface StudentCourse {
     rating: number;
     ratingCount: number;
     language: string;
+    videos?: Array<{
+      _id?: string;
+      title?: string;
+      duration?: number;
+      isFree?: boolean;
+      order?: number;
+    }>;
   };
 }
 

@@ -33,6 +33,34 @@ const enrollmentSchema = new mongoose.Schema(
         ref: 'Lesson',
       },
     ],
+    videoProgress: [
+      {
+        videoId: {
+          type: String,
+          required: true,
+        },
+        currentTime: {
+          type: Number,
+          default: 0,
+        },
+        duration: {
+          type: Number,
+          default: 0,
+        },
+        completed: {
+          type: Boolean,
+          default: false,
+        },
+        watchedAt: {
+          type: Date,
+          default: Date.now,
+        },
+        lastUpdated: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
     expiresAt: Date,
     status: {
       type: String,

@@ -25,33 +25,95 @@ const VideoUpload = ({
   type = 'courses',
 }: VideoUploadProps) => {
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [fileInfo, setFileInfo] = useState<{ name: string; size: number; type: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dispatch = useAppDispatch();
   const accessToken = useAppSelector((state) => state.auth.accessToken);
+
+  // Allowed video formats
+  const ALLOWED_VIDEO_TYPES = [
+    'video/mp4',
+    'video/webm',
+    'video/ogg',
+    'video/quicktime', // MOV
+    'video/x-msvideo', // AVI
+    'video/x-matroska', // MKV
+  ];
+
+  const ALLOWED_EXTENSIONS = ['.mp4', '.webm', '.ogg', '.mov', '.avi', '.mkv'];
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  };
+
+  const validateVideoFile = (file: File): { valid: boolean; error?: string } => {
+    // Check file extension
+    const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
+    if (!ALLOWED_EXTENSIONS.includes(fileExtension)) {
+      return {
+        valid: false,
+        error: `Invalid file format. Allowed formats: ${ALLOWED_EXTENSIONS.join(', ')}`,
+      };
+    }
+
+    // Check MIME type
+    if (!ALLOWED_VIDEO_TYPES.includes(file.type) && !file.type.startsWith('video/')) {
+      return {
+        valid: false,
+        error: `Invalid video type. Allowed types: MP4, WebM, OGG, MOV, AVI, MKV`,
+      };
+    }
+
+    // Validate file size (500MB limit)
+    const maxSize = 500 * 1024 * 1024; // 500MB
+    if (file.size > maxSize) {
+      return {
+        valid: false,
+        error: `File size (${formatFileSize(file.size)}) exceeds maximum limit of 500MB`,
+      };
+    }
+
+    // Check minimum file size (1MB)
+    const minSize = 1 * 1024 * 1024; // 1MB
+    if (file.size < minSize) {
+      return {
+        valid: false,
+        error: 'File size is too small. Minimum size is 1MB',
+      };
+    }
+
+    return { valid: true };
+  };
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    if (!file.type.startsWith('video/')) {
+    // Validate file
+    const validation = validateVideoFile(file);
+    if (!validation.valid) {
       dispatch(addToast({ 
         type: 'error', 
-        message: 'Please select a valid video file' 
+        message: validation.error || 'Invalid video file' 
       }));
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
       return;
     }
 
-    // Validate file size (500MB limit)
-    if (file.size > 500 * 1024 * 1024) {
-      dispatch(addToast({ 
-        type: 'error', 
-        message: 'Video size must be less than 500MB' 
-      }));
-      return;
-    }
-
+    setFileInfo({
+      name: file.name,
+      size: file.size,
+      type: file.type,
+    });
     setIsUploading(true);
+    setUploadProgress(0);
 
     try {
       const formData = new FormData();
@@ -68,12 +130,54 @@ const VideoUpload = ({
         apiUrl: `${API_BASE_URL}/upload/video`
       });
 
-      const response = await fetch(`${API_BASE_URL}/upload/video?type=${type}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-        },
-        body: formData,
+      // Use XMLHttpRequest for progress tracking
+      const xhr = new XMLHttpRequest();
+
+      const response = await new Promise<Response>((resolve, reject) => {
+        // Track upload progress
+        xhr.upload.addEventListener('progress', (e) => {
+          if (e.lengthComputable) {
+            const percentComplete = (e.loaded / e.total) * 100;
+            setUploadProgress(Math.round(percentComplete));
+          }
+        });
+
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const jsonResponse = JSON.parse(xhr.responseText);
+              const response = new Response(JSON.stringify(jsonResponse), {
+                status: xhr.status,
+                statusText: xhr.statusText,
+                headers: new Headers({ 'Content-Type': 'application/json' }),
+              });
+              resolve(response);
+            } catch (e) {
+              reject(new Error('Invalid response from server'));
+            }
+          } else {
+            try {
+              const errorData = JSON.parse(xhr.responseText);
+              reject(new Error(errorData.message || `Upload failed with status ${xhr.status}`));
+            } catch {
+              reject(new Error(`Upload failed with status ${xhr.status}`));
+            }
+          }
+        };
+
+        xhr.onerror = () => {
+          reject(new Error('Network error during upload. Please check your connection.'));
+        };
+
+        xhr.ontimeout = () => {
+          reject(new Error('Upload timeout. The file might be too large or connection is slow.'));
+        };
+
+        xhr.timeout = 300000; // 5 minutes timeout
+
+        xhr.open('POST', `${API_BASE_URL}/upload/video?type=${type}`);
+        xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
+        xhr.send(formData);
       });
 
       console.log('📡 Upload response:', {
@@ -99,12 +203,22 @@ const VideoUpload = ({
       }
     } catch (error: any) {
       console.error('Upload error:', error);
+      let errorMessage = 'Failed to upload video';
+      
+      if (error.message) {
+        errorMessage = error.message;
+      } else if (error.response) {
+        errorMessage = error.response.message || errorMessage;
+      }
+      
       dispatch(addToast({ 
         type: 'error', 
-        message: error.message || 'Failed to upload video' 
+        message: errorMessage 
       }));
     } finally {
       setIsUploading(false);
+      setUploadProgress(0);
+      setFileInfo(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -139,7 +253,7 @@ const VideoUpload = ({
           <input
             ref={fileInputRef}
             type="file"
-            accept="video/*"
+            accept="video/mp4,video/webm,video/ogg,video/quicktime,video/x-msvideo,video/x-matroska,.mp4,.webm,.ogg,.mov,.avi,.mkv"
             onChange={handleFileSelect}
             className="hidden"
             disabled={disabled || isUploading}
@@ -149,9 +263,30 @@ const VideoUpload = ({
             {isUploading ? (
               <>
                 <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary-500" />
-                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                <p className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">
                   Uploading video...
                 </p>
+                {fileInfo && (
+                  <div className="mt-2 space-y-1">
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                      {fileInfo.name}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-500">
+                      {formatFileSize(fileInfo.size)}
+                    </p>
+                  </div>
+                )}
+                <div className="mt-4 w-full max-w-xs mx-auto">
+                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden dark:bg-gray-700">
+                    <div
+                      className="h-full bg-primary-500 transition-all duration-300"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
+                  <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+                    {uploadProgress}% complete
+                  </p>
+                </div>
               </>
             ) : (
               <>
@@ -161,7 +296,10 @@ const VideoUpload = ({
                     Click to upload video
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    MP4, AVI, MOV up to 500MB
+                    MP4, WebM, OGG, MOV, AVI, MKV
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Maximum size: 500MB
                   </p>
                 </div>
               </>

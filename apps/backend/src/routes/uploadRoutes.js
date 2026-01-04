@@ -7,6 +7,7 @@ const {
   createUploadSingleVideo, 
   createUploadSingleFile 
 } = require('../utils/s3Upload');
+const { generateAndUploadThumbnail } = require('../utils/videoThumbnail');
 
 // Test route to check if upload endpoint is accessible
 router.get('/test', (req, res) => {
@@ -174,6 +175,19 @@ router.post('/video', authenticate, (req, res, next) => {
       size: req.file.size
     });
 
+    // Optionally generate thumbnail (async, don't wait)
+    if (req.query.generateThumbnail === 'true') {
+      generateAndUploadThumbnail(req.file.location, 1, folder)
+        .then((thumbnailUrl) => {
+          if (thumbnailUrl) {
+            console.log('✅ Thumbnail generated:', thumbnailUrl);
+          }
+        })
+        .catch((error) => {
+          console.error('❌ Thumbnail generation failed:', error);
+        });
+    }
+
     // Return the uploaded file information
     res.json({
       success: true,
@@ -183,6 +197,41 @@ router.post('/video', authenticate, (req, res, next) => {
       fileSize: req.file.size,
     });
   });
+});
+
+// Generate thumbnail from video URL
+router.post('/video/thumbnail', authenticate, async (req, res) => {
+  try {
+    const { videoUrl, timestamp = 1, folder = 'courses' } = req.body;
+
+    if (!videoUrl) {
+      return res.status(400).json({
+        success: false,
+        message: 'Video URL is required',
+      });
+    }
+
+    const thumbnailUrl = await generateAndUploadThumbnail(videoUrl, timestamp, folder);
+
+    if (!thumbnailUrl) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to generate thumbnail. Make sure ffmpeg is installed.',
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Thumbnail generated successfully',
+      thumbnailUrl,
+    });
+  } catch (error) {
+    console.error('Error generating thumbnail:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error generating thumbnail',
+    });
+  }
 });
 
 // Upload file route (for ebooks)

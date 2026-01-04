@@ -10,7 +10,8 @@ import { Badge } from '@/components/ui/Badge';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { ToastContainer } from '@/components/ui/Toast';
-import { useGetCourseBySlugQuery } from '@/store/api/courseApi';
+import { useGetCourseBySlugQuery, useGetRecommendedVideosQuery } from '@/store/api/courseApi';
+import VideoRecommendations from '@/components/course/VideoRecommendations';
 import { useGetDemoClassesQuery } from '@/store/api/demoClassApi';
 import { formatPrice, formatDate } from '@/lib/utils';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -152,7 +153,11 @@ export default function CourseDetailPage() {
                   </div>
 
                   {isEnrolled ? (
-                    <Button className="w-full" size="lg">
+                    <Button 
+                      className="w-full" 
+                      size="lg"
+                      onClick={() => router.push(`/courses/${slug}/learn`)}
+                    >
                       <Play className="mr-2 h-5 w-5" />
                       Continue Learning
                     </Button>
@@ -194,6 +199,71 @@ export default function CourseDetailPage() {
                   </ul>
                 </CardContent>
               </Card>
+
+              {/* Course Videos */}
+              {course.videos && course.videos.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Video className="h-5 w-5" />
+                      Course Videos ({course.videos.length})
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {course.videos
+                      .sort((a, b) => (a.order || 0) - (b.order || 0))
+                      .slice(0, 5)
+                      .map((video, index) => (
+                        <div
+                          key={video._id || index}
+                          className="flex items-center justify-between rounded-xl border border-gray-200 p-4 transition-colors hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800/50"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100 dark:bg-primary-900/30">
+                              <Play className="h-5 w-5 text-primary-600 dark:text-primary-400" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-foreground">{video.title}</p>
+                              <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
+                                {video.duration && (
+                                  <span>{Math.floor(video.duration / 60)} min</span>
+                                )}
+                                {video.isFree && <Badge variant="success">Free Preview</Badge>}
+                              </div>
+                            </div>
+                          </div>
+                          {video.isFree && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => router.push(`/courses/${slug}/learn`)}
+                            >
+                              Watch
+                            </Button>
+                          )}
+                        </div>
+                      ))}
+                    {course.videos.length > 5 && (
+                      <div className="pt-2 text-center">
+                        <Button
+                          variant="outline"
+                          onClick={() => router.push(`/courses/${slug}/learn`)}
+                        >
+                          View All {course.videos.length} Videos
+                        </Button>
+                      </div>
+                    )}
+                    {isEnrolled && course.videos.length <= 5 && (
+                      <div className="pt-2 text-center">
+                        <Button onClick={() => router.push(`/courses/${slug}/learn`)}>
+                          <Play className="mr-2 h-4 w-4" />
+                          Start Learning
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Curriculum */}
               <Card>
@@ -362,6 +432,13 @@ export default function CourseDetailPage() {
               </Card>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Recommendations */}
+      <section className="py-12 bg-muted/30">
+        <div className="container-custom">
+          <VideoRecommendations />
         </div>
       </section>
 
