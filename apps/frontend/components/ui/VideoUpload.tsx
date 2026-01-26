@@ -4,6 +4,8 @@ import { useState, useRef } from 'react';
 import { Upload, X, Video, Loader2 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addToast } from '@/store/slices/uiSlice';
+import { updateAccessToken, setCredentials, logout } from '@/store/slices/authSlice';
+import { useRefreshTokenMutation } from '@/store/api/authApi';
 import { API_BASE_URL } from '@/lib/config';
 import { Button } from './Button';
 
@@ -30,6 +32,9 @@ const VideoUpload = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dispatch = useAppDispatch();
   const accessToken = useAppSelector((state) => state.auth.accessToken);
+  const refreshToken = useAppSelector((state) => state.auth.refreshToken);
+  const user = useAppSelector((state) => state.auth.user);
+  const [refreshTokenMutation] = useRefreshTokenMutation();
 
   // Allowed video formats
   const ALLOWED_VIDEO_TYPES = [
@@ -123,62 +128,128 @@ const VideoUpload = ({
         throw new Error('No authentication token found');
       }
 
+      const uploadUrl = `${API_BASE_URL}/upload/video?type=${type}`;
+      
       console.log('🚀 Uploading video:', {
         fileName: file.name,
         fileSize: file.size,
         fileType: file.type,
-        apiUrl: `${API_BASE_URL}/upload/video`
+        apiUrl: uploadUrl,
+        hasToken: !!accessToken,
+        tokenPreview: accessToken ? `${accessToken.substring(0, 20)}...` : 'NO TOKEN'
       });
 
-      // Use XMLHttpRequest for progress tracking
-      const xhr = new XMLHttpRequest();
+      // Helper function to upload with token
+      const uploadWithToken = async (token: string, retry = false): Promise<Response> => {
+        return new Promise<Response>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
 
-      const response = await new Promise<Response>((resolve, reject) => {
-        // Track upload progress
-        xhr.upload.addEventListener('progress', (e) => {
-          if (e.lengthComputable) {
-            const percentComplete = (e.loaded / e.total) * 100;
-            setUploadProgress(Math.round(percentComplete));
+          // Track upload progress
+          xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+              const percentComplete = (e.loaded / e.total) * 100;
+              setUploadProgress(Math.round(percentComplete));
+              if (!retry) {
+                console.log(`📊 Upload progress: ${Math.round(percentComplete)}%`);
+              }
+            }
+          });
+
+          xhr.onload = () => {
+            console.log('📡 Upload response received:', {
+              status: xhr.status,
+              statusText: xhr.statusText,
+              retry,
+              responseText: xhr.responseText.substring(0, 200)
+            });
+            
+            if (xhr.status >= 200 && xhr.status < 300) {
+              try {
+                const jsonResponse = JSON.parse(xhr.responseText);
+                const response = new Response(JSON.stringify(jsonResponse), {
+                  status: xhr.status,
+                  statusText: xhr.statusText,
+                  headers: new Headers({ 'Content-Type': 'application/json' }),
+                });
+                resolve(response);
+              } catch (e) {
+                console.error('❌ Failed to parse response:', e);
+                reject(new Error('Invalid response from server'));
+              }
+            } else if (xhr.status === 401 && !retry && refreshToken) {
+              // Token expired, try to refresh
+              console.log('🔄 Token expired, attempting refresh...');
+              reject(new Error('TOKEN_EXPIRED'));
+            } else {
+              try {
+                const errorData = JSON.parse(xhr.responseText);
+                console.error('❌ Upload error response:', errorData);
+                reject(new Error(errorData.message || errorData.details || `Upload failed with status ${xhr.status}`));
+              } catch {
+                console.error('❌ Upload failed with status:', xhr.status, xhr.statusText);
+                reject(new Error(`Upload failed with status ${xhr.status}: ${xhr.statusText}`));
+              }
+            }
+          };
+
+          xhr.onerror = () => {
+            console.error('❌ Network error during upload');
+            reject(new Error('Network error during upload. Please check your connection and API URL.'));
+          };
+
+          xhr.ontimeout = () => {
+            console.error('❌ Upload timeout');
+            reject(new Error('Upload timeout. The file might be too large or connection is slow.'));
+          };
+
+          xhr.timeout = 300000; // 5 minutes timeout
+
+          try {
+            xhr.open('POST', uploadUrl);
+            xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+            xhr.send(formData);
+          } catch (error) {
+            console.error('❌ Error setting up XHR:', error);
+            reject(new Error('Failed to initialize upload request'));
           }
         });
+      };
 
-        xhr.onload = () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            try {
-              const jsonResponse = JSON.parse(xhr.responseText);
-              const response = new Response(JSON.stringify(jsonResponse), {
-                status: xhr.status,
-                statusText: xhr.statusText,
-                headers: new Headers({ 'Content-Type': 'application/json' }),
-              });
-              resolve(response);
-            } catch (e) {
-              reject(new Error('Invalid response from server'));
-            }
-          } else {
-            try {
-              const errorData = JSON.parse(xhr.responseText);
-              reject(new Error(errorData.message || `Upload failed with status ${xhr.status}`));
-            } catch {
-              reject(new Error(`Upload failed with status ${xhr.status}`));
-            }
+      // Try upload with current token
+      let response: Response;
+      let currentToken = accessToken;
+
+      try {
+        response = await uploadWithToken(currentToken, false);
+      } catch (error: any) {
+        // If token expired, try to refresh and retry
+        if (error.message === 'TOKEN_EXPIRED' && refreshToken && user) {
+          console.log('🔄 Refreshing token and retrying upload...');
+          try {
+            const refreshResult = await refreshTokenMutation({ refreshToken }).unwrap();
+            
+            // Update tokens in store
+            dispatch(setCredentials({
+              user,
+              accessToken: refreshResult.accessToken,
+              refreshToken: refreshResult.refreshToken,
+            }));
+
+            console.log('✅ Token refreshed, retrying upload...');
+            currentToken = refreshResult.accessToken;
+            
+            // Reset progress and retry upload
+            setUploadProgress(0);
+            response = await uploadWithToken(currentToken, true);
+          } catch (refreshError) {
+            console.error('❌ Token refresh failed:', refreshError);
+            dispatch(logout());
+            throw new Error('Session expired. Please login again.');
           }
-        };
-
-        xhr.onerror = () => {
-          reject(new Error('Network error during upload. Please check your connection.'));
-        };
-
-        xhr.ontimeout = () => {
-          reject(new Error('Upload timeout. The file might be too large or connection is slow.'));
-        };
-
-        xhr.timeout = 300000; // 5 minutes timeout
-
-        xhr.open('POST', `${API_BASE_URL}/upload/video?type=${type}`);
-        xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
-        xhr.send(formData);
-      });
+        } else {
+          throw error;
+        }
+      }
 
       console.log('📡 Upload response:', {
         status: response.status,
@@ -202,14 +273,35 @@ const VideoUpload = ({
         throw new Error('Invalid response from server');
       }
     } catch (error: any) {
-      console.error('Upload error:', error);
+      console.error('❌ Upload error details:', {
+        error,
+        message: error?.message,
+        stack: error?.stack,
+        name: error?.name
+      });
+      
       let errorMessage = 'Failed to upload video';
       
-      if (error.message) {
+      if (error?.message) {
         errorMessage = error.message;
-      } else if (error.response) {
+      } else if (error?.response) {
         errorMessage = error.response.message || errorMessage;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
       }
+      
+      // More specific error messages
+      if (errorMessage.includes('Network error') || errorMessage.includes('connection')) {
+        errorMessage = 'Network error. Please check your internet connection and API server status.';
+      } else if (errorMessage.includes('timeout')) {
+        errorMessage = 'Upload timeout. File might be too large. Try a smaller file or check your connection.';
+      } else if (errorMessage.includes('Authentication') || errorMessage.includes('token')) {
+        errorMessage = 'Authentication required. Please login again.';
+      } else if (errorMessage.includes('CORS')) {
+        errorMessage = 'CORS error. Please check API server configuration.';
+      }
+      
+      console.error('❌ Final error message:', errorMessage);
       
       dispatch(addToast({ 
         type: 'error', 

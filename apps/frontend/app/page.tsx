@@ -123,254 +123,159 @@ export default function HomePage() {
       )}
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50 py-20 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <motion.div
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.1, 0.2, 0.1],
-            }}
-            transition={{ duration: 8, repeat: Infinity }}
-            className="absolute -left-20 -top-20 h-96 w-96 rounded-full bg-gradient-to-r from-emerald-400 to-blue-500 blur-3xl"
-          />
-          <motion.div
-            animate={{
-              scale: [1, 1.3, 1],
-              opacity: [0.1, 0.2, 0.1],
-            }}
-            transition={{ duration: 10, repeat: Infinity, delay: 2 }}
-            className="absolute -right-20 -bottom-20 h-96 w-96 rounded-full bg-gradient-to-r from-purple-400 to-pink-500 blur-3xl"
-          />
-        </div>
+      <section className="relative overflow-hidden bg-brand-dark py-20 lg:py-32">
+        {/* Mesh Gradient Background */}
+        <div className="absolute inset-0 bg-mesh-gradient opacity-20" />
+        <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-5" />
+
+        {/* Floating Elements */}
+        <div className="absolute -left-20 top-20 h-72 w-72 rounded-full bg-brand-purple/30 blur-[100px] animate-pulse-slow" />
+        <div className="absolute -right-20 bottom-20 h-72 w-72 rounded-full bg-brand-blue/30 blur-[100px] animate-pulse-slow lg:delay-1000" />
 
         <div className="container-custom relative z-10">
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
             >
               <AnimatePresence mode="wait">
                 {bannersLoading ? (
-                  <div className="flex items-center justify-center py-20">
-                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
+                  <div className="flex h-[400px] items-center justify-center">
+                    <div className="h-12 w-12 animate-spin rounded-full border-4 border-solid border-brand-accent border-r-transparent"></div>
                   </div>
-                ) : banners.length > 0 ? (
+                ) : (
                   <motion.div
                     key={currentBannerIndex}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    transition={{ duration: 0.5, ease: 'easeInOut' }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.5 }}
                   >
-                    {/* Badge */}
+                    {/* Premium Badge */}
                     <motion.div
-                      initial={{ opacity: 0, y: -20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6, delay: 0.2 }}
-                      className="mb-6 inline-flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.5 }}
+                      className="mb-8 inline-flex items-center gap-2 rounded-full border border-brand-gold/30 bg-brand-gold/10 px-4 py-1.5 text-sm font-semibold text-brand-gold backdrop-blur-sm"
                     >
                       <Zap className="h-4 w-4" />
-                      Master Trading & Investing
+                      <span className="tracking-wide uppercase">Elite Investor Class</span>
                     </motion.div>
 
-                    {/* Banner Title */}
-                    <motion.h1
-                      key={`banner-title-${currentBannerIndex}`}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      transition={{ duration: 0.5, delay: 0.1 }}
-                      className="mb-6 text-5xl font-bold leading-tight lg:text-6xl"
-                    >
-                      {banners[currentBannerIndex]?.title || (
-                        <>
-                          Master the Art of{' '}
-                          <span className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
-                            Trading
-                          </span>
-                        </>
-                      )}
-                    </motion.h1>
-
-                    {/* Banner Description */}
-                    <motion.p
-                      key={`banner-desc-${currentBannerIndex}`}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      transition={{ duration: 0.5, delay: 0.2 }}
-                      className="mb-8 text-xl text-gray-700 dark:text-gray-300"
-                    >
-                      {banners[currentBannerIndex]?.description || 
-                        'Learn from expert traders, master technical analysis, and build profitable trading strategies. Join live trading sessions and transform your financial future.'}
-                    </motion.p>
-                    
-                    {/* Stats */}
-                    <div className="mb-8 flex flex-wrap gap-6">
-                      <div className="flex items-center gap-2">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/30">
-                          <TrendingUp className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold text-gray-900 dark:text-white">10K+</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">Active Traders</div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30">
-                          <Target className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold text-gray-900 dark:text-white">95%</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">Success Rate</div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap gap-4">
-                      <Link href="/courses">
-                        <Button size="lg" className="bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700">
-                          Explore Trading Courses
-                          <ArrowRight className="ml-2 h-5 w-5" />
-                        </Button>
-                      </Link>
-                      <Link href="/auth/signup">
-                        <Button size="lg" variant="outline" className="border-2">
-                          Start Free Trial
-                        </Button>
-                      </Link>
-                    </div>
-                  </motion.div>
-                ) : (
-                  <div>
-                    {/* Badge */}
-                    <motion.div
-                      initial={{ opacity: 0, y: -20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6, delay: 0.2 }}
-                      className="mb-6 inline-flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                    >
-                      <Zap className="h-4 w-4" />
-                      Master Trading & Investing
-                    </motion.div>
-
-                    <h1 className="mb-6 text-5xl font-bold leading-tight lg:text-6xl">
-                      Master the Art of{' '}
-                      <span className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
-                        Trading
+                    {/* Headline */}
+                    <h1 className="mb-6 text-5xl font-bold leading-tight tracking-tight text-white lg:text-7xl">
+                      Master the <br />
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue via-brand-purple to-brand-neon animate-gradient-x">
+                        Market Moves
                       </span>
                     </h1>
-                    <p className="mb-8 text-xl text-gray-700 dark:text-gray-300">
-                      Learn from expert traders, master technical analysis, and build profitable trading strategies. 
-                      Join live trading sessions and transform your financial future.
-                    </p>
-                    
-                    {/* Stats */}
-                    <div className="mb-8 flex flex-wrap gap-6">
-                      <div className="flex items-center gap-2">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-900/30">
-                          <TrendingUp className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold text-gray-900 dark:text-white">10K+</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">Active Traders</div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30">
-                          <Target className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold text-gray-900 dark:text-white">95%</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">Success Rate</div>
-                        </div>
-                      </div>
-                    </div>
 
-                    <div className="flex flex-wrap gap-4">
+                    {/* Description */}
+                    <p className="mb-8 text-lg text-gray-400 lg:text-xl lg:leading-relaxed max-w-lg">
+                      {banners[currentBannerIndex]?.description ||
+                        'Join the elite community of traders. Master technical analysis, psychology, and risk management with our institutional-grade curriculum.'}
+                    </p>
+
+                    {/* CTA Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-4">
                       <Link href="/courses">
-                        <Button size="lg" className="bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700">
-                          Explore Trading Courses
+                        <Button size="lg" className="w-full sm:w-auto h-14 px-8 text-lg bg-gradient-to-r from-brand-blue to-brand-purple hover:from-brand-blue/90 hover:to-brand-purple/90 shadow-neon border-0 rounded-xl transition-all hover:scale-105">
+                          Explore Courses
                           <ArrowRight className="ml-2 h-5 w-5" />
                         </Button>
                       </Link>
                       <Link href="/auth/signup">
-                        <Button size="lg" variant="outline" className="border-2">
+                        <Button size="lg" variant="outline" className="w-full sm:w-auto h-14 px-8 text-lg border-white/20 text-white hover:bg-white/10 hover:border-white/40 rounded-xl backdrop-blur-sm">
                           Start Free Trial
                         </Button>
                       </Link>
                     </div>
-                  </div>
+
+                    {/* Trust Indicators */}
+                    <div className="mt-12 flex items-center gap-8 text-gray-500">
+                      <div className="flex -space-x-4">
+                        {[1, 2, 3, 4].map((i) => (
+                          <div key={i} className="h-10 w-10 rounded-full border-2 border-brand-dark bg-gray-800" />
+                        ))}
+                      </div>
+                      <div className="text-sm">
+                        <span className="block font-bold text-white">10,000+ Traders</span>
+                        Trusted by industry leaders
+                      </div>
+                    </div>
+                  </motion.div>
                 )}
               </AnimatePresence>
             </motion.div>
 
+            {/* Right Side - 3D Floating Glass Card */}
             <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="relative"
+              initial={{ opacity: 0, scale: 0.8, rotateY: -20 }}
+              animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+              transition={{ duration: 1, delay: 0.2 }}
+              className="relative hidden lg:block perspective-1000"
             >
-              {/* Banner Image with Auto-Rotation - Full Image Display */}
-              {bannersLoading ? (
-                <div className="relative h-[450px] w-full rounded-3xl bg-gray-200 dark:bg-gray-800 flex items-center justify-center">
-                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
-                </div>
-              ) : banners.length > 0 ? (
-                <div className="relative h-[450px] w-full rounded-3xl overflow-hidden bg-gray-900 shadow-2xl flex items-center justify-center">
-                  <AnimatePresence mode="wait">
-                    {banners[currentBannerIndex]?.imageUrl && (
-                      <motion.div
-                        key={currentBannerIndex}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 1.05 }}
-                        transition={{ 
-                          duration: 0.8, 
-                          ease: [0.4, 0, 0.2, 1] // Custom easing for smoother animation
-                        }}
-                        className="absolute inset-0 flex items-center justify-center"
-                      >
-                        <Image
-                          src={banners[currentBannerIndex].imageUrl}
-                          alt={banners[currentBannerIndex].title || 'Banner'}
-                          fill
-                          className="object-contain"
-                          priority={currentBannerIndex === 0}
-                          sizes="(max-width: 768px) 100vw, 50vw"
-                        />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  {/* Dots Indicator */}
-                  {banners.length > 1 && (
-                    <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 gap-2">
-                      {banners.map((_, index) => (
-                        <button
-                          key={index}
-                          onClick={() => setCurrentBannerIndex(index)}
-                          className={`h-2 rounded-full transition-all duration-300 ${
-                            index === currentBannerIndex
-                              ? 'w-8 bg-white'
-                              : 'w-2 bg-white/50 hover:bg-white/75'
-                          }`}
-                          aria-label={`Go to banner ${index + 1}`}
-                        />
-                      ))}
+              <div className="relative z-10 animate-float">
+                {/* Main Glass Card */}
+                <div className="glass-panel p-6 rounded-3xl border border-white/10 shadow-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-2xl">
+                  {banners.length > 0 && banners[currentBannerIndex]?.imageUrl ? (
+                    <div className="relative h-[400px] w-full rounded-2xl overflow-hidden shadow-inner">
+                      <Image
+                        src={banners[currentBannerIndex].imageUrl}
+                        alt="Trading Dashboard"
+                        fill
+                        className="object-cover"
+                      />
+                      {/* Overlay Gradient */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/80 to-transparent" />
+                    </div>
+                  ) : (
+                    <div className="h-[400px] w-full rounded-2xl bg-brand-navy border border-white/5 flex items-center justify-center relative overflow-hidden">
+                      {/* Abstract Chart UI */}
+                      <div className="absolute inset-0 flex items-end justify-between px-8 pb-8 gap-2 opacity-50">
+                        {[40, 60, 45, 70, 50, 80, 65, 90].map((h, i) => (
+                          <motion.div
+                            key={i}
+                            initial={{ height: 0 }}
+                            animate={{ height: `${h}%` }}
+                            transition={{ duration: 1, delay: i * 0.1 }}
+                            className="w-8 rounded-t-sm bg-gradient-to-t from-brand-blue to-brand-neon/50"
+                          />
+                        ))}
+                      </div>
                     </div>
                   )}
+
+                  {/* Floating Stats Cards around the main card */}
+                  <motion.div
+                    animate={{ y: [0, -10, 0] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute -right-8 -top-8 glass-card p-4 rounded-2xl border-l-4 border-l-brand-gold bg-brand-navy/90"
+                  >
+                    <div className="text-xs text-gray-400">Total Profit</div>
+                    <div className="text-xl font-bold text-white flex items-center gap-2">
+                      +$12,450
+                      <TrendingUp className="h-4 w-4 text-brand-gold" />
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    animate={{ y: [0, 10, 0] }}
+                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                    className="absolute -left-8 -bottom-8 glass-card p-4 rounded-2xl border-l-4 border-l-brand-neon bg-brand-navy/90"
+                  >
+                    <div className="text-xs text-gray-400">Active Students</div>
+                    <div className="text-xl font-bold text-white flex items-center gap-2">
+                      2,543
+                      <Users className="h-4 w-4 text-brand-neon" />
+                    </div>
+                  </motion.div>
                 </div>
-              ) : (
-                <div className="relative h-[450px] w-full rounded-3xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center shadow-2xl">
-                  <div className="text-center text-white">
-                    <h2 className="text-3xl font-bold mb-4">Master Trading & Investing</h2>
-                    <p className="text-lg text-white/80">Start your journey today</p>
-                  </div>
-                </div>
-              )}
+              </div>
+
+              {/* Back Glow */}
+              <div className="absolute inset-0 -z-10 bg-gradient-to-br from-brand-blue to-brand-purple blur-[80px] opacity-40 rounded-full" />
             </motion.div>
           </div>
         </div>
@@ -511,16 +416,20 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -5 }}
               >
-                <Card className="h-full text-center">
-                  <CardContent className="pt-6">
-                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-100 dark:bg-primary-900">
-                      <feature.icon className="h-8 w-8 text-primary-600 dark:text-primary-400" />
+                <div className="group h-full p-1 rounded-2xl bg-gradient-to-b from-white/10 to-transparent hover:from-brand-accent/50 transition-all duration-300">
+                  <div className="h-full rounded-xl bg-brand-navy border border-white/5 p-6 hover:shadow-neon transition-all duration-300 flex flex-col items-center text-center relative overflow-hidden">
+                    <div className="absolute inset-0 bg-mesh-gradient opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
+
+                    <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-slate group-hover:bg-brand-blue/20 transition-colors duration-300">
+                      <feature.icon className="h-8 w-8 text-brand-blue group-hover:text-brand-neon transition-colors duration-300" />
                     </div>
-                    <h3 className="mb-2 text-xl font-bold">{feature.title}</h3>
-                    <p className="text-gray-600 dark:text-gray-400">{feature.description}</p>
-                  </CardContent>
-                </Card>
+
+                    <h3 className="mb-3 text-xl font-bold text-white group-hover:text-brand-gold transition-colors">{feature.title}</h3>
+                    <p className="text-gray-400 group-hover:text-gray-300 leading-relaxed z-10 relative">{feature.description}</p>
+                  </div>
+                </div>
               </motion.div>
             ))}
           </div>
@@ -714,52 +623,53 @@ export default function HomePage() {
       )}
 
       {/* Featured Courses */}
-      <section className="bg-gray-50 py-20 dark:bg-gray-900">
-        <div className="container-custom">
+      <section className="bg-brand-dark py-20 relative">
+        <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-5" />
+        <div className="container-custom relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="mb-12 text-center"
           >
-            <h2 className="mb-4 text-4xl font-bold">Featured Courses</h2>
-            <p className="text-xl text-gray-600 dark:text-gray-400">
-              Explore our most popular courses
+            <h2 className="mb-4 text-4xl font-bold text-white">Featured <span className="text-brand-gold">Courses</span></h2>
+            <p className="text-xl text-gray-400">
+              Explore our most popular trading programs
             </p>
           </motion.div>
 
           {isLoading ? (
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-96 animate-pulse rounded-2xl bg-gray-200 dark:bg-gray-800" />
+                <div key={i} className="h-96 animate-pulse rounded-2xl bg-brand-navy border border-white/5" />
               ))}
             </div>
           ) : coursesError ? (
-            <div className="rounded-3xl border border-red-200 bg-red-50 p-10 text-center dark:border-red-900/50 dark:bg-red-900/20">
+            <div className="rounded-3xl border border-red-500/20 bg-red-500/10 p-10 text-center">
               <AlertCircle className="mx-auto h-12 w-12 text-red-500" />
-              <h3 className="mt-6 text-2xl font-semibold">Courses failed to load</h3>
-              <p className="mt-2 text-gray-600 dark:text-gray-300">
+              <h3 className="mt-6 text-2xl font-semibold text-white">Courses failed to load</h3>
+              <p className="mt-2 text-gray-400">
                 Something went wrong while fetching featured courses. Please try again.
               </p>
-              <Button className="mt-6" onClick={() => refetchCourses()}>
+              <Button className="mt-6 bg-red-600 hover:bg-red-700 text-white" onClick={() => refetchCourses()}>
                 Retry loading
               </Button>
             </div>
           ) : coursesData?.courses?.length ? (
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 perspective-1000">
               {coursesData?.courses.map((course, index) => (
                 <CourseCard key={course._id} course={course} index={index} />
               ))}
             </div>
           ) : (
-            <div className="rounded-3xl border border-dashed border-gray-300 p-10 text-center dark:border-gray-700">
-              <BookOpen className="mx-auto h-12 w-12 text-primary-500" />
-              <h3 className="mt-6 text-2xl font-semibold">No featured courses yet</h3>
-              <p className="mt-2 text-gray-600 dark:text-gray-400">
+            <div className="rounded-3xl border border-dashed border-gray-700 p-10 text-center">
+              <BookOpen className="mx-auto h-12 w-12 text-brand-blue" />
+              <h3 className="mt-6 text-2xl font-semibold text-white">No featured courses yet</h3>
+              <p className="mt-2 text-gray-400">
                 Check back soon for curated picks, or browse the course catalog to start learning today.
               </p>
               <Link href="/courses" className="mt-6 inline-block">
-                <Button>
+                <Button variant="outline" className="border-brand-blue text-brand-blue hover:bg-brand-blue hover:text-white">
                   Browse all courses
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
@@ -769,7 +679,7 @@ export default function HomePage() {
 
           <div className="mt-12 text-center">
             <Link href="/courses">
-              <Button size="lg">
+              <Button size="lg" className="bg-brand-navy border border-white/10 hover:bg-brand-blue hover:text-white transition-all text-gray-300">
                 View All Courses
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>

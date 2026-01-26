@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Save, Eye } from 'lucide-react';
+import { ArrowLeft, Save, Eye, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/Input';
@@ -26,12 +26,14 @@ export default function CreateBlogPage() {
     content: '',
     featuredImage: '',
     category: 'technology',
-    tags: '',
+    tags: [] as string[],
     publishStatus: 'draft',
     featured: false,
     seoTitle: '',
     seoDescription: '',
   });
+
+  const [currentTag, setCurrentTag] = useState('');
 
   const categories = [
     'technology',
@@ -50,13 +52,38 @@ export default function CreateBlogPage() {
     }));
   };
 
+  const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const trimmed = currentTag.trim().replace(/,/g, '');
+      if (trimmed && !formData.tags.includes(trimmed)) {
+        setFormData(prev => ({ ...prev, tags: [...prev.tags, trimmed] }));
+        setCurrentTag('');
+      }
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setFormData(prev => ({
+      ...prev,
+      tags: prev.tags.filter(tag => tag !== tagToRemove)
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
+      // Add current tag if user forgot to press enter
+      let submissionTags = [...formData.tags];
+      const pendingTag = currentTag.trim().replace(/,/g, '');
+      if (pendingTag && !submissionTags.includes(pendingTag)) {
+        submissionTags.push(pendingTag);
+      }
+
       const blogData = {
         ...formData,
-        tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+        tags: submissionTags,
       };
 
       const sanitizedData = Object.entries(blogData).reduce<Record<string, unknown>>((acc, [key, value]) => {
@@ -80,8 +107,19 @@ export default function CreateBlogPage() {
       await createBlog(sanitizedData).unwrap();
       dispatch(addToast({ type: 'success', message: 'Blog created successfully!' }));
       router.push('/admin/blogs');
-    } catch (error) {
-      dispatch(addToast({ type: 'error', message: 'Failed to create blog' }));
+    } catch (error: any) {
+      console.error('Create blog error:', error);
+      let errorMessage = 'Failed to create blog';
+
+      if (error?.data?.details && Array.isArray(error.data.details) && error.data.details.length > 0) {
+        errorMessage = error.data.details[0];
+      } else if (error?.data?.message) {
+        errorMessage = error.data.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+
+      dispatch(addToast({ type: 'error', message: errorMessage.replace(/"/g, '') }));
     }
   };
 
@@ -256,17 +294,31 @@ export default function CreateBlogPage() {
                 <CardContent>
                   <div>
                     <label htmlFor="tags" className="mb-2 block font-medium">
-                      Tags (comma separated)
+                      Tags (Press Enter to add)
                     </label>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {formData.tags.map(tag => (
+                        <span key={tag} className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium dark:bg-primary-900/30 dark:text-primary-400">
+                          {tag}
+                          <button
+                            type="button"
+                            onClick={() => removeTag(tag)}
+                            className="hover:text-primary-700 dark:hover:text-primary-300 focus:outline-none"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
                     <Input
                       id="tags"
-                      name="tags"
-                      value={formData.tags}
-                      onChange={handleInputChange}
-                      placeholder="tag1, tag2, tag3"
+                      value={currentTag}
+                      onChange={(e) => setCurrentTag(e.target.value)}
+                      onKeyDown={handleAddTag}
+                      placeholder="Type tag and press Enter"
                     />
                     <p className="mt-1 text-sm text-gray-500">
-                      Separate tags with commas
+                      Press Enter or separate with commas
                     </p>
                   </div>
                 </CardContent>

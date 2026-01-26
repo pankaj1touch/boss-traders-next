@@ -30,12 +30,14 @@ export default function EditBlogPage() {
     content: '',
     featuredImage: '',
     category: 'technology',
-    tags: '',
+    tags: [] as string[],
     publishStatus: 'draft',
     featured: false,
     seoTitle: '',
     seoDescription: '',
   });
+
+  const [currentTag, setCurrentTag] = useState('');
 
   const [showPreview, setShowPreview] = useState(false);
 
@@ -48,7 +50,7 @@ export default function EditBlogPage() {
         content: blog.content || '',
         featuredImage: blog.featuredImage || '',
         category: blog.category || 'technology',
-        tags: blog.tags?.join(', ') || '',
+        tags: blog.tags || [],
         publishStatus: blog.publishStatus || 'draft',
         featured: blog.featured || false,
         seoTitle: blog.seoTitle || '',
@@ -74,13 +76,38 @@ export default function EditBlogPage() {
     }));
   };
 
+  const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const trimmed = currentTag.trim().replace(/,/g, '');
+      if (trimmed && !formData.tags.includes(trimmed)) {
+        setFormData(prev => ({ ...prev, tags: [...prev.tags, trimmed] }));
+        setCurrentTag('');
+      }
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setFormData(prev => ({
+      ...prev,
+      tags: prev.tags.filter(tag => tag !== tagToRemove)
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
+      // Add current tag if user forgot to press enter
+      let submissionTags = [...formData.tags];
+      const pendingTag = currentTag.trim().replace(/,/g, '');
+      if (pendingTag && !submissionTags.includes(pendingTag)) {
+        submissionTags.push(pendingTag);
+      }
+
       const updatedBlogData = {
         ...formData,
-        tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+        tags: submissionTags,
       };
 
       const result = await updateBlog({ id: blogId, data: updatedBlogData }).unwrap();
@@ -88,8 +115,17 @@ export default function EditBlogPage() {
       router.push('/admin/blogs');
     } catch (error: any) {
       console.error('Update error:', error);
-      const errorMessage = error?.data?.message || error?.message || 'Failed to update blog';
-      dispatch(addToast({ type: 'error', message: errorMessage }));
+      let errorMessage = 'Failed to update blog';
+
+      if (error?.data?.details && Array.isArray(error.data.details) && error.data.details.length > 0) {
+        errorMessage = error.data.details[0];
+      } else if (error?.data?.message) {
+        errorMessage = error.data.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+
+      dispatch(addToast({ type: 'error', message: errorMessage.replace(/"/g, '') }));
     }
   };
 
@@ -159,8 +195,8 @@ export default function EditBlogPage() {
             <div className="prose prose-lg max-w-none dark:prose-invert">
               {formData.featuredImage && (
                 <div className="mb-6">
-                  <img 
-                    src={formData.featuredImage} 
+                  <img
+                    src={formData.featuredImage}
                     alt={formData.title}
                     className="w-full h-64 object-cover rounded-xl"
                   />
@@ -317,17 +353,31 @@ export default function EditBlogPage() {
                 <CardContent>
                   <div>
                     <label htmlFor="tags" className="mb-2 block font-medium">
-                      Tags (comma separated)
+                      Tags (Press Enter to add)
                     </label>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {formData.tags.map(tag => (
+                        <span key={tag} className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium dark:bg-primary-900/30 dark:text-primary-400">
+                          {tag}
+                          <button
+                            type="button"
+                            onClick={() => removeTag(tag)}
+                            className="hover:text-primary-700 dark:hover:text-primary-300 focus:outline-none"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
                     <Input
                       id="tags"
-                      name="tags"
-                      value={formData.tags}
-                      onChange={handleInputChange}
-                      placeholder="tag1, tag2, tag3"
+                      value={currentTag}
+                      onChange={(e) => setCurrentTag(e.target.value)}
+                      onKeyDown={handleAddTag}
+                      placeholder="Type tag and press Enter"
                     />
                     <p className="mt-1 text-sm text-gray-500">
-                      Separate tags with commas
+                      Press Enter or separate with commas
                     </p>
                   </div>
                 </CardContent>

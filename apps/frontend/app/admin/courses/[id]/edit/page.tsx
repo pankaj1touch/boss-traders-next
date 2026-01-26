@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAdminGetCourseQuery, useAdminUpdateCourseMutation } from '@/store/api/adminApi';
 import { useGetVideoAnalyticsQuery } from '@/store/api/courseApi';
@@ -262,6 +262,28 @@ export default function EditCoursePage({ params }: { params: { id: string } }) {
       alert(error?.data?.message || 'Failed to update course');
     }
   };
+
+  const sortedByViews = useMemo(() => {
+    if (!analyticsData?.videos) return [];
+    return [...analyticsData.videos]
+      .sort((a, b) => (b.analytics?.totalViews || 0) - (a.analytics?.totalViews || 0))
+      .slice(0, 5);
+  }, [analyticsData?.videos]);
+
+  const sortedByCompletion = useMemo(() => {
+    if (!analyticsData?.videos) return [];
+    return [...analyticsData.videos]
+      .sort((a, b) => {
+        const rateA = a.analytics?.totalViews > 0
+          ? (a.analytics?.completions || 0) / a.analytics?.totalViews * 100
+          : 0;
+        const rateB = b.analytics?.totalViews > 0
+          ? (b.analytics?.completions || 0) / b.analytics?.totalViews * 100
+          : 0;
+        return rateB - rateA;
+      })
+      .slice(0, 5);
+  }, [analyticsData?.videos]);
 
   if (loadingCourse) {
     return (
@@ -996,9 +1018,7 @@ export default function EditCoursePage({ params }: { params: { id: string } }) {
                 <div className="rounded-xl border border-border bg-card p-6">
                   <h3 className="text-md font-semibold text-foreground mb-4">Views by Video</h3>
                   <div className="space-y-3">
-                    {analyticsData.videos
-                      .sort((a, b) => (b.analytics?.totalViews || 0) - (a.analytics?.totalViews || 0))
-                      .slice(0, 5)
+                    {sortedByViews
                       .map((video, index) => {
                         const maxViews = Math.max(...analyticsData.videos.map(v => v.analytics?.totalViews || 0));
                         const percentage = maxViews > 0 ? ((video.analytics?.totalViews || 0) / maxViews) * 100 : 0;
@@ -1028,17 +1048,7 @@ export default function EditCoursePage({ params }: { params: { id: string } }) {
                 <div className="rounded-xl border border-border bg-card p-6">
                   <h3 className="text-md font-semibold text-foreground mb-4">Completion Rate by Video</h3>
                   <div className="space-y-3">
-                    {analyticsData.videos
-                      .sort((a, b) => {
-                        const rateA = a.analytics?.totalViews > 0
-                          ? (a.analytics?.completions || 0) / a.analytics?.totalViews * 100
-                          : 0;
-                        const rateB = b.analytics?.totalViews > 0
-                          ? (b.analytics?.completions || 0) / b.analytics?.totalViews * 100
-                          : 0;
-                        return rateB - rateA;
-                      })
-                      .slice(0, 5)
+                    {sortedByCompletion
                       .map((video, index) => {
                         const completionRate = video.analytics?.totalViews > 0
                           ? ((video.analytics?.completions || 0) / video.analytics?.totalViews) * 100

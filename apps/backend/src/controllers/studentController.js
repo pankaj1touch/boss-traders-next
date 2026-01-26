@@ -118,13 +118,14 @@ exports.getMyEbooks = async (req, res, next) => {
 
     const ebookIds = Array.from(ebookMap.keys());
     const ebooksData = ebookIds.length
-      ? await Ebook.find({ _id: { $in: ebookIds } }).select('title author cover price format pages')
+      ? await Ebook.find({ _id: { $in: ebookIds } }).select('title slug author cover price format pages')
       : [];
 
     const ebooks = ebooksData.map((ebook) => {
       const meta = ebookMap.get(ebook._id.toString());
       return {
         _id: ebook._id,
+        slug: ebook.slug,
         title: ebook.title,
         author: ebook.author,
         cover: ebook.cover,
@@ -136,6 +137,41 @@ exports.getMyEbooks = async (req, res, next) => {
     });
 
     res.json({ ebooks });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getMyEbookById = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const { id } = req.params;
+
+    // Check if user has purchased this ebook
+    const order = await Order.findOne({
+      userId,
+      'items.ebookId': id,
+      status: 'completed',
+    });
+
+    if (!order) {
+      return res.status(403).json({ 
+        code: 'FORBIDDEN', 
+        message: 'Ebook not purchased' 
+      });
+    }
+
+    // Get ebook details
+    const ebook = await Ebook.findById(id).select('-__v');
+
+    if (!ebook) {
+      return res.status(404).json({ 
+        code: 'NOT_FOUND', 
+        message: 'Ebook not found' 
+      });
+    }
+
+    res.json({ ebook });
   } catch (error) {
     next(error);
   }

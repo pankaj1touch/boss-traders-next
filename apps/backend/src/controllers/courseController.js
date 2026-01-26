@@ -102,12 +102,22 @@ exports.getCourseBySlug = async (req, res, next) => {
     // Check if user is enrolled (if authenticated)
     let isEnrolled = false;
     if (req.user) {
+      // Check for enrollment - allow any status except 'cancelled'
       const enrollment = await Enrollment.findOne({
         userId: req.user._id,
         courseId: course._id,
-        status: 'active',
+        status: { $ne: 'cancelled' },
       });
       isEnrolled = !!enrollment;
+      
+      // Debug logging
+      console.log('📚 Course By Slug Debug:', {
+        courseId: course._id,
+        userId: req.user._id,
+        enrollmentFound: !!enrollment,
+        enrollmentStatus: enrollment?.status,
+        isEnrolled,
+      });
     }
 
     res.json({
@@ -3359,16 +3369,38 @@ exports.getCourseVideos = async (req, res, next) => {
     // Check if user is enrolled (if authenticated)
     let hasAccess = false;
     if (req.user) {
+      // Check for enrollment - allow any status except 'cancelled'
       const enrollment = await Enrollment.findOne({
         userId: req.user._id,
         courseId: id,
-        status: 'active',
+        status: { $ne: 'cancelled' },
       });
-      hasAccess = !!enrollment;
+      
+      // If enrollment exists and is not cancelled, grant access
+      if (enrollment) {
+        hasAccess = true;
+      }
+      
+      // Debug logging
+      console.log('📹 Course Videos API Debug:', {
+        courseId: id,
+        userId: req.user._id,
+        enrollmentFound: !!enrollment,
+        enrollmentStatus: enrollment?.status,
+        enrollmentId: enrollment?._id,
+        hasAccess,
+        totalVideosInCourse: course.videos?.length || 0,
+      });
+    } else {
+      console.log('📹 Course Videos API Debug (No user):', {
+        courseId: id,
+        hasAccess: false,
+        totalVideosInCourse: course.videos?.length || 0,
+      });
     }
 
     // Filter videos based on access
-    const videos = course.videos.map((video) => {
+    let videos = course.videos.map((video) => {
       // If user has access or video is free, show full details
       if (hasAccess || video.isFree) {
         return video;

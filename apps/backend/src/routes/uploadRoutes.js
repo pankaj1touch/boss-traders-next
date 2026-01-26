@@ -146,26 +146,46 @@ router.post('/video', authenticate, (req, res, next) => {
     console.log('📁 Video upload callback triggered');
     console.log('Error:', error);
     console.log('File:', req.file);
+    console.log('Request body:', req.body);
+    console.log('Request files:', req.files);
     
     if (error) {
       console.error('❌ Video upload error details:', {
         message: error.message,
         code: error.code,
+        name: error.name,
         stack: error.stack
       });
       
-      return res.status(400).json({
+      // More specific error messages
+      let errorMessage = error.message || 'Error uploading video';
+      let statusCode = 400;
+      
+      if (error.code === 'LIMIT_FILE_SIZE') {
+        errorMessage = 'File size exceeds maximum limit of 500MB';
+        statusCode = 413;
+      } else if (error.code === 'LIMIT_UNEXPECTED_FILE') {
+        errorMessage = 'Unexpected file field. Please use the correct field name.';
+      } else if (error.message?.includes('Only video')) {
+        errorMessage = 'Invalid file type. Only video files are allowed (MP4, WebM, OGG, MOV, AVI, MKV).';
+      }
+      
+      return res.status(statusCode).json({
         success: false,
-        message: error.message || 'Error uploading video',
-        details: error.code || 'UNKNOWN_ERROR'
+        message: errorMessage,
+        details: error.code || 'UNKNOWN_ERROR',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
 
     if (!req.file) {
       console.error('❌ No video file received');
+      console.log('Request keys:', Object.keys(req));
+      console.log('Files object:', req.files);
       return res.status(400).json({
         success: false,
-        message: 'No video file provided',
+        message: 'No video file provided. Please select a video file to upload.',
+        details: 'FILE_MISSING'
       });
     }
 

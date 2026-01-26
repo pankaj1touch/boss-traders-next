@@ -42,19 +42,23 @@ export default function MyEbooksPage() {
       {ebooks.length > 0 && (
         <div className="grid gap-6 md:grid-cols-2">
           {ebooks.map((ebook) => (
-            <div key={ebook._id} className="rounded-2xl border border-border bg-card p-6 flex gap-4">
+            <Link
+              key={ebook._id}
+              href={`/student/my-ebooks/${ebook._id}`}
+              className="rounded-2xl border border-border bg-card p-6 flex gap-4 hover:border-primary/50 hover:shadow-lg transition-all cursor-pointer"
+            >
               {ebook.cover ? (
-                <div className="relative h-32 w-24 overflow-hidden rounded-xl">
+                <div className="relative h-32 w-24 overflow-hidden rounded-xl flex-shrink-0">
                   <Image src={ebook.cover} alt={ebook.title} fill className="object-cover" />
                 </div>
               ) : (
-                <div className="flex h-32 w-24 items-center justify-center rounded-xl bg-accent/40">
+                <div className="flex h-32 w-24 items-center justify-center rounded-xl bg-accent/40 flex-shrink-0">
                   <FileText className="h-8 w-8 text-muted-foreground" />
                 </div>
               )}
-              <div className="flex-1 space-y-2">
+              <div className="flex-1 space-y-2 min-w-0">
                 <div>
-                  <h3 className="text-lg font-semibold text-foreground">{ebook.title}</h3>
+                  <h3 className="text-lg font-semibold text-foreground line-clamp-2">{ebook.title}</h3>
                   <p className="text-sm text-muted-foreground">by {ebook.author}</p>
                 </div>
                 <p className="text-sm text-muted-foreground">
@@ -66,7 +70,7 @@ export default function MyEbooksPage() {
                   {ebook.pages && <span>{ebook.pages} pages</span>}
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}

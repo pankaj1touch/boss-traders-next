@@ -1,0 +1,94 @@
+
+> edtech-frontend@1.0.0 build
+> next build
+
+  ▲ Next.js 14.2.33
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/52) ...
+   Generating static pages (13/52) 
+   Generating static pages (26/52) 
+   Generating static pages (39/52) 
+ ✓ Generating static pages (52/52)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+┌ ○ /                                    9.61 kB         200 kB
+├ ○ /_not-found                          880 B          88.7 kB
+├ ○ /about                               1.1 kB          179 kB
+├ ƒ /account                             2.77 kB         181 kB
+├ ƒ /account/demo-classes                4.99 kB         202 kB
+├ ƒ /account/orders                      3.97 kB         189 kB
+├ ○ /admin                               2.03 kB         127 kB
+├ ○ /admin/announcements                 5.37 kB         176 kB
+├ ƒ /admin/announcements/[id]/edit       5.6 kB          170 kB
+├ ○ /admin/announcements/create          4.97 kB         170 kB
+├ ○ /admin/banners                       3.71 kB         174 kB
+├ ƒ /admin/banners/[id]/edit             4.53 kB         169 kB
+├ ○ /admin/banners/create                4.3 kB          169 kB
+├ ○ /admin/blogs                         7.77 kB         176 kB
+├ ƒ /admin/blogs/[id]/edit               4.58 kB         174 kB
+├ ○ /admin/blogs/create                  4.11 kB         173 kB
+├ ○ /admin/coupons                       5.64 kB         177 kB
+├ ƒ /admin/coupons/[id]/edit             5.51 kB         170 kB
+├ ○ /admin/coupons/create                4.81 kB         169 kB
+├ ○ /admin/courses                       6.81 kB         171 kB
+├ ƒ /admin/courses/[id]/edit             13.5 kB         185 kB
+├ ○ /admin/courses/create                3.69 kB         173 kB
+├ ○ /admin/demo-classes                  3.41 kB         174 kB
+├ ƒ /admin/demo-classes/[id]/edit        3.78 kB         171 kB
+├ ○ /admin/demo-classes/create           3.48 kB         171 kB
+├ ○ /admin/demo-classes/registrations    4.85 kB         180 kB
+├ ○ /admin/ebooks                        6.68 kB         171 kB
+├ ƒ /admin/ebooks/[id]/edit              5.11 kB         170 kB
+├ ○ /admin/ebooks/create                 5.7 kB          170 kB
+├ ○ /admin/orders                        7.37 kB         178 kB
+├ ○ /admin/page-content                  6.03 kB         169 kB
+├ ƒ /admin/page-content/[id]/edit        2.1 kB          171 kB
+├ ○ /admin/page-content/create           2 kB            171 kB
+├ ○ /admin/social-links                  7.16 kB         170 kB
+├ ƒ /admin/social-links/[id]/edit        7.64 kB         170 kB
+├ ○ /admin/social-links/create           7.61 kB         170 kB
+├ ƒ /auth/forgot                         3.68 kB         174 kB
+├ ƒ /auth/login                          4.96 kB         196 kB
+├ ƒ /auth/reset                          4.22 kB         175 kB
+├ ƒ /auth/signup                         4.99 kB         196 kB
+├ ○ /blog                                5.47 kB         187 kB
+├ ƒ /blog/[slug]                         4.61 kB         183 kB
+├ ○ /careers                             1.1 kB          179 kB
+├ ○ /cart                                6.67 kB         185 kB
+├ ƒ /checkout/[orderId]                  4.11 kB         182 kB
+├ ○ /contact                             1.1 kB          179 kB
+├ ○ /courses                             3.9 kB          185 kB
+├ ƒ /courses/[slug]                      6.46 kB         193 kB
+├ ƒ /courses/[slug]/learn                8.8 kB          190 kB
+├ ○ /demo-classes                        4.19 kB         189 kB
+├ ƒ /demo-classes/[id]/register          5.42 kB         190 kB
+├ ○ /ebooks                              3.75 kB         182 kB
+├ ○ /live                                3.63 kB         188 kB
+├ ○ /offline                             992 B           179 kB
+├ ○ /student                             3.06 kB         126 kB
+├ ○ /student/analytics                   3.25 kB         184 kB
+├ ○ /student/certificates                2.12 kB         189 kB
+├ ○ /student/favorites                   2.23 kB         183 kB
+├ ○ /student/live-sessions               1.07 kB        97.7 kB
+├ ○ /student/my-courses                  2.49 kB         137 kB
+├ ○ /student/my-ebooks                   2.46 kB         144 kB
+├ ○ /student/orders                      2.93 kB         139 kB
+├ ○ /student/video-history               3.09 kB         187 kB
+└ ○ /success                             2.87 kB         181 kB
++ First Load JS shared by all            87.9 kB
+  ├ chunks/1528-ab3e006442d41112.js      31.8 kB
+  ├ chunks/1dd3208c-69042694ca77fa87.js  53.6 kB
+  └ other shared chunks (total)          2.38 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

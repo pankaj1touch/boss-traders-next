@@ -3,24 +3,48 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #0a0a0a;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --primary-glow: conic-gradient(from 180deg at 50% 50%, #16abff33 0deg, #0885ff33 55deg, #54d6ff33 120deg, #0071ff33 160deg, transparent 360deg);
 }
 
 .dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  --background: #0B0F19;
+  /* Deep Brand Navy */
+  --foreground: #f1f5f9;
+  --primary-glow: radial-gradient(rgba(29, 78, 216, 0.15), rgba(124, 58, 237, 0.15));
 }
 
 html {
-  @apply bg-background text-foreground;
+  @apply bg-background text-foreground scroll-smooth;
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+  @apply bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-white/20 dark:border-slate-700/30 shadow-lg;
+}
+
+.glass-card {
+  @apply bg-white/80 dark:bg-slate-900/50 backdrop-blur-md border border-gray-100 dark:border-white/10 shadow-sm hover:shadow-md transition-all duration-300;
+}
+
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400;
+}
+
+.text-gradient-premium {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400;
+}
+
+.text-gradient-gold {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-yellow-600;
 }
 
 @layer base {
   * {
     @apply border-gray-200 dark:border-gray-800;
   }
-  
+
   body {
     @apply bg-background text-foreground antialiased;
     transition: background-color 0.2s ease, color 0.2s ease;
@@ -117,4 +141,3 @@ html {
   border-color: #374151;
   color: #d1d5db;
 }
-

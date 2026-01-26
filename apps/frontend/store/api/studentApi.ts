@@ -35,9 +35,11 @@ export interface StudentCourse {
 
 export interface StudentEbook {
   _id: string;
+  slug: string;
   title: string;
   author: string;
   cover?: string;
+  description?: string;
   price: number;
   format: string;
   pages?: number;
@@ -58,6 +60,10 @@ export const studentApi = apiSlice.injectEndpoints({
       query: () => '/student/ebooks',
       providesTags: ['User', 'Ebook'],
     }),
+    getStudentEbookById: builder.query<{ ebook: StudentEbook }, string>({
+      query: (id) => `/student/ebooks/${id}`,
+      providesTags: (result, error, id) => [{ type: 'Ebook', id }],
+    }),
   }),
 });
 
@@ -65,5 +71,6 @@ export const {
   useGetStudentStatsQuery,
   useGetStudentCoursesQuery,
   useGetStudentEbooksQuery,
+  useGetStudentEbookByIdQuery,
 } = studentApi;
 

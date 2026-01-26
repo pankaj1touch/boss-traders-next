@@ -21,7 +21,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
           transition: { duration: 0.3 },
         })}
         className={cn(
-          'rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900',
+          'rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-white/5 dark:bg-brand-navy/40 dark:backdrop-blur-md transition-all duration-300',
           className
         )}
         {...props}

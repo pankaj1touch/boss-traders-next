@@ -12,6 +12,7 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: false,
   },
+  transpilePackages: ['lucide-react'],
   // PWA support
   async headers() {
     return [
