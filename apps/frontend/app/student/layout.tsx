@@ -1,15 +1,17 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAppSelector } from '@/store/hooks';
-import { BookOpen, FileText, Home, PlayCircle, ShoppingBag } from 'lucide-react';
+import { BookOpen, FileText, Home, PlayCircle, ShoppingBag, Menu, X } from 'lucide-react';
 
 export default function StudentLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -30,6 +32,11 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
     }
   }, [isAuthenticated, user, router]);
 
+  // Close sidebar on route change (mobile)
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [pathname]);
+
   if (!isAuthenticated || !user?.roles?.includes('student')) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -49,15 +56,62 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
     { href: '/student/orders', icon: ShoppingBag, label: 'My Orders' },
   ];
 
+  const isActiveRoute = (href: string) => {
+    if (href === '/student') {
+      return pathname === '/student';
+    }
+    return pathname.startsWith(href);
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Sidebar */}
-      <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card">
-        <div className="flex h-full flex-col">
-          {/* Logo - Clickable to Home */}
+      {/* Mobile Header - visible below xl (1280px) */}
+      <header className="xl:hidden fixed top-0 left-0 right-0 z-50 h-14 border-b border-border bg-white dark:bg-zinc-900 flex items-center justify-between px-4">
+        <Link href="/" className="flex items-center gap-2">
+          <div className="relative h-8 w-8 shrink-0">
+            <Image
+              src="/logo.png"
+              alt="Boss Traders"
+              fill
+              className="rounded-lg object-contain"
+              sizes="32px"
+            />
+          </div>
+          <span className="font-bold text-foreground">Student Portal</span>
+        </Link>
+        <button
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className="p-2 rounded-lg hover:bg-accent transition-colors"
+          aria-label="Toggle menu"
+        >
+          {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
+      </header>
+
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div
+          className="xl:hidden fixed inset-0 z-[60] bg-black/50 top-14"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar - Desktop (xl+): full height fixed, Mobile/Tablet: slide-over */}
+      <aside
+        className={`
+          fixed left-0 z-[70] w-64 border-r border-border shadow-2xl
+          bg-white dark:bg-zinc-900
+          transition-transform duration-300 ease-in-out
+          xl:top-0 xl:h-screen xl:translate-x-0 xl:z-40 xl:shadow-none
+          top-14 h-[calc(100vh-3.5rem)]
+          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full xl:translate-x-0'}
+        `}
+      >
+        <div className="flex h-full flex-col bg-white dark:bg-zinc-900">
+          {/* Logo - Only visible on desktop (xl+) */}
           <Link 
             href="/" 
-            className="flex h-16 items-center gap-3 border-b border-border px-6 hover:bg-accent/50 transition-colors"
+            className="hidden xl:flex h-16 items-center gap-3 border-b border-border px-6 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
           >
             <div className="relative h-8 w-8 shrink-0">
               <Image
@@ -72,23 +126,27 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
           </Link>
 
           {/* Navigation */}
-          <nav className="flex-1 space-y-1 px-3 py-4">
+          <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto bg-white dark:bg-zinc-900">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors
+                  ${isActiveRoute(item.href) 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'text-muted-foreground hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-foreground'
+                  }`}
               >
-                <item.icon className="h-5 w-5" />
-                {item.label}
+                <item.icon className="h-5 w-5 shrink-0" />
+                <span className="truncate">{item.label}</span>
               </Link>
             ))}
           </nav>
 
           {/* User info */}
-          <div className="border-t border-border p-4">
+          <div className="border-t border-border p-4 bg-white dark:bg-zinc-900">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground font-semibold">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground font-semibold shrink-0">
                 {user.name?.[0]?.toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
@@ -100,10 +158,30 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
         </div>
       </aside>
 
-      {/* Main content */}
-      <main className="pl-64">
-        <div className="container mx-auto px-6 py-8">{children}</div>
+      {/* Main content - Adjusted for mobile/tablet */}
+      <main className="xl:pl-64 pt-14 xl:pt-0 pb-20 xl:pb-0">
+        <div className="container mx-auto px-4 sm:px-6 py-6 xl:py-8">{children}</div>
       </main>
+
+      {/* Mobile/Tablet Bottom Navigation */}
+      <nav className="xl:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-zinc-900 border-t border-border safe-area-inset-bottom">
+        <div className="flex items-center justify-around h-16">
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex flex-col items-center justify-center flex-1 h-full py-2 transition-colors
+                ${isActiveRoute(item.href) 
+                  ? 'text-primary' 
+                  : 'text-muted-foreground hover:text-foreground'
+                }`}
+            >
+              <item.icon className="h-5 w-5" />
+              <span className="text-[10px] mt-1 font-medium truncate max-w-[60px]">{item.label}</span>
+            </Link>
+          ))}
+        </div>
+      </nav>
     </div>
   );
 }
