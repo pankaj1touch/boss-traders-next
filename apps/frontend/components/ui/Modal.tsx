@@ -59,11 +59,11 @@ export function Modal({ isOpen, onClose, title, children, size = 'lg' }: ModalPr
             className={`relative w-full ${sizeClasses[size]} mx-auto max-h-[90vh] overflow-hidden rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-2xl`}
           >
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">{title}</h2>
+            <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4 sm:p-6">
+              <h2 className="text-base sm:text-xl font-bold text-gray-900 dark:text-white truncate pr-2">{title}</h2>
               <button
                 onClick={onClose}
-                className="rounded-lg p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors"
+                className="rounded-lg p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors touch-manipulation shrink-0"
                 aria-label="Close modal"
               >
                 <X className="h-5 w-5" />

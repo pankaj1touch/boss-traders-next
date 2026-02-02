@@ -223,22 +223,22 @@ export default function CourseDiscussionsComponent({ courseId }: CourseDiscussio
   if (selectedDiscussion) {
     return (
       <div className="space-y-4">
-        <Button variant="outline" onClick={() => setSelectedDiscussionId(null)}>
+        <Button variant="outline" onClick={() => setSelectedDiscussionId(null)} className="w-full sm:w-auto">
           ← Back to Discussions
         </Button>
 
         <Card>
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
+          <CardHeader className="p-4 sm:p-6 pb-0">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2 mb-2">
                   {selectedDiscussion.isPinned && <Pin className="h-4 w-4 text-primary" />}
                   {selectedDiscussion.isLocked && <Lock className="h-4 w-4 text-muted-foreground" />}
                   {selectedDiscussion.isResolved && <CheckCircle className="h-4 w-4 text-green-500" />}
                   <Badge variant="secondary">{selectedDiscussion.category}</Badge>
                 </div>
-                <CardTitle>{selectedDiscussion.title}</CardTitle>
-                <div className="flex items-center gap-3 mt-2 text-sm text-muted-foreground">
+                <CardTitle className="text-base sm:text-lg break-words">{selectedDiscussion.title}</CardTitle>
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs sm:text-sm text-muted-foreground">
                   <span>By {selectedDiscussion.userId?.name || 'Unknown'}</span>
                   <span>•</span>
                   <span>{selectedDiscussion.views} views</span>
@@ -246,7 +246,7 @@ export default function CourseDiscussionsComponent({ courseId }: CourseDiscussio
                   <span>{new Date(selectedDiscussion.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2 self-start sm:self-auto">
                 <button
                   onClick={() => handleLikeDiscussion(selectedDiscussion._id)}
                   className="flex items-center gap-1 px-3 py-1 rounded-lg border border-border hover:bg-accent transition-colors"
@@ -266,9 +266,9 @@ export default function CourseDiscussionsComponent({ courseId }: CourseDiscussio
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="p-4 sm:p-6 space-y-5 sm:space-y-6">
             <div className="prose max-w-none">
-              <p className="whitespace-pre-wrap">{selectedDiscussion.content}</p>
+              <p className="whitespace-pre-wrap break-words">{selectedDiscussion.content}</p>
             </div>
 
             {selectedDiscussion.tags.length > 0 && (
@@ -289,13 +289,13 @@ export default function CourseDiscussionsComponent({ courseId }: CourseDiscussio
                 {selectedDiscussion.replies.map((reply, idx) => (
                   <div
                     key={reply._id}
-                    className={`p-4 rounded-lg border ${reply.isSolution
+                    className={`p-3 sm:p-4 rounded-lg border ${reply.isSolution
                       ? 'bg-green-50 dark:bg-green-900/20 border-green-500'
                       : 'bg-card border-border'
                       }`}
                   >
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex items-center gap-2">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         {reply.isSolution && (
                           <CheckCircle className="h-4 w-4 text-green-500" />
                         )}
@@ -304,7 +304,7 @@ export default function CourseDiscussionsComponent({ courseId }: CourseDiscussio
                           {new Date(reply.createdAt).toLocaleDateString()}
                         </span>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
                         <button
                           onClick={() => handleLikeReply(idx)}
                           className="flex items-center gap-1 px-2 py-1 rounded hover:bg-accent transition-colors"
@@ -350,10 +350,10 @@ export default function CourseDiscussionsComponent({ courseId }: CourseDiscussio
                           value={editingReplyContent}
                           onChange={(e) => setEditingReplyContent(e.target.value)}
                           rows={3}
-                          className="w-full rounded-lg border border-border bg-card px-4 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                          className="w-full rounded-lg border border-border bg-card px-3 sm:px-4 py-2 text-sm sm:text-base text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                         />
-                        <div className="flex gap-2">
-                          <Button size="sm" onClick={() => handleUpdateReply(idx)}>
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <Button size="sm" onClick={() => handleUpdateReply(idx)} className="w-full sm:w-auto">
                             Save
                           </Button>
                           <Button
@@ -363,13 +363,14 @@ export default function CourseDiscussionsComponent({ courseId }: CourseDiscussio
                               setEditingReplyIndex(null);
                               setEditingReplyContent('');
                             }}
+                            className="w-full sm:w-auto"
                           >
                             Cancel
                           </Button>
                         </div>
                       </div>
                     ) : (
-                      <p className="whitespace-pre-wrap">{reply.content}</p>
+                      <p className="whitespace-pre-wrap break-words text-sm sm:text-base">{reply.content}</p>
                     )}
                   </div>
                 ))}
@@ -382,9 +383,9 @@ export default function CourseDiscussionsComponent({ courseId }: CourseDiscussio
                     value={replyContent}
                     onChange={(e) => setReplyContent(e.target.value)}
                     rows={4}
-                    className="w-full rounded-lg border border-border bg-card px-4 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full rounded-lg border border-border bg-card px-3 sm:px-4 py-2 text-sm sm:text-base text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   />
-                  <Button onClick={handleAddReply} disabled={!replyContent.trim()}>
+                  <Button onClick={handleAddReply} disabled={!replyContent.trim()} className="w-full sm:w-auto">
                     Post Reply
                   </Button>
                 </div>
@@ -398,10 +399,10 @@ export default function CourseDiscussionsComponent({ courseId }: CourseDiscussio
 
   return (
     <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <MessageSquare className="h-5 w-5" />
+      <CardHeader className="p-4 sm:p-6 pb-0">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5" />
             Course Discussions
           </CardTitle>
           {isAuthenticated && (
@@ -409,6 +410,7 @@ export default function CourseDiscussionsComponent({ courseId }: CourseDiscussio
               variant="outline"
               size="sm"
               onClick={() => setShowCreateForm(!showCreateForm)}
+              className="w-full sm:w-auto"
             >
               {showCreateForm ? (
                 <>
@@ -425,11 +427,11 @@ export default function CourseDiscussionsComponent({ courseId }: CourseDiscussio
           )}
         </div>
       </CardHeader>
-      <CardContent className="p-6">
+      <CardContent className="p-4 sm:p-6">
         {/* Filters */}
         <div className="mb-6 space-y-3">
-          <div className="flex gap-2">
-            <div className="flex-1 relative">
+          <div className="flex flex-col sm:flex-row gap-2">
+            <div className="flex-1 min-w-0 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search discussions..."
@@ -447,7 +449,7 @@ export default function CourseDiscussionsComponent({ courseId }: CourseDiscussio
                 setCategory(e.target.value);
                 setPage(1);
               }}
-              className="rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground"
+              className="w-full sm:flex-1 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground"
             >
               <option value="">All Categories</option>
               <option value="general">General</option>
@@ -462,7 +464,7 @@ export default function CourseDiscussionsComponent({ courseId }: CourseDiscussio
                 setSort(e.target.value);
                 setPage(1);
               }}
-              className="rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground"
+              className="w-full sm:flex-1 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground"
             >
               <option value="recent">Recent</option>
               <option value="popular">Popular</option>
@@ -473,24 +475,25 @@ export default function CourseDiscussionsComponent({ courseId }: CourseDiscussio
 
         {/* Create Form */}
         {showCreateForm && isAuthenticated && (
-          <div className="mb-6 p-4 rounded-lg border border-border bg-muted/50 space-y-3">
+          <div className="mb-4 sm:mb-6 p-3 sm:p-4 rounded-lg border border-border bg-muted/50 space-y-3">
             <Input
               placeholder="Discussion title *"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              className="text-sm sm:text-base"
             />
             <textarea
               placeholder="Discussion content *"
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               rows={5}
-              className="w-full rounded-lg border border-border bg-card px-4 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full rounded-lg border border-border bg-card px-3 sm:px-4 py-2 text-sm sm:text-base text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             />
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <select
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
-                className="flex-1 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground"
+                className="w-full sm:flex-1 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground"
               >
                 <option value="general">General</option>
                 <option value="question">Question</option>
@@ -502,14 +505,14 @@ export default function CourseDiscussionsComponent({ courseId }: CourseDiscussio
                 placeholder="Tags (comma-separated)"
                 value={formData.tags}
                 onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                className="flex-1"
+                className="w-full sm:flex-1 text-sm sm:text-base"
               />
             </div>
-            <div className="flex gap-2">
-              <Button onClick={handleCreateDiscussion} disabled={!formData.title.trim() || !formData.content.trim()}>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button onClick={handleCreateDiscussion} disabled={!formData.title.trim() || !formData.content.trim()} className="w-full sm:w-auto">
                 Create Discussion
               </Button>
-              <Button variant="outline" onClick={() => setShowCreateForm(false)}>
+              <Button variant="outline" onClick={() => setShowCreateForm(false)} className="w-full sm:w-auto">
                 Cancel
               </Button>
             </div>
@@ -528,20 +531,20 @@ export default function CourseDiscussionsComponent({ courseId }: CourseDiscussio
             {discussions.map((discussion) => (
               <div
                 key={discussion._id}
-                className="p-4 rounded-lg border border-border bg-card hover:bg-accent/20 transition-colors cursor-pointer"
+                className="p-3 sm:p-4 rounded-lg border border-border bg-card hover:bg-accent/20 transition-colors cursor-pointer"
                 onClick={() => setSelectedDiscussionId(discussion._id)}
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
                       {discussion.isPinned && <Pin className="h-4 w-4 text-primary" />}
                       {discussion.isLocked && <Lock className="h-4 w-4 text-muted-foreground" />}
                       {discussion.isResolved && <CheckCircle className="h-4 w-4 text-green-500" />}
                       <Badge variant="secondary">{discussion.category}</Badge>
                     </div>
-                    <h3 className="font-semibold text-foreground mb-1">{discussion.title}</h3>
-                    <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{discussion.content}</p>
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                    <h3 className="font-semibold text-foreground mb-1 break-words">{discussion.title}</h3>
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-2 break-words">{discussion.content}</p>
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] sm:text-xs text-muted-foreground">
                       <span>By {discussion.userId?.name || 'Unknown'}</span>
                       <span>•</span>
                       <span>{discussion.views} views</span>
@@ -561,7 +564,7 @@ export default function CourseDiscussionsComponent({ courseId }: CourseDiscussio
 
         {/* Pagination */}
         {discussionsData && discussionsData.pagination.pages > 1 && (
-          <div className="flex items-center justify-center gap-2 mt-6">
+          <div className="flex flex-wrap items-center justify-center gap-2 mt-6">
             <Button
               variant="secondary"
               size="sm"

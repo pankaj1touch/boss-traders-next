@@ -159,7 +159,7 @@ export default function VideoAnnotationsComponent({
   if (isLoading) {
     return (
       <Card>
-        <CardContent className="p-6 text-center text-muted-foreground">
+        <CardContent className="p-4 sm:p-6 text-center text-muted-foreground">
           Loading annotations...
         </CardContent>
       </Card>
@@ -168,10 +168,10 @@ export default function VideoAnnotationsComponent({
 
   return (
     <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <MapPin className="h-5 w-5" />
+      <CardHeader className="p-4 sm:p-6 pb-0">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <MapPin className="h-4 w-4 sm:h-5 sm:w-5" />
             Video Annotations
           </CardTitle>
           {isAdminOrInstructor && (
@@ -190,6 +190,7 @@ export default function VideoAnnotationsComponent({
                   });
                 }
               }}
+              className="w-full sm:w-auto"
             >
               {showAddForm ? (
                 <>
@@ -206,11 +207,11 @@ export default function VideoAnnotationsComponent({
           )}
         </div>
       </CardHeader>
-      <CardContent className="p-6">
+      <CardContent className="p-4 sm:p-6">
         {/* Add Annotation Form */}
         {isAdminOrInstructor && showAddForm && (
-          <div className="mb-6 p-4 rounded-lg border border-border bg-muted/50 space-y-3">
-            <div className="flex gap-2">
+          <div className="mb-4 sm:mb-6 p-3 sm:p-4 rounded-lg border border-border bg-muted/50 space-y-3">
+            <div className="flex flex-col sm:flex-row gap-2">
               <select
                 value={formData.type}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
@@ -225,7 +226,7 @@ export default function VideoAnnotationsComponent({
                 type="color"
                 value={formData.color}
                 onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                className="w-12 h-10 rounded border border-border cursor-pointer"
+                className="w-full sm:w-12 h-10 rounded border border-border cursor-pointer"
                 title="Annotation color"
               />
             </div>
@@ -233,16 +234,17 @@ export default function VideoAnnotationsComponent({
               placeholder="Annotation title *"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              className="text-sm sm:text-base"
             />
             <textarea
               placeholder="Annotation content (optional)"
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               rows={3}
-              className="w-full rounded-lg border border-border bg-card px-4 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full rounded-lg border border-border bg-card px-3 sm:px-4 py-2 text-sm sm:text-base text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             />
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 text-sm cursor-pointer">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <label className="flex items-center gap-2 text-xs sm:text-sm cursor-pointer">
                 <input
                   type="checkbox"
                   checked={formData.isPublic}
@@ -255,11 +257,11 @@ export default function VideoAnnotationsComponent({
                 Will be added at {formatTime(currentTime)}
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button size="sm" onClick={handleCreate} disabled={!formData.title.trim()}>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button size="sm" onClick={handleCreate} disabled={!formData.title.trim()} className="w-full sm:w-auto">
                 Create Annotation
               </Button>
-              <Button size="sm" variant="outline" onClick={() => setShowAddForm(false)}>
+              <Button size="sm" variant="outline" onClick={() => setShowAddForm(false)} className="w-full sm:w-auto">
                 Cancel
               </Button>
             </div>
@@ -285,7 +287,7 @@ export default function VideoAnnotationsComponent({
               >
                 {editingId === annotation._id ? (
                   <div className="space-y-3">
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <select
                         value={formData.type}
                         onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
@@ -300,35 +302,36 @@ export default function VideoAnnotationsComponent({
                         type="color"
                         value={formData.color}
                         onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                        className="w-12 h-10 rounded border border-border cursor-pointer"
+                        className="w-full sm:w-12 h-10 rounded border border-border cursor-pointer"
                       />
                     </div>
                     <Input
                       placeholder="Title *"
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      className="text-sm sm:text-base"
                     />
                     <textarea
                       placeholder="Content"
                       value={formData.content}
                       onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                       rows={2}
-                      className="w-full rounded-lg border border-border bg-card px-4 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                      className="w-full rounded-lg border border-border bg-card px-3 sm:px-4 py-2 text-sm sm:text-base text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                     />
-                    <div className="flex items-center gap-2">
-                      <Button size="sm" onClick={() => handleUpdate(annotation._id)}>
+                    <div className="flex flex-col sm:flex-row items-center gap-2">
+                      <Button size="sm" onClick={() => handleUpdate(annotation._id)} className="w-full sm:w-auto">
                         Save
                       </Button>
-                      <Button size="sm" variant="outline" onClick={cancelEditing}>
+                      <Button size="sm" variant="outline" onClick={cancelEditing} className="w-full sm:w-auto">
                         Cancel
                       </Button>
                     </div>
                   </div>
                 ) : (
                   <>
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
                           <div
                             className="w-3 h-3 rounded-full"
                             style={{ backgroundColor: annotation.color || '#3b82f6' }}
@@ -350,11 +353,11 @@ export default function VideoAnnotationsComponent({
                             {formatTime(annotation.timestamp)}
                           </button>
                         </div>
-                        <h4 className="font-semibold text-foreground mb-1">{annotation.title}</h4>
+                        <h4 className="font-semibold text-foreground mb-1 break-words">{annotation.title}</h4>
                         {annotation.content && (
-                          <p className="text-sm text-muted-foreground mb-2">{annotation.content}</p>
+                          <p className="text-sm text-muted-foreground mb-2 break-words">{annotation.content}</p>
                         )}
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                           <span>By {annotation.createdBy?.name || 'Unknown'}</span>
                           <span>•</span>
                           <span>{new Date(annotation.createdAt).toLocaleDateString()}</span>
@@ -362,7 +365,7 @@ export default function VideoAnnotationsComponent({
                       </div>
                       {isAdminOrInstructor &&
                         (annotation.createdBy?._id === user?.id || user?.roles?.includes('admin')) && (
-                          <div className="flex gap-1">
+                          <div className="flex gap-1 self-start sm:self-auto">
                             <button
                               onClick={() => startEditing(annotation)}
                               className="p-1 hover:bg-accent rounded transition-colors"

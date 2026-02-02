@@ -628,20 +628,20 @@ export default function CourseLearnPage() {
       <Navbar />
       <ToastContainer />
 
-      <div className="container-custom py-6">
+      <div className="container-custom py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link href={`/courses/${slug}`}>
-                <Button variant="ghost" size="sm">
-                  <ArrowLeft className="mr-2 h-4 w-4" />
+        <div className="mb-4 sm:mb-6 space-y-3 sm:space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-w-0">
+              <Link href={`/courses/${slug}`} className="self-start">
+                <Button variant="ghost" size="sm" className="text-sm">
+                  <ArrowLeft className="mr-1.5 h-4 w-4 shrink-0" />
                   Back to Course
                 </Button>
               </Link>
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">{course.title}</h1>
-                <p className="text-sm text-muted-foreground">
+              <div className="min-w-0">
+                <h1 className="text-lg sm:text-2xl font-bold text-foreground truncate">{course.title}</h1>
+                <p className="text-xs sm:text-sm text-muted-foreground">
                   {videos.length} {videos.length === 1 ? 'video' : 'videos'}
                 </p>
               </div>
@@ -651,10 +651,10 @@ export default function CourseLearnPage() {
           {/* Progress Bar */}
           {videos.length > 0 && (
             <Card>
-              <CardContent className="p-4">
+              <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-foreground">Course Progress</span>
-                  <span className="text-sm text-muted-foreground">{calculateProgress()}%</span>
+                  <span className="text-xs sm:text-sm font-medium text-foreground">Course Progress</span>
+                  <span className="text-xs sm:text-sm text-muted-foreground">{calculateProgress()}%</span>
                 </div>
                 <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
                   <div
@@ -662,7 +662,7 @@ export default function CourseLearnPage() {
                     style={{ width: `${calculateProgress()}%` }}
                   />
                 </div>
-                <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+                <div className="mt-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs text-muted-foreground">
                   <span>
                     {videos.filter((v) => v._id && completedVideos.has(v._id)).length} of {videos.length} videos completed
                   </span>
@@ -677,14 +677,32 @@ export default function CourseLearnPage() {
           )}
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-4">
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-4">
+          {/* Video List - Show first on mobile so user can switch without scrolling */}
+          <div className="lg:col-span-1 order-1 lg:order-2">
+            <Card>
+              <CardContent className="p-3 sm:p-4">
+                <h2 className="mb-3 sm:mb-4 font-semibold text-foreground text-sm sm:text-base">Course Videos</h2>
+                <div className="max-h-[280px] sm:max-h-[400px] lg:max-h-[600px] overflow-y-auto -mx-1 px-1">
+                  <VideoList
+                    videos={videos}
+                    currentVideoIndex={selectedVideoIndex}
+                    completedVideoIds={completedVideos}
+                    hasAccess={hasAccess}
+                    onVideoSelect={handleVideoSelect}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
           {/* Video Player - Main Content */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-3 order-2 lg:order-1">
             {selectedVideo ? (
               <div className="space-y-4">
                 {selectedVideo ? (
-                  <div className="space-y-6">
-                    <div className="relative z-10">
+                  <div className="space-y-4 sm:space-y-6">
+                    <div className="relative z-10 w-full overflow-hidden rounded-xl bg-black">
                       {/* Main Player Component */}
                       {selectedVideo.videoUrl && selectedVideo.videoUrl.trim() !== '' ? (
                         <VideoPlayer
@@ -739,12 +757,12 @@ export default function CourseLearnPage() {
                     </div>
 
                     {/* Course Actions Bar */}
-                    <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-white/5 bg-brand-navy/50 p-4 backdrop-blur-sm">
-                      <div className="flex items-center gap-2">
-                        <h2 className="text-xl font-bold text-white hidden md:block">{selectedVideo.title}</h2>
+                    <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-4 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-slate-800/50 p-3 sm:p-4">
+                      <div className="flex items-center gap-2 min-w-0 flex-1 sm:flex-initial">
+                        <h2 className="text-base sm:text-xl font-bold text-foreground truncate">{selectedVideo.title}</h2>
                       </div>
 
-                      <div className="flex items-center gap-2 ml-auto">
+                      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -764,34 +782,35 @@ export default function CourseLearnPage() {
                               console.error('Failed to toggle favorite', error);
                             }
                           }}
-                          className={`hover:bg-white/10 ${favoriteData?.isFavorite ? 'text-red-500 hover:text-red-400' : 'text-gray-400 hover:text-white'}`}
+                          className={`p-2 sm:px-3 ${favoriteData?.isFavorite ? 'text-red-500 hover:text-red-600' : 'text-muted-foreground hover:text-foreground'}`}
                           title={favoriteData?.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                         >
-                          <Heart className={`h-5 w-5 ${favoriteData?.isFavorite ? 'fill-current' : ''}`} />
-                          <span className="ml-2 hidden sm:inline">{favoriteData?.isFavorite ? 'Saved' : 'Save'}</span>
+                          <Heart className={`h-4 w-4 sm:h-5 sm:w-5 ${favoriteData?.isFavorite ? 'fill-current' : ''}`} />
+                          <span className="ml-1.5 hidden sm:inline text-sm">{favoriteData?.isFavorite ? 'Saved' : 'Save'}</span>
                         </Button>
 
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => setShowRatingModal(true)}
-                          className="text-gray-400 hover:text-brand-gold hover:bg-white/10"
+                          className="p-2 sm:px-3 text-muted-foreground hover:text-foreground"
                           title="Rate this video"
                         >
-                          <Star className="h-5 w-5" />
-                          <span className="ml-2 hidden sm:inline">{ratingsData?.averageRating ? ratingsData.averageRating.toFixed(1) : 'Rate'}</span>
+                          <Star className="h-4 w-4 sm:h-5 sm:w-5" />
+                          <span className="ml-1.5 hidden sm:inline text-sm">{ratingsData?.averageRating ? ratingsData.averageRating.toFixed(1) : 'Rate'}</span>
                         </Button>
 
-                        <div className="h-6 w-px bg-white/10 mx-1" />
+                        <div className="h-5 w-px bg-gray-200 dark:bg-white/10 mx-0.5 hidden sm:block" />
 
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={handleShareVideo}
-                          className="text-gray-400 hover:text-brand-blue hover:bg-white/10"
+                          className="p-2 sm:px-3 text-muted-foreground hover:text-foreground"
+                          title="Share"
                         >
-                          <Share2 className="h-5 w-5" />
-                          <span className="ml-2 hidden sm:inline">Share</span>
+                          <Share2 className="h-4 w-4 sm:h-5 sm:w-5" />
+                          <span className="ml-1.5 hidden sm:inline text-sm">Share</span>
                         </Button>
 
                         {hasAccess && selectedVideo?._id && (
@@ -799,20 +818,20 @@ export default function CourseLearnPage() {
                             variant="ghost"
                             size="sm"
                             onClick={handleDownload}
-                            className="text-gray-400 hover:text-brand-neon hover:bg-white/10"
+                            className="p-2 sm:px-3 text-muted-foreground hover:text-foreground"
                             title="Download video"
                           >
-                            <Download className="h-5 w-5" />
-                            <span className="ml-2 hidden sm:inline">Download</span>
+                            <Download className="h-4 w-4 sm:h-5 sm:w-5" />
+                            <span className="ml-1.5 hidden sm:inline text-sm">Download</span>
                           </Button>
                         )}
                       </div>
                     </div>
                     {selectedVideo.description && (
                       <Card>
-                        <CardContent className="p-6">
-                          <h3 className="mb-2 font-semibold text-foreground">About this video</h3>
-                          <p className="text-muted-foreground">{selectedVideo.description}</p>
+                        <CardContent className="p-4 sm:p-6">
+                          <h3 className="mb-2 font-semibold text-foreground text-sm sm:text-base">About this video</h3>
+                          <p className="text-muted-foreground text-sm sm:text-base">{selectedVideo.description}</p>
                         </CardContent>
                       </Card>
                     )}
@@ -870,32 +889,30 @@ export default function CourseLearnPage() {
                     )}
 
                     {/* Navigation */}
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between gap-4">
+                    <div className="space-y-3 sm:space-y-4">
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
                         <Button
                           variant="outline"
                           onClick={handlePreviousVideo}
                           disabled={!canGoPrevious}
-                          className="flex items-center gap-2"
+                          className="flex items-center justify-center gap-2 order-2 sm:order-1 flex-1 sm:flex-initial"
                         >
-                          <ChevronLeft className="h-4 w-4" />
-                          Previous Video
+                          <ChevronLeft className="h-4 w-4 shrink-0" />
+                          <span className="hidden sm:inline">Previous</span>
                         </Button>
 
-                        <div className="flex items-center gap-4">
-                          <div className="text-sm text-muted-foreground">
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 order-1 sm:order-2">
+                          <div className="text-xs sm:text-sm text-muted-foreground text-center">
                             Video {selectedVideoIndex + 1} of {videos.length}
                           </div>
-
-                          {/* Auto-play toggle */}
-                          <label className="flex items-center gap-2 text-sm cursor-pointer">
+                          <label className="flex items-center gap-2 text-xs sm:text-sm cursor-pointer">
                             <input
                               type="checkbox"
                               checked={autoPlayNext}
                               onChange={(e) => setAutoPlayNext(e.target.checked)}
-                              className="rounded border-gray-300"
+                              className="rounded border-gray-300 dark:border-gray-600"
                             />
-                            <span className="text-muted-foreground">Auto-play next</span>
+                            <span className="text-muted-foreground whitespace-nowrap">Auto-play next</span>
                           </label>
                         </div>
 
@@ -903,10 +920,10 @@ export default function CourseLearnPage() {
                           variant="outline"
                           onClick={handleNextVideo}
                           disabled={!canGoNext || (videos[selectedVideoIndex + 1]?.locked && !hasAccess)}
-                          className="flex items-center gap-2"
+                          className="flex items-center justify-center gap-2 order-3 flex-1 sm:flex-initial"
                         >
-                          Next Video
-                          <ChevronRight className="h-4 w-4" />
+                          <span className="hidden sm:inline">Next</span>
+                          <ChevronRight className="h-4 w-4 shrink-0" />
                         </Button>
                       </div>
 
@@ -916,9 +933,9 @@ export default function CourseLearnPage() {
                           <Button
                             variant="outline"
                             onClick={handleMarkAsComplete}
-                            className="flex items-center gap-2"
+                            className="flex items-center gap-2 w-full sm:w-auto"
                           >
-                            <CheckCircle2 className="h-4 w-4" />
+                            <CheckCircle2 className="h-4 w-4 shrink-0" />
                             Mark as Complete
                           </Button>
                         </div>
@@ -934,24 +951,6 @@ export default function CourseLearnPage() {
                 )}
               </div>
             ) : null}
-
-            {/* Video List Sidebar */}
-            <div className="lg:col-span-1">
-              <Card>
-                <CardContent className="p-4">
-                  <h2 className="mb-4 font-semibold text-foreground">Course Videos</h2>
-                  <div className="max-h-[600px] overflow-y-auto">
-                    <VideoList
-                      videos={videos}
-                      currentVideoIndex={selectedVideoIndex}
-                      completedVideoIds={completedVideos}
-                      hasAccess={hasAccess}
-                      onVideoSelect={handleVideoSelect}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
           </div>
         </div>
 
@@ -967,11 +966,11 @@ export default function CourseLearnPage() {
               <label className="block text-sm font-medium text-foreground mb-2">
                 Share Link
               </label>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Input
                   value={shareLink}
                   readOnly
-                  className="flex-1"
+                  className="flex-1 min-w-0"
                 />
                 <Button
                   onClick={copyToClipboard}
@@ -996,7 +995,7 @@ export default function CourseLearnPage() {
               <label className="block text-sm font-medium text-foreground mb-2">
                 Share on Social Media
               </label>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-2 gap-2">
                 <Button
                   variant="outline"
                   onClick={() => shareToSocial('twitter')}

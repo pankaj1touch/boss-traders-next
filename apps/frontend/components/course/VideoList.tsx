@@ -119,37 +119,38 @@ export default function VideoList({
   }
 
   return (
-    <div className={`space-y-3 ${className}`}>
+    <div className={`space-y-2 sm:space-y-3 ${className}`}>
       {/* Search and Filter */}
       {(showSearch || showFilter) && (
-        <div className="space-y-2 mb-4">
+        <div className="space-y-2 mb-3 sm:mb-4">
           {showSearch && (
             <div className="relative group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-hover:text-brand-blue transition-colors" />
+              <Search className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
               <Input
                 type="text"
                 placeholder="Search videos..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 pr-9 bg-black/20 border-white/10 text-white placeholder:text-gray-500 hover:border-brand-blue/30 focus-visible:border-brand-blue transition-all"
+                className="pl-8 sm:pl-9 pr-8 sm:pr-9 h-9 sm:h-10 text-sm border-border bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-primary"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                  className="absolute right-2.5 sm:right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5"
+                  aria-label="Clear search"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </button>
               )}
             </div>
           )}
 
           {showFilter && (
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value as any)}
-                className="flex-1 rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-blue hover:bg-black/40 transition-colors"
+                className="w-full sm:flex-1 rounded-lg border border-border bg-card px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="all">All Videos</option>
                 <option value="free">Free Only</option>
@@ -159,7 +160,7 @@ export default function VideoList({
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="flex-1 rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-blue hover:bg-black/40 transition-colors"
+                className="w-full sm:flex-1 rounded-lg border border-border bg-card px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="order">By Order</option>
                 <option value="title">By Title</option>
@@ -172,8 +173,8 @@ export default function VideoList({
 
       {/* Video List */}
       {filteredAndSortedVideos.length === 0 ? (
-        <div className="text-center py-8 bg-white/5 rounded-xl border border-white/5 border-dashed">
-          <p className="text-sm text-gray-400">No videos match your search</p>
+        <div className="text-center py-4 sm:py-8 rounded-xl border border-border bg-muted/30 border-dashed">
+          <p className="text-xs sm:text-sm text-muted-foreground">No videos match your search</p>
           {(searchQuery || filterType !== 'all') && (
             <Button
               variant="ghost"
@@ -182,14 +183,14 @@ export default function VideoList({
                 setSearchQuery('');
                 setFilterType('all');
               }}
-              className="mt-2 text-brand-blue hover:text-white"
+              className="mt-2 text-primary hover:text-primary/90"
             >
               Clear filters
             </Button>
           )}
         </div>
       ) : (
-        <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+        <div className="space-y-1.5 sm:space-y-2 overflow-y-auto pr-1 -mr-1">
           {filteredAndSortedVideos.map((video, filteredIndex) => {
             const originalIndex = getOriginalIndex(filteredIndex);
             const isSelected = originalIndex === currentVideoIndex;
@@ -202,60 +203,52 @@ export default function VideoList({
                 ref={isSelected ? selectedRef : null}
                 onClick={() => onVideoSelect(originalIndex)}
                 disabled={isLocked}
-                className={`w-full rounded-xl border p-3 text-left transition-all duration-200 group relative overflow-hidden ${isSelected
-                  ? 'border-brand-blue/50 bg-brand-blue/10 shadow-[0_0_15px_rgba(37,99,235,0.1)]'
-                  : 'border-white/5 bg-white/5 hover:bg-white/10 hover:border-white/10'
+                className={`w-full rounded-lg sm:rounded-xl border p-2 sm:p-3 text-left transition-all duration-200 group relative overflow-hidden ${isSelected
+                  ? 'border-primary/50 bg-primary/10 shadow-sm'
+                  : 'border-border bg-muted/30 hover:bg-muted/50 hover:border-border'
                   } ${isLocked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               >
-                {isSelected && <div className="absolute left-0 top-0 bottom-0 w-1 bg-brand-blue" />}
+                {isSelected && <div className="absolute left-0 top-0 bottom-0 w-0.5 sm:w-1 bg-primary rounded-l" />}
 
-                <div className="flex items-start gap-3">
-                  {/* Icon */}
-                  <div className={`mt-0.5 flex-shrink-0 flex items-center justify-center p-1.5 rounded-full ${isSelected ? 'bg-brand-blue/20 text-brand-blue' : 'bg-black/20 text-gray-400'}`}>
+                <div className="flex items-start gap-2 sm:gap-3">
+                  <div className={`mt-0.5 flex-shrink-0 flex items-center justify-center p-1 sm:p-1.5 rounded-full ${isSelected ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
                     {isLocked ? (
-                      <Lock className="h-3.5 w-3.5" />
+                      <Lock className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                     ) : isCompleted ? (
-                      <CheckCircle2 className="h-3.5 w-3.5 text-green-400" />
+                      <CheckCircle2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-green-600 dark:text-green-400" />
                     ) : (
-                      <Play className={`h-3.5 w-3.5 ${isSelected && 'fill-current'}`} />
+                      <Play className={`h-3 w-3 sm:h-3.5 sm:w-3.5 ${isSelected && 'fill-current'}`} />
                     )}
                   </div>
 
-                  {/* Content */}
                   <div className="flex-1 min-w-0">
-                    <p
-                      className={`text-sm font-medium line-clamp-2 transition-colors ${isSelected
-                        ? 'text-white'
-                        : 'text-gray-300 group-hover:text-white'
-                        }`}
-                    >
+                    <p className={`text-xs sm:text-sm font-medium line-clamp-2 transition-colors ${isSelected ? 'text-foreground' : 'text-muted-foreground group-hover:text-foreground'}`}>
                       {video.title}
                     </p>
-
-                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <div className="mt-1 sm:mt-2 flex flex-wrap items-center gap-1 sm:gap-2">
                       {video.duration && (
-                        <span className="text-xs text-gray-500 font-mono">
+                        <span className="text-[10px] sm:text-xs text-muted-foreground font-mono">
                           {formatDuration(video.duration)}
                         </span>
                       )}
                       {!video.videoUrl || video.videoUrl.trim() === '' ? (
-                        <Badge className="text-[10px] py-0 h-5 bg-yellow-500/10 text-yellow-400 border-yellow-500/20 hover:bg-yellow-500/20">
+                        <Badge className="text-[9px] sm:text-[10px] py-0 h-4 sm:h-5 px-1.5 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20">
                           Not Available
                         </Badge>
                       ) : null}
                       {video.isFree && (
-                        <Badge className="text-[10px] py-0 h-5 bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20">
+                        <Badge className="text-[9px] sm:text-[10px] py-0 h-4 sm:h-5 px-1.5 bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20">
                           Free
                         </Badge>
                       )}
                       {isLocked && (
-                        <Badge className="text-[10px] py-0 h-5 bg-gray-700/50 text-gray-400 border-gray-600">
+                        <Badge className="text-[9px] sm:text-[10px] py-0 h-4 sm:h-5 px-1.5 bg-muted text-muted-foreground">
                           Locked
                         </Badge>
                       )}
                       {isCompleted && !isLocked && (
-                        <Badge className="text-[10px] py-0 h-5 bg-brand-blue/10 text-brand-blue border-brand-blue/20">
-                          Completed
+                        <Badge className="text-[9px] sm:text-[10px] py-0 h-4 sm:h-5 px-1.5 bg-primary/10 text-primary border-primary/20">
+                          Done
                         </Badge>
                       )}
                     </div>
@@ -269,4 +262,3 @@ export default function VideoList({
     </div>
   );
 }
-

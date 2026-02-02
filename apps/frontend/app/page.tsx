@@ -123,7 +123,7 @@ export default function HomePage() {
       )}
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-brand-dark py-20 lg:py-32">
+      <section className="relative overflow-hidden bg-brand-dark py-14 sm:py-20 lg:py-32">
         {/* Mesh Gradient Background */}
         <div className="absolute inset-0 bg-mesh-gradient opacity-20" />
         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-5" />
@@ -133,7 +133,7 @@ export default function HomePage() {
         <div className="absolute -right-20 bottom-20 h-72 w-72 rounded-full bg-brand-blue/30 blur-[100px] animate-pulse-slow lg:delay-1000" />
 
         <div className="container-custom relative z-10">
-          <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+          <div className="grid gap-10 sm:gap-12 lg:grid-cols-2 lg:items-center">
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
@@ -141,7 +141,7 @@ export default function HomePage() {
             >
               <AnimatePresence mode="wait">
                 {bannersLoading ? (
-                  <div className="flex h-[400px] items-center justify-center">
+                  <div className="flex h-[260px] sm:h-[400px] items-center justify-center">
                     <div className="h-12 w-12 animate-spin rounded-full border-4 border-solid border-brand-accent border-r-transparent"></div>
                   </div>
                 ) : (
@@ -157,14 +157,14 @@ export default function HomePage() {
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.5 }}
-                      className="mb-8 inline-flex items-center gap-2 rounded-full border border-brand-gold/30 bg-brand-gold/10 px-4 py-1.5 text-sm font-semibold text-brand-gold backdrop-blur-sm"
+                      className="mb-6 sm:mb-8 inline-flex items-center gap-2 rounded-full border border-brand-gold/30 bg-brand-gold/10 px-3 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm font-semibold text-brand-gold backdrop-blur-sm"
                     >
                       <Zap className="h-4 w-4" />
                       <span className="tracking-wide uppercase">Elite Investor Class</span>
                     </motion.div>
 
                     {/* Headline */}
-                    <h1 className="mb-6 text-5xl font-bold leading-tight tracking-tight text-white lg:text-7xl">
+                    <h1 className="mb-5 sm:mb-6 text-4xl sm:text-5xl font-bold leading-tight tracking-tight text-white lg:text-7xl">
                       Master the <br />
                       <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue via-brand-purple to-brand-neon animate-gradient-x">
                         Market Moves
@@ -172,7 +172,7 @@ export default function HomePage() {
                     </h1>
 
                     {/* Description */}
-                    <p className="mb-8 text-lg text-gray-400 lg:text-xl lg:leading-relaxed max-w-lg">
+                    <p className="mb-6 sm:mb-8 text-base sm:text-lg text-gray-400 lg:text-xl lg:leading-relaxed max-w-lg">
                       {banners[currentBannerIndex]?.description ||
                         'Join the elite community of traders. Master technical analysis, psychology, and risk management with our institutional-grade curriculum.'}
                     </p>
@@ -180,27 +180,27 @@ export default function HomePage() {
                     {/* CTA Buttons */}
                     <div className="flex flex-col sm:flex-row gap-4">
                       <Link href="/courses">
-                        <Button size="lg" className="w-full sm:w-auto h-14 px-8 text-lg bg-gradient-to-r from-brand-blue to-brand-purple hover:from-brand-blue/90 hover:to-brand-purple/90 shadow-neon border-0 rounded-xl transition-all hover:scale-105">
+                        <Button size="lg" className="w-full sm:w-auto h-12 sm:h-14 px-6 sm:px-8 text-base sm:text-lg bg-gradient-to-r from-brand-blue to-brand-purple hover:from-brand-blue/90 hover:to-brand-purple/90 shadow-neon border-0 rounded-xl transition-all hover:scale-105">
                           Explore Courses
                           <ArrowRight className="ml-2 h-5 w-5" />
                         </Button>
                       </Link>
                       <Link href="/auth/signup">
-                        <Button size="lg" variant="outline" className="w-full sm:w-auto h-14 px-8 text-lg border-white/20 text-white hover:bg-white/10 hover:border-white/40 rounded-xl backdrop-blur-sm">
+                        <Button size="lg" variant="outline" className="w-full sm:w-auto h-12 sm:h-14 px-6 sm:px-8 text-base sm:text-lg border-white/20 text-white hover:bg-white/10 hover:border-white/40 rounded-xl backdrop-blur-sm">
                           Start Free Trial
                         </Button>
                       </Link>
                     </div>
 
                     {/* Trust Indicators */}
-                    <div className="mt-12 flex items-center gap-8 text-gray-500">
-                      <div className="flex -space-x-4">
+                    <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 text-gray-500">
+                      <div className="flex -space-x-3 sm:-space-x-4">
                         {[1, 2, 3, 4].map((i) => (
-                          <div key={i} className="h-10 w-10 rounded-full border-2 border-brand-dark bg-gray-800" />
+                          <div key={i} className="h-9 w-9 sm:h-10 sm:w-10 rounded-full border-2 border-brand-dark bg-gray-800" />
                         ))}
                       </div>
-                      <div className="text-sm">
-                        <span className="block font-bold text-white">10,000+ Traders</span>
+                      <div className="text-xs sm:text-sm">
+                        <span className="block font-bold text-white text-sm sm:text-base">10,000+ Traders</span>
                         Trusted by industry leaders
                       </div>
                     </div>
@@ -291,8 +291,8 @@ export default function HomePage() {
               viewport={{ once: true }}
               className="mb-8 text-center"
             >
-              <h2 className="mb-2 text-3xl font-bold text-foreground">Announcements</h2>
-              <p className="text-muted-foreground">Stay updated with our latest news and updates</p>
+              <h2 className="mb-2 text-2xl sm:text-3xl font-bold text-foreground">Announcements</h2>
+              <p className="text-sm sm:text-base text-muted-foreground">Stay updated with our latest news and updates</p>
             </motion.div>
 
             {announcementsLoading ? (
@@ -318,7 +318,7 @@ export default function HomePage() {
       )}
 
       {/* Featured Blog Posts */}
-      <section className="py-20">
+      <section className="py-12 sm:py-16 lg:py-20">
         <div className="container-custom">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -326,26 +326,26 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="mb-12 text-center"
           >
-            <h2 className="mb-4 text-4xl font-bold">Latest Blog Posts</h2>
-            <p className="text-xl text-gray-600 dark:text-gray-400">
+            <h2 className="mb-3 sm:mb-4 text-2xl sm:text-3xl lg:text-4xl font-bold">Latest Blog Posts</h2>
+            <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-400">
               Stay updated with our latest insights and tutorials
             </p>
           </motion.div>
 
           {blogsLoading ? (
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
               {[...Array(10)].map((_, i) => (
                 <div key={i} className="h-96 animate-pulse rounded-2xl bg-gray-200 dark:bg-gray-800" />
               ))}
             </div>
           ) : blogsError ? (
-            <div className="rounded-3xl border border-red-200 bg-red-50 p-10 text-center dark:border-red-900/50 dark:bg-red-900/20">
+            <div className="rounded-3xl border border-red-200 bg-red-50 p-6 sm:p-10 text-center dark:border-red-900/50 dark:bg-red-900/20">
               <AlertCircle className="mx-auto h-12 w-12 text-red-500" />
-              <h3 className="mt-6 text-2xl font-semibold">Unable to load blog posts</h3>
-              <p className="mt-2 text-gray-600 dark:text-gray-300">
+              <h3 className="mt-4 sm:mt-6 text-xl sm:text-2xl font-semibold">Unable to load blog posts</h3>
+              <p className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
                 Please refresh the page or try again. You can still read all articles from the blog page.
               </p>
-              <div className="mt-6 flex flex-wrap justify-center gap-4">
+              <div className="mt-6 flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4">
                 <Button onClick={() => refetchBlogs()}>Retry loading</Button>
                 <Link href="/blog">
                   <Button variant="outline">Visit blog</Button>
@@ -367,10 +367,10 @@ export default function HomePage() {
               ))}
             </div>
           ) : (
-            <div className="rounded-3xl border border-dashed border-gray-300 p-10 text-center dark:border-gray-700">
+            <div className="rounded-3xl border border-dashed border-gray-300 p-6 sm:p-10 text-center dark:border-gray-700">
               <Newspaper className="mx-auto h-12 w-12 text-primary-500" />
-              <h3 className="mt-6 text-2xl font-semibold">No blog posts yet</h3>
-              <p className="mt-2 text-gray-600 dark:text-gray-400">
+              <h3 className="mt-4 sm:mt-6 text-xl sm:text-2xl font-semibold">No blog posts yet</h3>
+              <p className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
                 Our editorial team is preparing fresh insights. Explore all articles or check back soon.
               </p>
               <Link href="/blog" className="mt-6 inline-block">
@@ -384,7 +384,7 @@ export default function HomePage() {
 
           <div className="mt-12 text-center">
             <Link href="/blog">
-              <Button size="lg">
+              <Button size="lg" className="w-full sm:w-auto">
                 View All Blog Posts
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
@@ -394,7 +394,7 @@ export default function HomePage() {
       </section>
 
       {/* Features */}
-      <section className="py-20">
+      <section className="py-12 sm:py-16 lg:py-20">
         <div className="container-custom">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -402,13 +402,13 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="mb-12 text-center"
           >
-            <h2 className="mb-4 text-4xl font-bold">Why Choose Boss Traders</h2>
-            <p className="text-xl text-gray-600 dark:text-gray-400">
+            <h2 className="mb-3 sm:mb-4 text-2xl sm:text-3xl lg:text-4xl font-bold">Why Choose Boss Traders</h2>
+            <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-400">
               Everything you need to master trading and build a profitable portfolio
             </p>
           </motion.div>
 
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-4">
             {features.map((feature, index) => (
               <motion.div
                 key={feature.title}
@@ -419,15 +419,15 @@ export default function HomePage() {
                 whileHover={{ y: -5 }}
               >
                 <div className="group h-full p-1 rounded-2xl bg-gradient-to-b from-white/10 to-transparent hover:from-brand-accent/50 transition-all duration-300">
-                  <div className="h-full rounded-xl bg-brand-navy border border-white/5 p-6 hover:shadow-neon transition-all duration-300 flex flex-col items-center text-center relative overflow-hidden">
+                  <div className="h-full rounded-xl bg-brand-navy border border-white/5 p-4 sm:p-6 hover:shadow-neon transition-all duration-300 flex flex-col items-center text-center relative overflow-hidden">
                     <div className="absolute inset-0 bg-mesh-gradient opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
 
-                    <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-slate group-hover:bg-brand-blue/20 transition-colors duration-300">
-                      <feature.icon className="h-8 w-8 text-brand-blue group-hover:text-brand-neon transition-colors duration-300" />
+                    <div className="mx-auto mb-5 sm:mb-6 flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-brand-slate group-hover:bg-brand-blue/20 transition-colors duration-300">
+                      <feature.icon className="h-6 w-6 sm:h-8 sm:w-8 text-brand-blue group-hover:text-brand-neon transition-colors duration-300" />
                     </div>
 
-                    <h3 className="mb-3 text-xl font-bold text-white group-hover:text-brand-gold transition-colors">{feature.title}</h3>
-                    <p className="text-gray-400 group-hover:text-gray-300 leading-relaxed z-10 relative">{feature.description}</p>
+                    <h3 className="mb-2 sm:mb-3 text-lg sm:text-xl font-bold text-white group-hover:text-brand-gold transition-colors">{feature.title}</h3>
+                    <p className="text-sm sm:text-base text-gray-400 group-hover:text-gray-300 leading-relaxed z-10 relative">{feature.description}</p>
                   </div>
                 </div>
               </motion.div>
@@ -437,7 +437,7 @@ export default function HomePage() {
       </section>
 
       {/* Demo Classes Section */}
-      <section className="py-20">
+      <section className="py-12 sm:py-16 lg:py-20">
         <div className="container-custom">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -445,8 +445,8 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="mb-12 text-center"
           >
-            <h2 className="mb-4 text-4xl font-bold">Upcoming Demo Classes</h2>
-            <p className="text-xl text-gray-600 dark:text-gray-400">
+            <h2 className="mb-3 sm:mb-4 text-2xl sm:text-3xl lg:text-4xl font-bold">Upcoming Demo Classes</h2>
+            <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-400">
               Experience our courses with free demo sessions before you enroll
             </p>
           </motion.div>
@@ -472,7 +472,7 @@ export default function HomePage() {
                       transition={{ delay: index * 0.1 }}
                     >
                       <Card className="h-full transition-shadow hover:shadow-lg">
-                        <CardContent className="p-6">
+                        <CardContent className="p-4 sm:p-6">
                           <div className="mb-4 flex items-start justify-between">
                             <Badge variant="primary">Demo Class</Badge>
                             {demoClass.courseId && (
@@ -484,13 +484,13 @@ export default function HomePage() {
                               </Link>
                             )}
                           </div>
-                          <h3 className="mb-2 text-xl font-bold">{demoClass.title}</h3>
+                          <h3 className="mb-2 text-lg sm:text-xl font-bold">{demoClass.title}</h3>
                           {demoClass.description && (
                             <p className="mb-4 text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
                               {demoClass.description}
                             </p>
                           )}
-                          <div className="mb-4 space-y-2 text-sm">
+                          <div className="mb-4 space-y-2 text-xs sm:text-sm">
                             <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                               <Calendar className="h-4 w-4" />
                               <span>{format(new Date(demoClass.scheduledAt), 'MMM dd, yyyy • hh:mm a')}</span>
@@ -557,7 +557,7 @@ export default function HomePage() {
               </div>
               <div className="mt-12 text-center">
                 <Link href="/demo-classes">
-                  <Button size="lg">
+                  <Button size="lg" className="w-full sm:w-auto">
                     View All Demo Classes
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
@@ -565,13 +565,13 @@ export default function HomePage() {
               </div>
             </>
           ) : (
-            <div className="rounded-3xl border border-dashed border-gray-300 p-10 text-center dark:border-gray-700">
+            <div className="rounded-3xl border border-dashed border-gray-300 p-6 sm:p-10 text-center dark:border-gray-700">
               <Video className="mx-auto h-12 w-12 text-primary-500" />
-              <h3 className="mt-6 text-2xl font-semibold">No demo classes scheduled</h3>
-              <p className="mt-2 text-gray-600 dark:text-gray-400">
+              <h3 className="mt-4 sm:mt-6 text-xl sm:text-2xl font-semibold">No demo classes scheduled</h3>
+              <p className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
                 Check back soon for upcoming demo sessions, or explore our courses to get started.
               </p>
-              <div className="mt-6 flex flex-wrap justify-center gap-4">
+              <div className="mt-6 flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4">
                 <Link href="/courses">
                   <Button>
                     Explore Courses
@@ -589,7 +589,7 @@ export default function HomePage() {
 
       {/* Active Coupons Section */}
       {!couponsLoading && couponsData?.coupons && Array.isArray(couponsData.coupons) && couponsData.coupons.length > 0 && (
-        <section className="py-20">
+        <section className="py-12 sm:py-16 lg:py-20">
           <div className="container-custom">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -597,8 +597,8 @@ export default function HomePage() {
               viewport={{ once: true }}
               className="mb-12 text-center"
             >
-              <h2 className="mb-4 text-4xl font-bold">Special Offers & Coupons</h2>
-              <p className="text-xl text-gray-600 dark:text-gray-400">
+              <h2 className="mb-3 sm:mb-4 text-2xl sm:text-3xl lg:text-4xl font-bold">Special Offers & Coupons</h2>
+              <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-400">
                 Use these coupon codes to get amazing discounts on your purchases
               </p>
             </motion.div>
@@ -623,7 +623,7 @@ export default function HomePage() {
       )}
 
       {/* Featured Courses */}
-      <section className="bg-brand-dark py-20 relative">
+      <section className="bg-brand-dark py-12 sm:py-16 lg:py-20 relative">
         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-5" />
         <div className="container-custom relative z-10">
           <motion.div
@@ -632,23 +632,23 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="mb-12 text-center"
           >
-            <h2 className="mb-4 text-4xl font-bold text-white">Featured <span className="text-brand-gold">Courses</span></h2>
-            <p className="text-xl text-gray-400">
+            <h2 className="mb-3 sm:mb-4 text-2xl sm:text-3xl lg:text-4xl font-bold text-white">Featured <span className="text-brand-gold">Courses</span></h2>
+            <p className="text-base sm:text-lg lg:text-xl text-gray-400">
               Explore our most popular trading programs
             </p>
           </motion.div>
 
           {isLoading ? (
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="h-96 animate-pulse rounded-2xl bg-brand-navy border border-white/5" />
               ))}
             </div>
           ) : coursesError ? (
-            <div className="rounded-3xl border border-red-500/20 bg-red-500/10 p-10 text-center">
+            <div className="rounded-3xl border border-red-500/20 bg-red-500/10 p-6 sm:p-10 text-center">
               <AlertCircle className="mx-auto h-12 w-12 text-red-500" />
-              <h3 className="mt-6 text-2xl font-semibold text-white">Courses failed to load</h3>
-              <p className="mt-2 text-gray-400">
+              <h3 className="mt-4 sm:mt-6 text-xl sm:text-2xl font-semibold text-white">Courses failed to load</h3>
+              <p className="mt-2 text-sm sm:text-base text-gray-400">
                 Something went wrong while fetching featured courses. Please try again.
               </p>
               <Button className="mt-6 bg-red-600 hover:bg-red-700 text-white" onClick={() => refetchCourses()}>
@@ -656,20 +656,20 @@ export default function HomePage() {
               </Button>
             </div>
           ) : coursesData?.courses?.length ? (
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 perspective-1000">
+            <div className="grid gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3 perspective-1000">
               {coursesData?.courses.map((course, index) => (
                 <CourseCard key={course._id} course={course} index={index} />
               ))}
             </div>
           ) : (
-            <div className="rounded-3xl border border-dashed border-gray-700 p-10 text-center">
+            <div className="rounded-3xl border border-dashed border-gray-700 p-6 sm:p-10 text-center">
               <BookOpen className="mx-auto h-12 w-12 text-brand-blue" />
-              <h3 className="mt-6 text-2xl font-semibold text-white">No featured courses yet</h3>
-              <p className="mt-2 text-gray-400">
+              <h3 className="mt-4 sm:mt-6 text-xl sm:text-2xl font-semibold text-white">No featured courses yet</h3>
+              <p className="mt-2 text-sm sm:text-base text-gray-400">
                 Check back soon for curated picks, or browse the course catalog to start learning today.
               </p>
-              <Link href="/courses" className="mt-6 inline-block">
-                <Button variant="outline" className="border-brand-blue text-brand-blue hover:bg-brand-blue hover:text-white">
+              <Link href="/courses" className="mt-6 inline-block w-full sm:w-auto">
+                <Button variant="outline" className="w-full sm:w-auto border-brand-blue text-brand-blue hover:bg-brand-blue hover:text-white">
                   Browse all courses
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
@@ -679,7 +679,7 @@ export default function HomePage() {
 
           <div className="mt-12 text-center">
             <Link href="/courses">
-              <Button size="lg" className="bg-brand-navy border border-white/10 hover:bg-brand-blue hover:text-white transition-all text-gray-300">
+              <Button size="lg" className="w-full sm:w-auto bg-brand-navy border border-white/10 hover:bg-brand-blue hover:text-white transition-all text-gray-300">
                 View All Courses
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
@@ -689,20 +689,20 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20">
+      <section className="py-12 sm:py-16 lg:py-20">
         <div className="container-custom">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="rounded-3xl bg-gradient-to-r from-primary-600 to-secondary-600 p-12 text-center text-white"
+            className="rounded-3xl bg-gradient-to-r from-primary-600 to-secondary-600 p-6 sm:p-10 lg:p-12 text-center text-white"
           >
-            <h2 className="mb-4 text-4xl font-bold">Ready to Master Trading?</h2>
-            <p className="mb-8 text-xl">
+            <h2 className="mb-3 sm:mb-4 text-2xl sm:text-3xl lg:text-4xl font-bold">Ready to Master Trading?</h2>
+            <p className="mb-6 sm:mb-8 text-base sm:text-lg lg:text-xl">
               Join thousands of successful traders and start your profitable journey today
             </p>
             <Link href="/auth/signup">
-              <Button size="lg" variant="outline" className="border-white bg-white text-primary-600 hover:bg-gray-100">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto border-white bg-white text-primary-600 hover:bg-gray-100">
                 Create Free Account
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>

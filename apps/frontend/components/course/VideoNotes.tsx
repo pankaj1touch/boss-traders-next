@@ -97,8 +97,8 @@ export default function VideoNotes({
   if (isLoading) {
     return (
       <Card>
-        <CardContent className="p-6">
-          <div className="text-center text-muted-foreground">Loading notes...</div>
+        <CardContent className="p-4 sm:p-6">
+          <div className="text-center text-muted-foreground text-sm sm:text-base">Loading notes...</div>
         </CardContent>
       </Card>
     );
@@ -110,11 +110,11 @@ export default function VideoNotes({
 
   return (
     <Card>
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5" />
-            <h3 className="text-lg font-semibold text-foreground">
+      <CardContent className="p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <div className="flex items-center gap-2 min-w-0">
+            <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" />
+            <h3 className="text-base sm:text-lg font-semibold text-foreground truncate">
               Notes ({notes.length})
             </h3>
           </div>
@@ -122,43 +122,45 @@ export default function VideoNotes({
             size="sm"
             variant="outline"
             onClick={() => setShowAddNote(!showAddNote)}
+            className="w-full sm:w-auto shrink-0"
           >
-            <Plus className="h-4 w-4 mr-1" />
+            <Plus className="h-4 w-4 mr-1 shrink-0" />
             Add Note
           </Button>
         </div>
 
         {/* Add Note Form */}
         {showAddNote && (
-          <div className="mb-6 p-4 rounded-lg border border-border bg-card space-y-3">
+          <div className="mb-4 sm:mb-6 p-3 sm:p-4 rounded-lg border border-border bg-muted/30 space-y-3">
             <Input
               placeholder="Note title (optional)"
               value={newNoteTitle}
               onChange={(e) => setNewNoteTitle(e.target.value)}
+              className="text-sm sm:text-base"
             />
             <textarea
               placeholder="Write your note..."
               value={newNoteContent}
               onChange={(e) => setNewNoteContent(e.target.value)}
               rows={3}
-              className="w-full rounded-lg border border-border bg-card px-4 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full rounded-lg border border-border bg-card px-3 sm:px-4 py-2 text-sm sm:text-base text-foreground focus:outline-none focus:ring-2 focus:ring-primary min-h-[80px]"
             />
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
                   checked={isBookmark}
                   onChange={(e) => setIsBookmark(e.target.checked)}
-                  className="rounded border-gray-300"
+                  className="rounded border-gray-300 dark:border-gray-600"
                 />
-                <label className="text-sm text-foreground flex items-center gap-1">
-                  <Bookmark className="h-4 w-4" />
+                <label className="text-xs sm:text-sm text-foreground flex items-center gap-1">
+                  <Bookmark className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   Bookmark
                 </label>
               </div>
               <div className="flex gap-2">
-                <Button size="sm" onClick={handleCreateNote} disabled={!newNoteContent.trim()}>
-                  <Save className="h-4 w-4 mr-1" />
+                <Button size="sm" onClick={handleCreateNote} disabled={!newNoteContent.trim()} className="flex-1 sm:flex-initial">
+                  <Save className="h-4 w-4 mr-1 shrink-0" />
                   Save
                 </Button>
                 <Button
@@ -170,7 +172,7 @@ export default function VideoNotes({
                     setNewNoteTitle('');
                   }}
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-4 w-4 shrink-0" />
                 </Button>
               </div>
             </div>
@@ -182,37 +184,38 @@ export default function VideoNotes({
 
         {/* Bookmarks */}
         {bookmarks.length > 0 && (
-          <div className="mb-6">
-            <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-              <Bookmark className="h-4 w-4" />
+          <div className="mb-4 sm:mb-6">
+            <h4 className="text-xs sm:text-sm font-semibold text-foreground mb-2 sm:mb-3 flex items-center gap-2">
+              <Bookmark className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
               Bookmarks ({bookmarks.length})
             </h4>
             <div className="space-y-2">
               {bookmarks.map((note) => (
                 <div
                   key={note._id}
-                  className="p-3 rounded-lg border border-border bg-card hover:bg-accent cursor-pointer"
+                  className="p-2.5 sm:p-3 rounded-lg border border-border bg-card hover:bg-accent cursor-pointer"
                   onClick={() => onNoteClick?.(note.timestamp)}
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
                       {note.title && (
-                        <h5 className="font-medium text-foreground mb-1">{note.title}</h5>
+                        <h5 className="font-medium text-foreground mb-1 text-sm sm:text-base truncate">{note.title}</h5>
                       )}
-                      <p className="text-sm text-foreground line-clamp-2">{note.content}</p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className="text-xs text-muted-foreground">
+                      <p className="text-xs sm:text-sm text-foreground line-clamp-2">{note.content}</p>
+                      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-1.5 sm:mt-2">
+                        <span className="text-[10px] sm:text-xs text-muted-foreground">
                           {formatTime(note.timestamp)}
                         </span>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-[10px] sm:text-xs text-muted-foreground">
                           {formatDistanceToNow(new Date(note.createdAt), { addSuffix: true })}
                         </span>
                       </div>
                     </div>
-                    <div className="flex gap-1">
+                    <div className="flex gap-0.5 sm:gap-1 shrink-0">
                       <Button
                         size="sm"
                         variant="ghost"
+                        className="p-1.5 sm:p-2"
                         onClick={(e) => {
                           e.stopPropagation();
                           setEditingNoteId(note._id);
@@ -220,17 +223,18 @@ export default function VideoNotes({
                           setEditTitle(note.title || '');
                         }}
                       >
-                        <Edit2 className="h-4 w-4" />
+                        <Edit2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       </Button>
                       <Button
                         size="sm"
                         variant="ghost"
+                        className="p-1.5 sm:p-2"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDeleteNote(note._id);
                         }}
                       >
-                        <Trash2 className="h-4 w-4 text-red-600" />
+                        <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-600" />
                       </Button>
                     </div>
                   </div>
@@ -242,17 +246,17 @@ export default function VideoNotes({
 
         {/* Regular Notes */}
         <div>
-          <h4 className="text-sm font-semibold text-foreground mb-3">All Notes</h4>
+          <h4 className="text-xs sm:text-sm font-semibold text-foreground mb-2 sm:mb-3">All Notes</h4>
           {regularNotes.length === 0 && bookmarks.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              No notes yet. Click "Add Note" to get started!
+            <div className="text-center py-6 sm:py-8 text-muted-foreground text-sm">
+              No notes yet. Click &quot;Add Note&quot; to get started!
             </div>
           ) : (
             <div className="space-y-2">
               {regularNotes.map((note) => (
                 <div
                   key={note._id}
-                  className="p-3 rounded-lg border border-border bg-card hover:bg-accent cursor-pointer"
+                  className="p-2.5 sm:p-3 rounded-lg border border-border bg-card hover:bg-accent cursor-pointer"
                   onClick={() => onNoteClick?.(note.timestamp)}
                 >
                   {editingNoteId === note._id ? (
@@ -261,14 +265,15 @@ export default function VideoNotes({
                         value={editTitle}
                         onChange={(e) => setEditTitle(e.target.value)}
                         placeholder="Note title"
+                        className="text-sm sm:text-base"
                       />
                       <textarea
                         value={editContent}
                         onChange={(e) => setEditContent(e.target.value)}
                         rows={3}
-                        className="w-full rounded-lg border border-border bg-card px-4 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                        className="w-full rounded-lg border border-border bg-card px-3 sm:px-4 py-2 text-sm sm:text-base text-foreground focus:outline-none focus:ring-2 focus:ring-primary min-h-[72px]"
                       />
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 flex-wrap">
                         <Button size="sm" onClick={() => handleUpdateNote(note._id)}>
                           Save
                         </Button>
@@ -286,25 +291,26 @@ export default function VideoNotes({
                       </div>
                     </div>
                   ) : (
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
                         {note.title && (
-                          <h5 className="font-medium text-foreground mb-1">{note.title}</h5>
+                          <h5 className="font-medium text-foreground mb-1 text-sm sm:text-base truncate">{note.title}</h5>
                         )}
-                        <p className="text-sm text-foreground line-clamp-3">{note.content}</p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <span className="text-xs text-muted-foreground">
+                        <p className="text-xs sm:text-sm text-foreground line-clamp-3">{note.content}</p>
+                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-1.5 sm:mt-2">
+                          <span className="text-[10px] sm:text-xs text-muted-foreground">
                             {formatTime(note.timestamp)}
                           </span>
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-[10px] sm:text-xs text-muted-foreground">
                             {formatDistanceToNow(new Date(note.createdAt), { addSuffix: true })}
                           </span>
                         </div>
                       </div>
-                      <div className="flex gap-1">
+                      <div className="flex gap-0.5 sm:gap-1 shrink-0">
                         <Button
                           size="sm"
                           variant="ghost"
+                          className="p-1.5 sm:p-2"
                           onClick={(e) => {
                             e.stopPropagation();
                             setEditingNoteId(note._id);
@@ -312,17 +318,18 @@ export default function VideoNotes({
                             setEditTitle(note.title || '');
                           }}
                         >
-                          <Edit2 className="h-4 w-4" />
+                          <Edit2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                         </Button>
                         <Button
                           size="sm"
                           variant="ghost"
+                          className="p-1.5 sm:p-2"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDeleteNote(note._id);
                           }}
                         >
-                          <Trash2 className="h-4 w-4 text-red-600" />
+                          <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-600" />
                         </Button>
                       </div>
                     </div>

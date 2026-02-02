@@ -446,7 +446,7 @@ export default function VideoPlayer({
       )}
 
       {/* Video Container */}
-      <div className={`relative w-full overflow-hidden rounded-2xl bg-black shadow-2xl ring-1 ring-white/10 ${isTheaterMode ? 'max-w-7xl aspect-video' : 'aspect-video'}`}>
+      <div className={`relative w-full overflow-hidden rounded-xl sm:rounded-2xl bg-black shadow-2xl ring-1 ring-white/10 ${isTheaterMode ? 'max-w-7xl aspect-video' : 'aspect-video'}`}>
         {isLoading && !error && (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-900 z-20">
             <Loader2 className="h-12 w-12 animate-spin text-brand-blue" />
@@ -526,19 +526,19 @@ export default function VideoPlayer({
 
         {/* Bottom Controls Overlay */}
         <div className={`absolute bottom-0 left-0 right-0 z-30 transition-all duration-300 ${showControls ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
-          <div className="bg-gradient-to-t from-black/90 via-black/60 to-transparent px-4 pb-4 pt-12">
+          <div className="bg-gradient-to-t from-black/90 via-black/60 to-transparent px-3 sm:px-4 pb-3 sm:pb-4 pt-8 sm:pt-12">
 
-            {/* Progress Bar */}
-            <div className="group/progress relative h-1.5 w-full cursor-pointer touch-none mb-4 flex items-center">
+            {/* Progress Bar - taller on mobile for touch */}
+            <div className="group/progress relative h-2 sm:h-1.5 w-full cursor-pointer touch-none mb-3 sm:mb-4 flex items-center">
               <input
                 type="range"
                 min="0"
                 max={duration || 0}
                 value={currentTime}
                 onChange={handleSeek}
-                className="absolute inset-0 h-full w-full opacity-0 z-50 cursor-pointer"
+                className="absolute inset-0 h-full w-full opacity-0 z-50 cursor-pointer min-h-[24px] sm:min-h-0"
               />
-              <div className="relative h-1 w-full rounded-full bg-white/20 overflow-hidden group-hover/progress:h-1.5 transition-all">
+              <div className="relative h-1.5 sm:h-1 w-full rounded-full bg-white/20 overflow-hidden group-hover/progress:h-1.5 transition-all">
                 <div
                   className="absolute h-full bg-gradient-to-r from-brand-blue to-brand-neon transition-all"
                   style={{ width: `${(currentTime / (duration || 1)) * 100}%` }}
@@ -567,26 +567,27 @@ export default function VideoPlayer({
               )}
             </div>
 
-            {/* Main Controls Row */}
-            <div className="flex items-center justify-between text-white">
-              <div className="flex items-center gap-4">
+            {/* Main Controls Row - touch-friendly on mobile */}
+            <div className="flex items-center justify-between text-white gap-2">
+              <div className="flex items-center gap-2 sm:gap-4 min-w-0">
                 <button
                   onClick={togglePlay}
-                  className="hover:text-brand-neon transition-colors"
+                  className="p-2 sm:p-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center hover:text-brand-neon transition-colors touch-manipulation"
+                  aria-label={isPlaying ? 'Pause' : 'Play'}
                 >
                   {isPlaying ? (
-                    <Pause className="h-6 w-6 fill-current" />
+                    <Pause className="h-6 w-6 sm:h-6 sm:w-6 fill-current shrink-0" />
                   ) : (
-                    <Play className="h-6 w-6 fill-current" />
+                    <Play className="h-6 w-6 sm:h-6 sm:w-6 fill-current shrink-0" />
                   )}
                 </button>
 
-                <div className="flex items-center gap-2 group/volume">
-                  <button onClick={toggleMute} className="hover:text-brand-blue transition-colors">
+                <div className="flex items-center gap-1 sm:gap-2 group/volume">
+                  <button onClick={toggleMute} className="p-2 sm:p-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center hover:text-brand-blue transition-colors touch-manipulation" aria-label={isMuted ? 'Unmute' : 'Mute'}>
                     {isMuted ? (
-                      <VolumeX className="h-5 w-5" />
+                      <VolumeX className="h-5 w-5 shrink-0" />
                     ) : (
-                      <Volume2 className="h-5 w-5" />
+                      <Volume2 className="h-5 w-5 shrink-0" />
                     )}
                   </button>
                   <input
@@ -600,14 +601,14 @@ export default function VideoPlayer({
                   />
                 </div>
 
-                <div className="text-sm font-medium tracking-wide">
+                <div className="text-xs sm:text-sm font-medium tracking-wide shrink-0 hidden sm:block">
                   <span className="text-white">{formatTime(currentTime)}</span>
                   <span className="text-white/50 mx-1">/</span>
                   <span className="text-white/70">{formatTime(duration)}</span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 sm:gap-2 shrink-0">
                 {/* Speed Toggle */}
                 <div className="relative" ref={speedMenuRef}>
                   <button
