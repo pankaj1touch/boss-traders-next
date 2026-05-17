@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAppSelector } from '@/store/hooks';
-import { BookOpen, BookText, LayoutDashboard, FileText, ShoppingBag, Image as ImageIcon, Video, Tag, Megaphone, Info, Share2 } from 'lucide-react';
+import { BookOpen, BookText, LayoutDashboard, FileText, ShoppingBag, Image as ImageIcon, Video, Tag, Megaphone, Info, Share2, User, Lock } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -46,6 +46,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin/coupons', icon: Tag, label: 'Coupons' },
     { href: '/admin/page-content', icon: Info, label: 'Page Content' },
     { href: '/admin/social-links', icon: Share2, label: 'Social Links' },
+    { href: '/account/profile', icon: User, label: 'Profile' },
+    { href: '/account/change-password', icon: Lock, label: 'Change password' },
   ];
 
   return (
@@ -87,8 +89,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           {/* User info */}
           <div className="border-t border-border p-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground font-semibold">
-                {user.name?.[0]?.toUpperCase()}
+              <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-primary text-primary-foreground">
+                {user.avatarUrl ? (
+                  <Image
+                    src={user.avatarUrl}
+                    alt={user.name ?? 'User'}
+                    fill
+                    className="object-cover"
+                    sizes="40px"
+                    unoptimized
+                  />
+                ) : (
+                  <span className="flex h-full w-full items-center justify-center font-semibold">
+                    {user.name?.[0]?.toUpperCase() ?? '?'}
+                  </span>
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">{user.name}</p>

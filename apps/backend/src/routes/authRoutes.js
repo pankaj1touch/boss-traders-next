@@ -12,6 +12,7 @@ const {
   forgotPasswordSchema,
   resetPasswordSchema,
   updateProfileSchema,
+  changePasswordSchema,
 } = require('../validators/authValidators');
 
 router.post('/signup', /* authLimiter, */ validate(signupSchema), authController.signup);
@@ -24,6 +25,7 @@ router.get('/validate-reset-token', authController.validateResetToken);
 router.post('/reset-password', /* authLimiter, */ validate(resetPasswordSchema), authController.resetPassword);
 router.get('/me', authenticate, authController.getProfile);
 router.patch('/me', authenticate, validate(updateProfileSchema), authController.updateProfile);
+router.post('/change-password', authenticate, validate(changePasswordSchema), authController.changePassword);
 
 module.exports = router;
 

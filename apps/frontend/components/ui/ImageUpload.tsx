@@ -13,7 +13,7 @@ interface ImageUploadProps {
   className?: string;
   error?: string;
   disabled?: boolean;
-  type?: 'blog' | 'courses' | 'ebooks';
+  type?: 'blog' | 'courses' | 'ebooks' | 'avatar';
 }
 
 const ImageUpload = ({

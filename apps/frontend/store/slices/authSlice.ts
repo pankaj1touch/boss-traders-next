@@ -5,6 +5,7 @@ interface User {
   name: string;
   email: string;
   roles: string[];
+  phone?: string;
   avatarUrl?: string;
 }
 
@@ -85,9 +86,15 @@ const authSlice = createSlice({
         }
       }
     },
+    updateUser: (state, action: PayloadAction<User>) => {
+      state.user = action.payload;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('user', JSON.stringify(action.payload));
+      }
+    },
   },
 });
 
-export const { setCredentials, updateAccessToken, logout, initializeAuth } = authSlice.actions;
+export const { setCredentials, updateAccessToken, logout, initializeAuth, updateUser } = authSlice.actions;
 export default authSlice.reducer;
 

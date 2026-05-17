@@ -17,6 +17,7 @@ export interface User {
   name: string;
   email: string;
   roles: string[];
+  phone?: string;
   avatarUrl?: string;
 }
 
@@ -89,6 +90,16 @@ export const authApi = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    changePassword: builder.mutation<
+      { message: string },
+      { currentPassword: string; newPassword: string }
+    >({
+      query: (data) => ({
+        url: '/auth/change-password',
+        method: 'POST',
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -102,5 +113,6 @@ export const {
   useUpdateProfileMutation,
   useRefreshTokenMutation,
   useLogoutMutation,
+  useChangePasswordMutation,
 } = authApi;
 

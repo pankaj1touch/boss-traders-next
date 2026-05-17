@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -16,6 +16,7 @@ import {
   LogOut,
   Settings,
   Phone,
+  Lock,
 } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { ContinuousBanner } from './ContinuousBanner';
@@ -28,12 +29,25 @@ import { useLogoutMutation } from '@/store/api/authApi';
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
   const cartItems = useAppSelector((state) => state.cart.items);
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => {
     setHydrated(true);
   }, []);
+
+  // Close user dropdown when clicking outside
+  useEffect(() => {
+    if (!userMenuOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [userMenuOpen]);
   const dispatch = useAppDispatch();
   const [logoutMutation] = useLogoutMutation();
 
@@ -147,13 +161,26 @@ export function Navbar() {
 
             {/* User Menu */}
             {isAuthenticated && user ? (
-              <div className="relative">
+              <div className="relative" ref={userMenuRef}>
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="flex items-center gap-2 rounded-2xl p-2 hover:bg-gray-100 dark:hover:bg-gray-800"
                 >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-600 text-sm font-semibold text-white">
-                    {user.name.charAt(0).toUpperCase()}
+                  <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full bg-primary-600">
+                    {user.avatarUrl ? (
+                      <Image
+                        src={user.avatarUrl}
+                        alt={user.name}
+                        fill
+                        className="object-cover"
+                        sizes="32px"
+                        unoptimized
+                      />
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center text-sm font-semibold text-white">
+                        {user.name?.charAt(0)?.toUpperCase() ?? '?'}
+                      </span>
+                    )}
                   </div>
                   <span className="hidden text-sm font-medium md:block">{user.name}</span>
                 </button>
@@ -219,6 +246,14 @@ export function Navbar() {
                       >
                         <Bell className="h-4 w-4" />
                         Notifications
+                      </Link>
+                      <Link
+                        href="/account/change-password"
+                        className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <Lock className="h-4 w-4" />
+                        Change password
                       </Link>
                       <hr className="my-2 border-gray-200 dark:border-gray-800" />
                       <button

@@ -260,6 +260,32 @@ exports.updateProfile = async (req, res, next) => {
   }
 };
 
+exports.changePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userWithPassword = await User.findById(req.user.id);
+    if (!userWithPassword) {
+      return res.status(401).json({ code: 'UNAUTHORIZED', message: 'User not found' });
+    }
+
+    const isValid = await userWithPassword.comparePassword(currentPassword);
+    if (!isValid) {
+      return res.status(400).json({
+        code: 'INVALID_PASSWORD',
+        message: 'Current password is incorrect',
+      });
+    }
+
+    userWithPassword.passwordHash = newPassword;
+    await userWithPassword.save();
+
+    logger.info(`Password changed for user: ${userWithPassword.email}`);
+
+    res.json({ message: 'Password changed successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
 
 exports.validateResetToken = async (req, res, next) => {
   try {

@@ -35,6 +35,11 @@ const updateProfileSchema = Joi.object({
   avatarUrl: Joi.string().uri().optional(),
 });
 
+const changePasswordSchema = Joi.object({
+  currentPassword: Joi.string().required(),
+  newPassword: Joi.string().min(8).required(),
+});
+
 module.exports = {
   signupSchema,
   loginSchema,
@@ -43,5 +48,6 @@ module.exports = {
   forgotPasswordSchema,
   resetPasswordSchema,
   updateProfileSchema,
+  changePasswordSchema,
 };
 

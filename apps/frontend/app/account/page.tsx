@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { User, ShoppingBag, Bell, Settings, BookOpen, Video } from 'lucide-react';
+import { User, ShoppingBag, Bell, BookOpen, Video, Lock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
@@ -58,6 +58,14 @@ export default function AccountPage() {
       href: '/account/notifications',
       color: 'text-orange-600',
       bg: 'bg-orange-50 dark:bg-orange-950',
+    },
+    {
+      icon: Lock,
+      title: 'Change password',
+      description: 'Update your account password',
+      href: '/account/change-password',
+      color: 'text-amber-600',
+      bg: 'bg-amber-50 dark:bg-amber-950',
     },
   ];
 
