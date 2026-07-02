@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, BookOpen, Users, Award, TrendingUp, AlertCircle, Newspaper, LineChart, BarChart3, DollarSign, Target, Zap, Calendar, Clock, MapPin, User, Video } from 'lucide-react';
+import { ArrowRight, BookOpen, Users, Award, TrendingUp, AlertCircle, Newspaper, LineChart, DollarSign, Target, Calendar, Clock, MapPin, User, Video, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { CourseCard } from '@/components/CourseCard';
@@ -75,6 +75,11 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, [banners.length]);
 
+  const goToPrevBanner = () =>
+    setCurrentBannerIndex((prev) => (prev - 1 + banners.length) % banners.length);
+  const goToNextBanner = () =>
+    setCurrentBannerIndex((prev) => (prev + 1) % banners.length);
+
   const features = [
     {
       icon: LineChart,
@@ -122,163 +127,95 @@ export default function HomePage() {
         <AnnouncementBanner priority="high" maxAnnouncements={1} />
       )}
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-brand-dark py-14 sm:py-20 lg:py-32">
-        {/* Mesh Gradient Background */}
-        <div className="absolute inset-0 bg-mesh-gradient opacity-20" />
-        <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-5" />
-
-        {/* Floating Elements */}
-        <div className="absolute -left-20 top-20 h-72 w-72 rounded-full bg-brand-purple/30 blur-[100px] animate-pulse-slow" />
-        <div className="absolute -right-20 bottom-20 h-72 w-72 rounded-full bg-brand-blue/30 blur-[100px] animate-pulse-slow lg:delay-1000" />
-
-        <div className="container-custom relative z-10">
-          <div className="grid gap-10 sm:gap-12 lg:grid-cols-2 lg:items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-            >
+      {/* Hero Section - Full-screen Banner Slider (images only, dynamic from API) */}
+      <section className="relative overflow-hidden bg-brand-dark">
+        {/* Full-screen Banner Carousel - dynamic data from API only */}
+        {bannersLoading ? (
+          <div className="h-[70vh] min-h-[360px] w-full animate-pulse bg-white/5 sm:h-[85vh]" />
+        ) : banners.length > 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+            className="group relative w-full"
+          >
+            <div className="relative h-[70vh] min-h-[360px] w-full overflow-hidden sm:h-[85vh]">
               <AnimatePresence mode="wait">
-                {bannersLoading ? (
-                  <div className="flex h-[260px] sm:h-[400px] items-center justify-center">
-                    <div className="h-12 w-12 animate-spin rounded-full border-4 border-solid border-brand-accent border-r-transparent"></div>
-                  </div>
-                ) : (
-                  <motion.div
-                    key={currentBannerIndex}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    {/* Premium Badge */}
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.5 }}
-                      className="mb-6 sm:mb-8 inline-flex items-center gap-2 rounded-full border border-brand-gold/30 bg-brand-gold/10 px-3 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm font-semibold text-brand-gold backdrop-blur-sm"
-                    >
-                      <Zap className="h-4 w-4" />
-                      <span className="tracking-wide uppercase">Elite Investor Class</span>
-                    </motion.div>
-
-                    {/* Headline */}
-                    <h1 className="mb-5 sm:mb-6 text-4xl sm:text-5xl font-bold leading-tight tracking-tight text-white lg:text-7xl">
-                      Master the <br />
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue via-brand-purple to-brand-neon animate-gradient-x">
-                        Market Moves
-                      </span>
-                    </h1>
-
-                    {/* Description */}
-                    <p className="mb-6 sm:mb-8 text-base sm:text-lg text-gray-400 lg:text-xl lg:leading-relaxed max-w-lg">
-                      {banners[currentBannerIndex]?.description ||
-                        'Join the elite community of traders. Master technical analysis, psychology, and risk management with our institutional-grade curriculum.'}
-                    </p>
-
-                    {/* CTA Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-4">
-                      <Link href="/courses">
-                        <Button size="lg" className="w-full sm:w-auto h-12 sm:h-14 px-6 sm:px-8 text-base sm:text-lg bg-gradient-to-r from-brand-blue to-brand-purple hover:from-brand-blue/90 hover:to-brand-purple/90 shadow-neon border-0 rounded-xl transition-all hover:scale-105">
-                          Explore Courses
-                          <ArrowRight className="ml-2 h-5 w-5" />
-                        </Button>
-                      </Link>
-                      <Link href="/auth/signup">
-                        <Button size="lg" variant="outline" className="w-full sm:w-auto h-12 sm:h-14 px-6 sm:px-8 text-base sm:text-lg border-white/20 text-white hover:bg-white/10 hover:border-white/40 rounded-xl backdrop-blur-sm">
-                          Start Free Trial
-                        </Button>
-                      </Link>
-                    </div>
-
-                    {/* Trust Indicators */}
-                    <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 text-gray-500">
-                      <div className="flex -space-x-3 sm:-space-x-4">
-                        {[1, 2, 3, 4].map((i) => (
-                          <div key={i} className="h-9 w-9 sm:h-10 sm:w-10 rounded-full border-2 border-brand-dark bg-gray-800" />
-                        ))}
-                      </div>
-                      <div className="text-xs sm:text-sm">
-                        <span className="block font-bold text-white text-sm sm:text-base">10,000+ Traders</span>
-                        Trusted by industry leaders
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-
-            {/* Right Side - 3D Floating Glass Card */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8, rotateY: -20 }}
-              animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-              transition={{ duration: 1, delay: 0.2 }}
-              className="relative hidden lg:block perspective-1000"
-            >
-              <div className="relative z-10 animate-float">
-                {/* Main Glass Card */}
-                <div className="glass-panel p-6 rounded-3xl border border-white/10 shadow-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-2xl">
-                  {banners.length > 0 && banners[currentBannerIndex]?.imageUrl ? (
-                    <div className="relative h-[400px] w-full rounded-2xl overflow-hidden shadow-inner">
+                <motion.div
+                  key={`banner-${currentBannerIndex}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="absolute inset-0"
+                >
+                  {banners[currentBannerIndex]?.imageUrl && (
+                    <>
+                      {/* Blurred backdrop fills the sides so the full image can show without empty gaps */}
                       <Image
                         src={banners[currentBannerIndex].imageUrl}
-                        alt="Trading Dashboard"
+                        alt=""
+                        aria-hidden
                         fill
-                        className="object-cover"
+                        sizes="100vw"
+                        className="scale-110 object-cover opacity-40 blur-2xl"
                       />
-                      {/* Overlay Gradient */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/80 to-transparent" />
-                    </div>
-                  ) : (
-                    <div className="h-[400px] w-full rounded-2xl bg-brand-navy border border-white/5 flex items-center justify-center relative overflow-hidden">
-                      {/* Abstract Chart UI */}
-                      <div className="absolute inset-0 flex items-end justify-between px-8 pb-8 gap-2 opacity-50">
-                        {[40, 60, 45, 70, 50, 80, 65, 90].map((h, i) => (
-                          <motion.div
-                            key={i}
-                            initial={{ height: 0 }}
-                            animate={{ height: `${h}%` }}
-                            transition={{ duration: 1, delay: i * 0.1 }}
-                            className="w-8 rounded-t-sm bg-gradient-to-t from-brand-blue to-brand-neon/50"
-                          />
-                        ))}
-                      </div>
-                    </div>
+                      <div className="absolute inset-0 bg-brand-dark/50" />
+                      {/* Full image - never cropped */}
+                      <Image
+                        src={banners[currentBannerIndex].imageUrl}
+                        alt={banners[currentBannerIndex]?.title || 'Boss Traders banner'}
+                        fill
+                        sizes="100vw"
+                        className="object-contain"
+                        priority={currentBannerIndex === 0}
+                      />
+                    </>
                   )}
+                </motion.div>
+              </AnimatePresence>
 
-                  {/* Floating Stats Cards around the main card */}
-                  <motion.div
-                    animate={{ y: [0, -10, 0] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute -right-8 -top-8 glass-card p-4 rounded-2xl border-l-4 border-l-brand-gold bg-brand-navy/90"
+              {/* Navigation Arrows */}
+              {banners.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={goToPrevBanner}
+                    aria-label="Previous banner"
+                    className="absolute left-3 top-1/2 z-10 -translate-y-1/2 rounded-full border border-white/10 bg-brand-dark/50 p-2 text-white opacity-70 backdrop-blur-sm transition-all hover:bg-brand-dark/90 hover:opacity-100 sm:left-6 sm:p-3"
                   >
-                    <div className="text-xs text-gray-400">Total Profit</div>
-                    <div className="text-xl font-bold text-white flex items-center gap-2">
-                      +$12,450
-                      <TrendingUp className="h-4 w-4 text-brand-gold" />
-                    </div>
-                  </motion.div>
+                    <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={goToNextBanner}
+                    aria-label="Next banner"
+                    className="absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full border border-white/10 bg-brand-dark/50 p-2 text-white opacity-70 backdrop-blur-sm transition-all hover:bg-brand-dark/90 hover:opacity-100 sm:right-6 sm:p-3"
+                  >
+                    <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
+                  </button>
+                </>
+              )}
 
-                  <motion.div
-                    animate={{ y: [0, 10, 0] }}
-                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                    className="absolute -left-8 -bottom-8 glass-card p-4 rounded-2xl border-l-4 border-l-brand-neon bg-brand-navy/90"
-                  >
-                    <div className="text-xs text-gray-400">Active Students</div>
-                    <div className="text-xl font-bold text-white flex items-center gap-2">
-                      2,543
-                      <Users className="h-4 w-4 text-brand-neon" />
-                    </div>
-                  </motion.div>
+              {/* Dots */}
+              {banners.length > 1 && (
+                <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2">
+                  {banners.map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      aria-label={`Show banner ${i + 1}`}
+                      onClick={() => setCurrentBannerIndex(i)}
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        i === currentBannerIndex ? 'w-8 bg-brand-neon' : 'w-2 bg-white/40 hover:bg-white/70'
+                      }`}
+                    />
+                  ))}
                 </div>
-              </div>
-
-              {/* Back Glow */}
-              <div className="absolute inset-0 -z-10 bg-gradient-to-br from-brand-blue to-brand-purple blur-[80px] opacity-40 rounded-full" />
-            </motion.div>
-          </div>
-        </div>
+              )}
+            </div>
+          </motion.div>
+        ) : null}
       </section>
 
       {/* Announcements Section */}

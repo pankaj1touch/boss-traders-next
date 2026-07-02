@@ -1,5 +1,5 @@
-const CACHE_NAME = 'boss-traders-v1';
-const RUNTIME_CACHE = 'boss-traders-runtime-v1';
+const CACHE_NAME = 'boss-traders-v2';
+const RUNTIME_CACHE = 'boss-traders-runtime-v2';
 
 // Assets to cache on install
 const PRECACHE_ASSETS = [
@@ -45,6 +45,24 @@ self.addEventListener('fetch', (event) => {
 
   // Skip cross-origin requests
   if (!event.request.url.startsWith(self.location.origin)) {
+    return;
+  }
+
+  // Network-first for page navigations / documents so the latest HTML is always served.
+  if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const responseToCache = response.clone();
+          caches.open(RUNTIME_CACHE).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+          return response;
+        })
+        .catch(() =>
+          caches.match(event.request).then((cached) => cached || caches.match('/offline'))
+        )
+    );
     return;
   }
 
