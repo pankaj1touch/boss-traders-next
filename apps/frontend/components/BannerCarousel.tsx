@@ -38,7 +38,7 @@ export function BannerCarousel() {
 
   if (isLoading) {
     return (
-      <div className="relative h-[500px] w-full bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="relative h-[240px] w-full bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 sm:h-[360px] lg:h-[500px]">
         <div className="container-custom flex h-full items-center justify-center">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
         </div>
@@ -54,7 +54,7 @@ export function BannerCarousel() {
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <div className="relative h-[500px] w-full">
+      <div className="relative h-[240px] w-full sm:h-[360px] lg:h-[500px]">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
@@ -82,12 +82,12 @@ export function BannerCarousel() {
 
             {/* Content */}
             <div className="container-custom relative z-10 flex h-full items-center">
-              <div className="max-w-2xl space-y-6 text-white">
+              <div className="max-w-2xl space-y-3 text-white sm:space-y-5 lg:space-y-6">
                 <motion.h1
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
-                  className="text-4xl font-bold leading-tight md:text-5xl lg:text-6xl"
+                  className="text-2xl font-bold leading-tight sm:text-4xl md:text-5xl lg:text-6xl"
                 >
                   {currentBanner.title}
                 </motion.h1>
@@ -95,7 +95,7 @@ export function BannerCarousel() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="text-lg text-white/90 md:text-xl"
+                  className="line-clamp-2 text-sm text-white/90 sm:line-clamp-none sm:text-lg md:text-xl"
                 >
                   {currentBanner.description}
                 </motion.p>
@@ -104,7 +104,7 @@ export function BannerCarousel() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
                 >
-                  <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100">
+                  <Button size="sm" className="bg-white text-gray-900 hover:bg-gray-100 sm:h-11 sm:px-8 sm:text-base">
                     Learn More
                   </Button>
                 </motion.div>
