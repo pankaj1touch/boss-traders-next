@@ -168,12 +168,15 @@ export default function BlogPostPage() {
                 transition={{ delay: 0.2 }}
                 className="mb-8"
               >
-                <div className="relative h-64 overflow-hidden rounded-2xl lg:h-96">
+                <div className="relative w-full overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-800">
                   <Image
                     src={blog.featuredImage}
                     alt={blog.title}
-                    fill
-                    className="object-cover"
+                    width={1600}
+                    height={900}
+                    className="h-auto w-full object-contain"
+                    sizes="(min-width: 1024px) 896px, 100vw"
+                    priority
                   />
                 </div>
               </motion.div>
